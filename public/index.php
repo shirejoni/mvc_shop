@@ -1,12 +1,10 @@
 <?php
-/**
- * Created by PhpStorm.
- * User: Shirejoni
- * Date: 3/18/2019
- * Time: 7:02 PM
- */
 
-echo "Hello World!";
+define("DS", DIRECTORY_SEPARATOR);
+define("ROOT_PATH", dirname(__DIR__));
+define("APP_PATH", ROOT_PATH . DS . 'application');
 
-echo "<br>";
-var_dump($_GET);
+require_once APP_PATH . DS . 'config/constants.php';
+require_once ROOT_PATH . DS . 'vendor/autoload.php';
+
+$application = new \App\System\Application();
