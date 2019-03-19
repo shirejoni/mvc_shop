@@ -15,10 +15,22 @@ class Action
     private $route;
     private $status = false;
 
-    public function __construct($route)
+    public function __construct($route, $preRoute = false)
     {
-        $this->controller_path = CONTROLLER_PATH;
-        $this->controller_namespace = CONTROLLER_NAMESPACE;
+        switch ($preRoute) {
+            case "web" :
+                $this->controller_path = WEB_PATH . DS . 'controllers';
+                $this->controller_namespace = "App\\Web\\Controller";
+                break;
+            case "admin":
+                $this->controller_path = ADMIN_PATH . DS . 'controllers';
+                $this->controller_namespace = "App\\Admin\\Controller";
+                break;
+            default:
+                $this->controller_path = CONTROLLER_PATH;
+                $this->controller_namespace = CONTROLLER_NAMESPACE;
+        }
+
 
         $parts = explode("/", $route);
         while ($parts) {
@@ -38,7 +50,7 @@ class Action
 
     }
 
-    public function execute($registry) {
+    public function execute($registry, $option = array()) {
         if(substr($this->method, 0, 2) == "__") {
             throw new \Exception("Calling Magic Method is not Allowed");
         }
@@ -53,6 +65,13 @@ class Action
             if(method_exists($class, $this->method)) {
                 return call_user_func_array([$class, $this->method], []);
             }else {
+                if(!empty($option['error_route'])) {
+                    $errorPreRoute = !empty($option['error_pre_route']) ? $option['error_pre_route'] : false;
+                    $this->__construct($option['error_route'], $errorPreRoute);
+                    if($this->isStatus()) {
+                        return $this->execute($registry);
+                    }
+                }
                 throw new \Exception("No such Method found in controller {$this->route} : {$this->method}");
             }
         }else {
@@ -60,6 +79,14 @@ class Action
         }
 
 
+    }
+
+    /**
+     * @return bool
+     */
+    public function isStatus(): bool
+    {
+        return $this->status;
     }
 
 

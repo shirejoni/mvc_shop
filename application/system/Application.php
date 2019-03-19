@@ -2,6 +2,7 @@
 
 namespace App\System;
 
+use App\lib\Action;
 use App\Lib\Registry;
 use App\lib\Router;
 
@@ -26,6 +27,7 @@ class Application {
 
         $Router = new Router($this->registry);
         $this->registry->Router = $Router;
+
 
         $Router->dispatch();
     }
