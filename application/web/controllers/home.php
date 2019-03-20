@@ -2,15 +2,16 @@
 
 namespace App\Web\Controller;
 
+use App\lib\Response;
 use App\system\Controller;
 
+/**
+ * @property Response Response
+ */
 class ControllerHome extends Controller {
 
     public function index() {
-        $data = array(
-            'URL'   => URL,
-        );
-        echo $this->render('home/index', $data);
+        $this->Response->setOutPut($this->render("home/index"));
     }
 
     public function about() {
