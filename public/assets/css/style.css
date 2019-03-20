@@ -1,0 +1,558 @@
+* {
+    margin: 0;
+    padding: 0;
+    direction: rtl;
+}
+a {
+    text-decoration: none;
+}
+/* Fonts */
+@font-face {
+    font-family: 'Maven Pro';
+    src: url('../fonts/MavenPro-Medium.eot');
+    src: url('../fonts/MavenPro-Medium.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/MavenPro-Medium.woff2') format('woff2'),
+    url('../fonts/MavenPro-Medium.woff') format('woff');
+    url('../fonts/MavenPro-Medium.ttf') format('truetype');
+    font-weight: 500;
+    font-style: normal;
+}
+@font-face {
+    font-family: 'Maven Pro';
+    src: url('../fonts/MavenPro-Bold.eot');
+    src: url('../fonts/MavenPro-Bold.eot?#iefix') format('embedded-opentype'),
+    url('../fonts/MavenPro-Bold.woff2') format('woff2'),
+    url('../fonts/MavenPro-Bold.woff') format('woff'),
+    url('../fonts/MavenPro-Bold.ttf') format('truetype');
+    font-weight: bold;
+    font-style: normal;
+}
+@font-face {
+    font-family:'yekan';
+    src:url('../fonts/web_Yekan.woff');
+    src:url('../fonts/web_Yekan.eot') format("embedded-opentype"),
+    url('../fonts/web_Yekan.woff') format("woff"),
+    url('../fonts/web_Yekan.ttf') format("truetype");
+    font-weight:normal;
+    font-style:normal
+}
+
+/* General */
+#main {
+    width: 100%;
+    margin: 0 auto;
+    box-sizing: border-box;
+}
+.bigWrap {
+    width: 1250px;
+    margin: 0 auto;
+}
+.clearfix::after {
+    content: "";
+    clear: both;
+    display: table;
+}
+
+#nav-top {
+    width: 100%;
+    height: 40px;
+    background-color: #f5f5f5;
+    margin: 0 auto;
+    border-bottom: 1px solid #e1e7ec;
+}
+#nav-top #contact {
+    float: right;
+}
+
+#nav-top #contact span {
+    font: 12px "Maven Pro";
+    color: #606975;
+    line-height: 40px;
+    margin: 0 15px;
+    display: inline-block;
+}
+#nav-top #contact i {
+    display: inline-block;
+    float: right;
+    line-height: 40px;
+    font-size: 15px;
+    margin: 0 10px;
+}
+#nav-top #account {
+    float: left;
+    color: #606975;
+
+}
+#nav-top #account a {
+    display: inline-block;
+    font: 12px yekan;
+    color: #606975;
+    line-height: 40px;
+    margin: 0 5px;
+}
+#nav-top #account #language {
+    color: black;
+}
+header {
+    width: 100%;
+    height: 80px;
+    background-color: white;
+    border-bottom: 1px solid #e1e7ec;
+    z-index: 100;
+}
+header #category {
+    width: 10%;
+    float: right;
+    position: relative;
+    z-index: 100;
+}
+header #category > a {
+    font: 15px yekan;
+    color: #374250;
+    line-height: 80px;
+}
+header #category > a > i {
+    display: block;
+    float: right;
+    font-size: 29px;
+    margin: 25px 10px;
+}
+header #logo {
+    float: right;
+    width: 65%;
+    box-sizing: border-box;
+    padding: 23px;
+    text-align: center;
+}
+header #cart-search {
+    width: 25%;
+    float: right;
+    text-align: left;
+}
+header #cart-search .search {
+    width: 250px;
+    float: right;
+    height: 100%;
+    background-color: #428CC6;
+    position: relative;
+}
+header #cart-search .search #search-field {
+    width: 0;
+    height: 40px;
+    position: absolute;
+    top: 20px;
+    left: 0;
+    background-color: white;
+    box-shadow: 0px 4px 8px rgba(72,72,72,0.1);
+    overflow: hidden;
+}
+header #cart-search .search #search-field input {
+    width: 100%;
+    height: 100%;
+    display: block;
+    border: 0;
+    box-sizing: border-box;
+    padding: 0 5px 0 40px;
+    font: 12px yekan;
+    color: #444444;
+    line-height: 40px;
+
+}
+header #cart-search .search > i {
+    display: block;
+    position: absolute;
+    top: 20px;
+    left: 0;
+    font-size: 22px;
+    color: #444444;
+    width: 40px;
+    height: 40px;
+    text-align: center;
+    line-height: 40px;
+    cursor: text;
+}
+
+header #cart-search .shopping {
+    width: 50px;
+    float: left;
+    height: 100%;
+    font-size: 22px;
+    color: #444444;
+    line-height: 80px;
+    text-align: center;
+}
+#amazing-offer {
+    width: 100%;
+    padding: 80px 0;
+    box-sizing: border-box;
+}
+#amazing-offer-box {
+    width: 370px;
+    height: 350px;
+    float: left;
+    border-radius: 10px;
+    background-color: #f5f5f5;
+    text-align: center;
+}
+#amazing-offer #amazing-offer-box > span {
+    font: 19px yekan;
+    color: #374250;
+    margin-top: 50px;
+    display: inline-block;
+}
+#amazing-offer #amazing-offer-box > h2 {
+    font: 40PX "Maven Pro";
+    color: #374250;
+    font-weight: bold;
+    line-height: 80px;
+}
+#amazing-offer-box .counter  span {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    border: 1px solid #e1e7ec;
+    font: 14px "Maven Pro";
+    font-weight: bold;
+    text-align: center;
+    line-height: 40px;
+    color: #374250;
+}
+
+#amazing-offer-box .counter-text  span {
+    display: inline-block;
+    width: 40px;
+    height: 40px;
+    margin: 0 3px;
+    font: 14px yekan;
+    text-align: center;
+    line-height: 40px;
+    color: #374250;
+}
+#amazing-offer-box > i {
+    font-size: 25px;
+    color: #374250;
+    line-height: 80px;
+}
+#amazing-offer .product-row {
+    float: right;
+}
+.product {
+    width: 250px;
+    height: 350px;
+    margin: 0 30px;
+    float: right;
+}
+#amazing-offer .product {
+    margin: 0 20px;
+}
+.product .product-img {
+    width: 250px;
+    height: 250px;
+}
+.product-img img {
+    width: 100%;
+    height: 100%;
+}
+.product .product-price {
+    width: 100%;
+    height: 30px;
+    text-align: center;
+    line-height: 30px;
+    position: relative;
+}
+.product-price .price {
+    font: 14px "Maven Pro";
+    font-weight: bold;
+    color: #374250;
+}
+.product-price .toman {
+    font:   10px yekan;
+    color: #374250;
+}
+.product-price .old {
+    color: #9da9b9;
+    text-decoration: line-through;
+}
+.product-price .new {
+    position: absolute;
+    top: -10px;
+}
+.product .product-title {
+    font: 14px yekan;
+    color: #374250;
+    margin-top: 10px;
+    text-align: center;
+}
+.product-box {
+    width: 100%;
+    padding: 40px 0;
+    box-sizing: border-box;
+}
+.product-box .product-box-title {
+    text-align: center;
+    font: 22px yekan;
+    color: #374250;
+}
+footer {
+    width: 100%;
+    height: 300px;
+    background-color: #f5f5f5;
+}
+footer #about-us {
+    float: right;
+    width: 400px;
+    box-sizing: border-box;
+    padding: 80px 30px 0 30px;
+}
+footer #about-us div {
+    text-align: center;
+}
+footer #about-us p {
+    font: 12px yekan;
+    color: #444444;
+    margin-top: 10px;
+}
+footer #newsletter-box {
+    width: 400px;
+    float: right;
+    box-sizing: border-box;
+    padding: 80px 30px 0 30px;
+}
+footer #newsletter-box h2 {
+    font: 20px yekan;
+    color: #444444;
+    text-align: center;
+}
+footer #newsletter-box p {
+    text-align: center;
+    font: 12px yekan;
+    color: #999999;
+    line-height: 50px;
+}
+footer #newsletter-box #newsletter-input {
+    width: 370px;
+    height: 40px;
+    background-color: white;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 0 auto;
+    position: relative;
+}
+footer #newsletter-input input {
+    width: 100%;
+    height: 40px;
+    box-sizing: border-box;
+    padding: 0 10px 0 50px;
+    font: 16px yekan;
+    line-height: 40px;
+    border: 0;
+}
+footer #newsletter-input i {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    display: inline-block;
+    font-size: 20px;
+    line-height: 40px;
+    text-align: center;
+}
+footer #social-box {
+    width: 400px;
+    box-sizing: border-box;
+    padding: 80px 30px 0 30px;
+    margin-right: 30px;
+    text-align: center;
+    float: right;
+}
+footer #social-box h2 {
+    font: 20px yekan;
+    color: #444444;
+}
+footer #social-box .social-icon i {
+    font-size: 30px;
+    color: #444444;
+    display: inline-block;
+    margin: 0 5px;
+    line-height: 90px;
+}
+footer #social-box .copy-right {
+    text-align: center;
+    font: 16px "Maven Pro";
+    color: #444444;
+}
+#category #category-box {
+    display: none;
+    width: 900px;
+    height: 400px;
+    background-color: white;
+    position: absolute;
+    top: 80px;
+    right: 0;
+    box-shadow: 0 -1px 10px rgba(0,0,0,0.1);
+}
+#category-box #main-category {
+    width: 200px;
+    height: 100%;
+    display: block;
+    float: right;
+    border-left: 1px solid rgba(0,0,0,0.1);
+    list-style: none;
+    position: relative;
+}
+#category-box #main-category > li {
+    width: 100%;
+    height: 40px;
+    display: block;
+
+}
+#category-box #main-category > li > a {
+    width: 100%;
+    height: 100%;
+    display: block;
+    font: 13px yekan;
+    color: #9da9b9;
+    line-height: 40px;
+    padding-right: 20px;
+    box-sizing: border-box;
+}
+#category #main-category > li > a > i {
+    display: block;
+    width: 40px;
+    height: 40px;
+    float: left;
+    line-height: 40px;
+    text-align: center;
+}
+#category #main-category > li > a:hover {
+    color: #444444;
+}
+#category-box #category-ads {
+    width: 300px;
+    height: 400px;
+    float: left;
+}
+#category-box #category-ads img {
+    width: 100%;
+    height: 100%;
+}
+#category-box .sub-category-box {
+    display: none;
+    width: 400px;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    right: 200px;
+}
+#category-box .sub-category-box .column {
+    width: 200px;
+    height: 100%;
+    border-left: 1px solid rgba(0,0,0,0.1);
+    float: right;
+    box-sizing: border-box;
+}
+#category-box .sub-category-box .column ul {
+    list-style: none;
+    width: 100%;
+    height: 100%;
+}
+#category-box .sub-category-box .column ul li {
+    width: 100%;
+    height: 25px;
+    box-sizing: border-box;
+    padding-right: 25px;
+}
+#category-box .sub-category-box .column ul li a {
+    font: 11px yekan;
+    color: #9da9b9;
+    line-height: 25px;
+}
+#category-box .sub-category-box .column ul li.title {
+    height: 30px;
+    padding-right: 20px;
+}
+#category-box .sub-category-box .column ul li.title a {
+    font: 12px yekan;
+    color: #444444;
+    line-height: 30px;
+
+}
+#category-box .sub-category-box .column ul li a:hover {
+    color: #dc9715;
+}
+#category-box #main-category > li.active .sub-category-box {
+    display: block;
+}
+
+#slider {
+    width: 100%;
+    height: 575px;
+    background-color: #606975;
+    overflow: hidden;
+    position: relative;
+}
+.slider-box .slider {
+    position: absolute;
+    top: 0;
+    left: 0;
+    transition: left 0.5s;
+    width: 100%;
+    height: 100%;
+    background-color: aliceblue;
+    z-index: 10;
+}
+
+.slider-box .slide {
+    width: 100%;
+    height: 100%;
+    background-color: #428CC6;
+    position: absolute;
+    top: 0;
+    left: 0;
+    font: 50px Vazir;
+    font-weight: bold;
+    text-align: center;
+    line-height: 340px;
+}
+.slider-box .slide:first-child {
+    z-index: 5;
+}
+.slider-box .slide img {
+    width: 100%;
+    height: 100%;
+    z-index: -1;
+}
+.slider-box .left-icon {
+    position: absolute;
+    top: 50%;
+    width: 50px;
+    height: 50px;
+    transform: translateY(-25px);
+    background: url("../img/left-icon.png") no-repeat;
+    background-size: cover;
+    left: 25px;
+    z-index: 50;
+    cursor: pointer;
+
+}
+
+.slider-box .right-icon {
+    position: absolute;
+    top: 50%;
+    width: 50px;
+    height: 50px;
+    transform: translateY(-25px);
+    background: url("../img/right-icon.png") no-repeat;
+    background-size: cover;
+    right: 25px;
+    z-index: 50;
+    cursor: pointer;
+}
+
+
+
+
+
+

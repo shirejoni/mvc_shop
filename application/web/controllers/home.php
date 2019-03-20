@@ -7,8 +7,10 @@ use App\system\Controller;
 class ControllerHome extends Controller {
 
     public function index() {
-        $name = "Hossein";
-        echo $this->render('home/index', ["Name"    => $name]);
+        $data = array(
+            'URL'   => URL,
+        );
+        echo $this->render('home/index', $data);
     }
 
     public function about() {

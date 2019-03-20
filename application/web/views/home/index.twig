@@ -1,1 +1,411 @@
-<h1>Hello {{ Name }}</h1>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>فروشگاه من</title>
+    <link rel="stylesheet" href="{{ URL }}assets/css/fontawesome-all.min.css">
+    <link rel="stylesheet" href="{{ URL }}assets/css/style.css">
+</head>
+<body>
+<div id="main">
+    <nav id="nav-top">
+
+        <div class="bigWrap">
+            <!-- Contact Info-->
+            <div id="contact">
+                    <span>
+                        <i class="fa fa-envelope"></i>
+                        admin@admin.com
+                    </span>
+                <span style="direction: ltr">
+                        <i class="fa fa-phone"></i>
+                        +989131111111
+                    </span>
+            </div>
+            <div id="account">
+                <a href="#">ورود</a>
+                |
+                <a href="#">ثبت نام</a>
+                |
+                <a href="#" id="language">
+                    فارسی
+                    <i class="fa fa-caret-down"></i>
+                </a>
+            </div>
+        </div>
+    </nav>
+    <header class="clearfix">
+        <div class="bigWrap">
+            <div id="category">
+                <a href="#">
+                    <i class="fa fa-bars"></i>
+                    موضوعات
+                </a>
+                <div id="category-box">
+                    <ul id="main-category">
+                        <li class="active">
+                            <a href="#">
+                                مردانه
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                            <div class="sub-category-box">
+                                <div class="column">
+                                    <ul>
+                                        <li class="title"><a href="#">    تیشرت</a></li>
+                                        <li class="title"><a href="#">    پیراهن</a></li>
+                                        <li><a href="#">    پیراهن استین بلند</a></li>
+                                        <li><a href="#">    پیراهن استین کوتاه</a></li>
+                                        <li class="title"><a href="#">    شلوار</a></li>
+                                        <li><a href="#">    شلوار جین</a></li>
+                                        <li><a href="#">    شلوار کتان</a></li>
+                                        <li><a href="#">    شلوار رسمی</a></li>
+                                        <li class="title"><a href="#">    شلوارک</a></li>
+                                        <li><a href="#">    پیراهن استین کوتاه</a></li>
+                                        <li class="title"><a href="#">    شلوار</a></li>
+                                        <li><a href="#">    شلوار جین</a></li>
+                                        <li><a href="#">    شلوار کتان</a></li>
+                                    </ul>
+
+                                </div>
+                                <div class="column">
+                                    <ul>
+                                        <li class="title"><a href="#">    تیشرت</a></li>
+                                        <li class="title"><a href="#">    پیراهن</a></li>
+                                        <li><a href="#">    پیراهن استین بلند</a></li>
+                                        <li><a href="#">    پیراهن استین کوتاه</a></li>
+                                        <li class="title"><a href="#">    شلوار</a></li>
+                                        <li><a href="#">    شلوار جین</a></li>
+                                        <li><a href="#">    شلوار کتان</a></li>
+                                        <li><a href="#">    شلوار رسمی</a></li>
+                                        <li class="title"><a href="#">    شلوارک</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <a href="#">
+                                زنانه
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                            <div class="sub-category-box">
+                                <div class="column">
+                                    <ul>
+                                        <li><a href="#">    مانتو</a></li>
+                                        <li><a href="#">    مانتو مجلسی</a></li>
+                                        <li class="title"><a href="#">    تاپ و تیشرت</a></li>
+                                        <li><a href="#">    تاپ</a></li>
+                                        <li><a href="#">    تیشرت</a></li>
+                                        <li><a href="#">    پولوشرت</a></li>
+                                        <li class="title"><a href="#">    شال و روسری</a></li>
+                                        <li><a href="#">    پیراهن استین کوتاه</a></li>
+                                        <li class="title"><a href="#">    شلوار</a></li>
+                                        <li><a href="#">    شلوار جین</a></li>
+                                        <li><a href="#">    شلوار کتان</a></li>
+                                    </ul>
+
+                                </div>
+                                <div class="column">
+                                    <ul>
+                                        <li class="title"><a href="#">    تیشرت</a></li>
+                                        <li class="title"><a href="#">    پیراهن</a></li>
+                                        <li><a href="#">    پیراهن استین بلند</a></li>
+                                        <li><a href="#">    پیراهن استین کوتاه</a></li>
+                                        <li class="title"><a href="#">    شلوار</a></li>
+                                        <li><a href="#">    شلوار جین</a></li>
+                                        <li><a href="#">    شلوار کتان</a></li>
+                                        <li><a href="#">    شلوار رسمی</a></li>
+                                        <li class="title"><a href="#">    شلوارک</a></li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </li>
+                        <li>
+                            <a href="#">
+                                کالای دیجیتال
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#">
+                                لوازم خانگی
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                        </li>
+                    </ul>
+                    <div id="category-ads">
+                        <img src="{{ URL }}assets/img/ads/ads.png" alt="Category Ads">
+                    </div>
+                    <div class="clear"></div>
+                </div>
+            </div>
+            <div id="logo">
+                <img src="{{ URL }}assets/img/logo.png" alt="Site Logo">
+            </div>
+            <div id="cart-search">
+                <div class="search">
+                    <div id="search-field">
+                        <input type="text" placeholder="جستجو...">
+                    </div>
+                    <i class="fa fa-search"></i>
+                </div>
+                <div class="shopping">
+                    <i class="fa fa-shopping-cart"></i>
+                </div>
+                <div class="clear"></div>
+            </div>
+        </div>
+
+    </header>
+    <div id="slider" class="slider-box">
+        <div class="slider" style="left: 0%;">
+            <div class="slide" style="background-color: rgb(215, 161, 81); left: 0%;">
+                <img src="{{ URL }}assets/img/slider.png" alt="Slider">
+            </div>
+            <div class="slide" style="background-color: rgb(215, 161, 81); left: 0%;">2</div>
+
+        </div>
+
+        <div class="slider-buttons">
+            <div class="left-icon" style="opacity: 0.3;"></div>
+            <div class="right-icon" style="opacity: 1;"></div>
+        </div>
+    </div>
+    <div id="amazing-offer" class="clearfix">
+        <div class="bigWrap">
+            <div id="amazing-offer-box">
+                <span>پیشنهاد امروز</span>
+                <h2>Amazing Offer</h2>
+                <div class="counter">
+                    <span>5</span>
+                    <span>16</span>
+                    <span>10</span>
+                    <span>23</span>
+                </div>
+                <div class="counter-text">
+                    <span>روز</span>
+                    <span>ساعت</span>
+                    <span>دقیقه</span>
+                    <span>ثانیه</span>
+                </div>
+
+                <i class="fa fa-long-arrow-alt-right"></i>
+            </div>
+            <div class="product-row clearfix" >
+                <div class="product">
+                    <div class="product-img">
+                        <img src="{{ URL }}assets/img/product/thumbnail/product-01.png" alt="Photo Product">
+                    </div>
+                    <div class="product-price">
+                        <span class="price new">1,000,000</span>
+                        <span class="price old">1,200,000</span>
+                        <span class="toman">تومان</span>
+
+                    </div>
+                    <div class="product-title">
+                        گوشی شاهین
+                    </div>
+                </div>
+
+                <div class="product">
+                    <div class="product-img">
+                        <img src="{{ URL }}assets/img/product/thumbnail/product-01.png" alt="Photo Product">
+                    </div>
+                    <div class="product-price">
+                        <span class="price new">1,000,000</span>
+                        <span class="price old">1,200,000</span>
+                        <span class="toman">تومان</span>
+
+                    </div>
+                    <div class="product-title">
+                        گوشی شاهین
+                    </div>
+                </div>
+
+                <div class="product">
+                    <div class="product-img">
+                        <img src="{{ URL }}assets/img/product/thumbnail/product-01.png" alt="Photo Product">
+                    </div>
+                    <div class="product-price">
+                        <span class="price new">1,000,000</span>
+                        <span class="price old">1,200,000</span>
+                        <span class="toman">تومان</span>
+
+                    </div>
+                    <div class="product-title">
+                        گوشی شاهین
+                    </div>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    <div id="best-seller" class="product-box clearfix">
+        <div class="product-box-title">
+            پرفروش ترین کالاها
+        </div>
+        <div class="bigWrap">
+            <div class="product">
+                <div class="product-img">
+                    <img src="{{ URL }}assets/img/product/thumbnail/product-01.png" alt="Photo Product">
+                </div>
+                <div class="product-price">
+                    <span class="price new">1,000,000</span>
+                    <span class="price old">1,200,000</span>
+                    <span class="toman">تومان</span>
+
+                </div>
+                <div class="product-title">
+                    گوشی شاهین
+                </div>
+            </div>
+            <div class="product">
+                <div class="product-img">
+                    <img src="{{ URL }}assets/img/product/thumbnail/product-01.png" alt="Photo Product">
+                </div>
+                <div class="product-price">
+                    <span class="price new">1,000,000</span>
+                    <span class="price old">1,200,000</span>
+                    <span class="toman">تومان</span>
+
+                </div>
+                <div class="product-title">
+                    گوشی شاهین
+                </div>
+            </div>
+            <div class="product">
+                <div class="product-img">
+                    <img src="{{ URL }}assets/img/product/thumbnail/product-01.png" alt="Photo Product">
+                </div>
+                <div class="product-price">
+                    <span class="price new">1,000,000</span>
+                    <span class="price old">1,200,000</span>
+                    <span class="toman">تومان</span>
+
+                </div>
+                <div class="product-title">
+                    گوشی شاهین
+                </div>
+            </div>
+            <div class="product">
+                <div class="product-img">
+                    <img src="{{ URL }}assets/img/product/thumbnail/product-01.png" alt="Photo Product">
+                </div>
+                <div class="product-price">
+                    <span class="price new">1,000,000</span>
+                    <span class="price old">1,200,000</span>
+                    <span class="toman">تومان</span>
+
+                </div>
+                <div class="product-title">
+                    گوشی شاهین
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="newest" class="product-box clearfix">
+        <div class="product-box-title">
+            جدیدترین کالاها
+        </div>
+        <div class="bigWrap">
+            <div class="product">
+                <div class="product-img">
+                    <img src="{{ URL }}assets/img/product/thumbnail/product-01.png" alt="Photo Product">
+                </div>
+                <div class="product-price">
+                    <span class="price new">1,000,000</span>
+                    <span class="price old">1,200,000</span>
+                    <span class="toman">تومان</span>
+
+                </div>
+                <div class="product-title">
+                    گوشی شاهین
+                </div>
+            </div>
+            <div class="product">
+                <div class="product-img">
+                    <img src="{{ URL }}assets/img/product/thumbnail/product-01.png" alt="Photo Product">
+                </div>
+                <div class="product-price">
+                    <span class="price new">1,000,000</span>
+                    <span class="price old">1,200,000</span>
+                    <span class="toman">تومان</span>
+
+                </div>
+                <div class="product-title">
+                    گوشی شاهین
+                </div>
+            </div>
+            <div class="product">
+                <div class="product-img">
+                    <img src="{{ URL }}assets/img/product/thumbnail/product-01.png" alt="Photo Product">
+                </div>
+                <div class="product-price">
+                    <span class="price new">1,000,000</span>
+                    <span class="price old">1,200,000</span>
+                    <span class="toman">تومان</span>
+
+                </div>
+                <div class="product-title">
+                    گوشی شاهین
+                </div>
+            </div>
+            <div class="product">
+                <div class="product-img">
+                    <img src="{{ URL }}assets/img/product/thumbnail/product-01.png" alt="Photo Product">
+                </div>
+                <div class="product-price">
+                    <span class="price new">1,000,000</span>
+                    <span class="price old">1,200,000</span>
+                    <span class="toman">تومان</span>
+
+                </div>
+                <div class="product-title">
+                    گوشی شاهین
+                </div>
+            </div>
+        </div>
+    </div>
+    <footer class="clearfix">
+        <div class="bigWrap">
+            <div id="about-us">
+                <div>
+                    <img src="{{ URL }}assets/img/logo.png" alt="Site Logo">
+                </div>
+                <p>
+                    لورم ایپسوم متن ساختگی با تولید سادگی نامفهوم از صنعت چاپ و با استفاده از طراحان گرافیک است. چاپگرها و متون بلکه روزنامه و مجله در ستون و سطرآنچنان که لازم است و برای شرایط فعلی تکنولوژی مورد نیاز و کاربردهای متنوع با هدف بهبود ابزارهای کاربردی می باشد. کتابهای زیادی در شصت و سه درصد گذشته، حال و آینده شناخت فراوان جامعه و متخصصان را می طلبد تا با نرم افزارها شناخت بیشتری
+                </p>
+            </div>
+            <div id="newsletter-box">
+                <h2>خبرنامه</h2>
+                <p>
+                    برای دریافت اخرین تخفیفات و پیشنهادات ایمیل خود رو وارد کنید
+                </p>
+                <div id="newsletter-input">
+                    <input type="text" placeholder="ایمیل">
+                    <i class="fa fa-check"></i>
+                </div>
+            </div>
+            <div id="social-box">
+                <h2>
+                    فروشگاه من را دنبال کنید در:
+                </h2>
+                <div class="social-icon">
+                    <i class="fab fa-instagram"></i>
+                    <i class="fab fa-twitter"></i>
+                    <i class="fab fa-facebook"></i>
+                    <i class="fab fa-youtube"></i>
+                </div>
+                <div class="copy-right">
+                    copy @ 2018
+                </div>
+            </div>
+        </div>
+    </footer>
+</div>
+<script type="text/javascript" src="{{ URL }}assets/js/jquery-3.3.1.min.js"></script>
+<script type="text/javascript" src="{{ URL }}assets/js/main.js"></script>
+</body>
+</html>
