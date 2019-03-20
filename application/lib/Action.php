@@ -14,6 +14,7 @@ class Action
     private $file_path;
     private $route;
     private $status = false;
+    private $data = [];
 
     public function __construct($route, $preRoute = false)
     {
@@ -60,8 +61,7 @@ class Action
             preg_replace_callback("/[a-zA-Z0-9]+/", function ($matches) use (&$className) {
                 $className .= ucfirst($matches[0]);
             }, $this->route);
-            // TODO : Set Data
-            $class = new $className($registry);
+            $class = new $className($registry, $this->data);
             if(method_exists($class, $this->method)) {
                 return call_user_func_array([$class, $this->method], []);
             }else {
@@ -89,5 +89,8 @@ class Action
         return $this->status;
     }
 
+    public function setData($name, $value) {
+        $this->data[$name] = $value;
+    }
 
 }

@@ -2,10 +2,13 @@
 
 namespace App\Web\Controller;
 
-class ControllerHome {
+use App\system\Controller;
+
+class ControllerHome extends Controller {
 
     public function index() {
-        echo "Web Home/index @controller: ControllerHome @line: 8";
+        $name = "Hossein";
+        echo $this->render('home/index', ["Name"    => $name]);
     }
 
     public function about() {
