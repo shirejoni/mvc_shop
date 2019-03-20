@@ -25,7 +25,18 @@ class Controller
     }
 
     public function render($path, $data = []) {
+        $_ = array(
+            'URL'   => URL,
+            'Site_Title' => 'فروشگاه من', // TODO : set Site title with Config Class
+        );
+        $data = array_merge($_, $data);
         return $this->twig->render($path . '.twig', $data);
     }
+
+    public function __get($name)
+    {
+        return $this->registry->{$name};
+    }
+
 
 }

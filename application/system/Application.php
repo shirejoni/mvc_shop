@@ -4,6 +4,7 @@ namespace App\System;
 
 use App\lib\Action;
 use App\Lib\Registry;
+use App\lib\Response;
 use App\lib\Router;
 
 class Application {
@@ -17,6 +18,8 @@ class Application {
     {
         $this->registry = new Registry();
         $this->registry->Application = $this;
+        $Response = new Response();
+        $this->registry->Response = $Response;
         $this->processURL();
 
         if($this->isAdminRequested) {
@@ -30,6 +33,9 @@ class Application {
 
 
         $Router->dispatch();
+
+        $Response->outPut();
+
     }
 
     private function processURL()
