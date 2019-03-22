@@ -4,6 +4,7 @@ namespace App\System;
 
 use App\lib\Action;
 use App\Lib\Registry;
+use App\lib\Request;
 use App\lib\Response;
 use App\lib\Router;
 
@@ -31,6 +32,7 @@ class Application {
         $Router = new Router($this->registry);
         $this->registry->Router = $Router;
 
+        $this->registry->Request = new Request($this->registry, $this->uri, CONTROLLER_PATH);
 
         $Router->dispatch();
 

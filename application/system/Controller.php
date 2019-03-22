@@ -8,6 +8,9 @@ use App\Lib\Registry;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
+/**
+ * @property Application Application
+ */
 class Controller
 {
     protected $registry;
@@ -27,6 +30,7 @@ class Controller
     public function render($path, $data = []) {
         $_ = array(
             'URL'   => URL,
+            'CURRENT_URL'   => $this->Application->getUrl(),
             'Site_Title' => 'فروشگاه من', // TODO : set Site title with Config Class
         );
         $data = array_merge($_, $data);
