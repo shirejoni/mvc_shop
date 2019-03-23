@@ -5,11 +5,14 @@ namespace App\Admin\Controller;
 use App\lib\Request;
 use App\lib\Response;
 use App\lib\Validate;
+use App\model\Language;
+use App\model\User;
 use App\system\Controller;
 
 /**
  * @property Response Response
  * @property Request Request
+ * @property Language Language
  */
 class ControllerLogin extends Controller {
 
@@ -22,18 +25,30 @@ class ControllerLogin extends Controller {
             $password = $this->Request->post['password'];
             if(!Validate::emailValid($email)) {
                 $error = true;
-                $messages[] = 'ایمیل معتبر نمی باشد!';
+                $messages[] = $this->Language->get('error_invalid_email');
             }
             if(!Validate::passwordValid($password)) {
                 $error = true;
-                $messages[] = 'رمزعبور معتبر نمی باشد!';
+                $messages[] = $this->Language->get('error_invalid_password');
             }
 
             if(!$error) {
-                $json = array(
-                    'status' => 1,
-                    'messages' => ['ورود با موفقیت انجام شد']
-                );
+                /** @var User $User */
+                $User = $this->load('User', $this->registry);
+                if($result = $User->getUserByEmail($email)) {
+                    if(password_verify($password, $result['password'])) {
+                        $json = array(
+                            'status' => 1,
+                            'messages' => [$this->Language->get('success_message')]
+                        );
+                    }else {
+                        $error = true;
+                        $messages[] = $this->Language->get('error_no_such_user');
+                    }
+                }else {
+                    $error = true;
+                    $messages[] = $this->Language->get('error_no_such_user');
+                }
             }
 
             if($error) {

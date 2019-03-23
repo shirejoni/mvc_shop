@@ -60,14 +60,14 @@
             data['email'] = element.val();
         }else {
             error = true;
-            messages.push('نام کاربری معتبر نمی باشد!');
+            messages.push('{{ T['error_invalid_email'] }}');
         }
         element = $("#password");
         if(element.val() != "") {
             data['password'] = element.val();
         }else {
             error = true;
-            messages.push('رمزعبور معتبر نمی باشد!');
+            messages.push('{{ T['error_invalid_password'] }}');
         }
 
         if(!error) {

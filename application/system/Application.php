@@ -3,10 +3,12 @@
 namespace App\System;
 
 use App\lib\Action;
+use App\Lib\Database;
 use App\Lib\Registry;
 use App\lib\Request;
 use App\lib\Response;
 use App\lib\Router;
+use App\model\Language;
 
 class Application {
     private const ADMIN_ALIAS = ADMIN_ALIAS_NAME;
@@ -14,6 +16,7 @@ class Application {
     private $uri = '/';
     private $url;
     private $registry;
+    private $language_id = false;
 
     public function __construct()
     {
@@ -21,7 +24,12 @@ class Application {
         $this->registry->Application = $this;
         $Response = new Response();
         $this->registry->Response = $Response;
+        $this->registry->Database = new Database(DB_SERVER, DB_NAME, DB_USER, DB_PASSWORD);
+        $this->registry->Language = new Language($this->registry);
         $this->processURL();
+        if(!$this->language_id) {
+            // TODO: Load Language ID with Cookie and Session
+        }
 
         if($this->isAdminRequested) {
             require_once ADMIN_PATH . DS .'config/admin_constants.php';
@@ -33,6 +41,10 @@ class Application {
         $this->registry->Router = $Router;
 
         $this->registry->Request = new Request($this->registry, $this->uri, CONTROLLER_PATH);
+        if($this->language_id) {
+            $this->registry->Language->setLanguageByID($this->language_id);
+        }
+        $this->registry->Language->load('admin/admin'); // TODO : set it with Config
 
         $Router->dispatch();
 
@@ -45,15 +57,21 @@ class Application {
         $_GET['url'] = isset($_GET['url']) ? filter_var(trim($_GET['url'], "/"), FILTER_SANITIZE_URL) : "";
         $url = explode("/", $_GET['url']);
 
-        // TODO : check isset Language in url
+        $languages = $this->registry->Language->getLanguages();
+        if(array_key_exists($url[0], $languages)) {
+            $this->language_id = $languages[$url[0]]['language_id'];
+            $languageCode = array_shift($url);
+        }
         if($url[0] == self::ADMIN_ALIAS) {
             $this->isAdminRequested = true;
             array_shift($url);
         }
 
         $sUrl = $_GET['url'];
-        // TODO : process for language Request in url
 
+        if(isset($languageCode)) {
+            $sUrl = substr($sUrl, strlen($languageCode) + 1);
+        }
         if($this->isAdminRequested) {
             $sUrl = substr($sUrl, strlen(self::ADMIN_ALIAS) + 1);
         }

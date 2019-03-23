@@ -5,11 +5,13 @@ namespace App\system;
 
 
 use App\Lib\Registry;
+use App\model\Language;
 use Twig\Environment;
 use Twig\Loader\FilesystemLoader;
 
 /**
  * @property Application Application
+ * @property Language Language
  */
 class Controller
 {
@@ -32,6 +34,7 @@ class Controller
             'URL'   => URL,
             'CURRENT_URL'   => $this->Application->getUrl(),
             'Site_Title' => 'فروشگاه من', // TODO : set Site title with Config Class
+            'T'         => $this->Language->all(),
         );
         $data = array_merge($_, $data);
         return $this->twig->render($path . '.twig', $data);
@@ -40,6 +43,28 @@ class Controller
     public function __get($name)
     {
         return $this->registry->{$name};
+    }
+
+    public function load($name, ... $params) {
+        $parts = explode('\\', $name);
+        $model_id = strtolower(implode('_', $parts));
+        if(!$this->registry->has($model_id)) {
+            $className = array_pop($parts);
+            $file = MODEL_PATH;
+            if(count($parts) > 0) {
+                $file .= DS . strtolower(implode(DS, $parts));
+            }
+            $file .= DS . ucfirst($className) . '.php';
+            if(file_exists($file)) {
+                require_once $file;
+                $modelName = '\\' . MODEL_NAMESPACE . '\\' . ucfirst($className);
+                $modelObject = new $modelName(... $params);
+                $this->registry->{$model_id} = $modelObject;
+            }else {
+                throw new \Exception("Call an unknown Model name = {$name}");
+            }
+        }
+        return $this->registry->{$model_id};
     }
 
 
