@@ -10,7 +10,6 @@ use App\model\User;
 use App\system\Controller;
 
 /**
- * Login Controller
  * @property Response Response
  * @property Request Request
  * @property Language Language
