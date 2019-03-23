@@ -8,6 +8,7 @@ use App\Lib\Registry;
 use App\lib\Request;
 use App\lib\Response;
 use App\lib\Router;
+use App\Lib\Session;
 use App\model\Language;
 
 class Application {
@@ -27,6 +28,12 @@ class Application {
         $this->registry->Database = new Database(DB_SERVER, DB_NAME, DB_USER, DB_PASSWORD);
         $this->registry->Language = new Language($this->registry);
         $this->processURL();
+        session_set_save_handler(new Session($this->registry->Database));
+        session_start(array(
+            'use_strict_mode' => '1',
+            'cookie_httponly' => '1'
+        ));
+
         if(!$this->language_id) {
             // TODO: Load Language ID with Cookie and Session
         }
