@@ -37,6 +37,14 @@ class ControllerLogin extends Controller {
                 $User = $this->load('User', $this->registry);
                 if($result = $User->getUserByEmail($email)) {
                     if(password_verify($password, $result['password'])) {
+                        $ip = get_ip_address();
+                        $option = [];
+                        // TODO : get Valid IP with validate_ip in production
+                        if($ip) {
+                            $option['ip'] = $ip;
+                        }
+                        $User->login($option);
+
                         $json = array(
                             'status' => 1,
                             'messages' => [$this->Language->get('success_message')]

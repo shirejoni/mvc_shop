@@ -21,6 +21,7 @@ class Application {
 
     public function __construct()
     {
+        require_once SYSTEM_PATH . DS . 'common_function.php';
         $this->registry = new Registry();
         $this->registry->Application = $this;
         $Response = new Response();
