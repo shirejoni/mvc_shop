@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controller;
 
+use App\lib\Config;
 use App\lib\Request;
 use App\lib\Response;
 use App\lib\Validate;
@@ -13,6 +14,7 @@ use App\system\Controller;
  * @property Response Response
  * @property Request Request
  * @property Language Language
+ * @property Config Config
  */
 class ControllerLogin extends Controller {
 
@@ -44,6 +46,11 @@ class ControllerLogin extends Controller {
                             $option['ip'] = $ip;
                         }
                         $User->login($option);
+
+                        $_SESSION['login_time'] = time();
+                        $_SESSION['login_time_expiry'] = time() + $this->Config->get('max_time_inactive_session_time');
+                        $_SESSION['ip'] = $ip;
+                        $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
 
                         $json = array(
                             'status' => 1,
