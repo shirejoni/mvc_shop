@@ -28,7 +28,7 @@ class Router
         if(empty($action)) {
             $uri = $this->registry->Application->getUri();
             if($uri == "" || $uri == "/") {
-                $uri = "home/index";// TODO: Set default uri with Config class
+                $uri = $this->registry->Config->get('default_route');// TODO: Set default uri with Config class
             }
             $action = new Action($uri);
             if(!$action->isStatus()) {

@@ -3,6 +3,7 @@
 namespace App\System;
 
 use App\lib\Action;
+use App\lib\Config;
 use App\Lib\Database;
 use App\Lib\Registry;
 use App\lib\Request;
@@ -44,15 +45,27 @@ class Application {
         }else {
             require_once WEB_PATH . DS . 'config/web_constants.php';
         }
+        $Config = new Config();
+        $this->registry->Config = $Config;
+        $Config->load(MAIN_CONFIG_FILE);
 
         $Router = new Router($this->registry);
         $this->registry->Router = $Router;
+        $preActions = $Config->get('pre_actions');
+        if(count($preActions) > 0) {
+            foreach ($preActions as $preAction) {
+
+                $Router->addPreRoute(new Action($preAction));
+            }
+        }
 
         $this->registry->Request = new Request($this->registry, $this->uri, CONTROLLER_PATH);
         if($this->language_id) {
             $this->registry->Language->setLanguageByID($this->language_id);
         }
-        $this->registry->Language->load('admin/admin'); // TODO : set it with Config
+
+
+        $this->registry->Language->load($Config->get('default_language_file_path'));
 
         $Router->dispatch();
 

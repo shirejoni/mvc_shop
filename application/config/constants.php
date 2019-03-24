@@ -17,6 +17,7 @@ define("DEBUG_MODE", true);// DEVELOPMENT True Production False
 
 define("URL", "http://myshop.test/");
 define("ADMIN_ALIAS_NAME", "admin");
+define("MAIN_CONFIG_FILE", 'config');
 
 define('DEFAULT_LANGUAGE_DIR', 'fa');
 define('DEFAULT_LANGUAGE_CODE', 'fa');
