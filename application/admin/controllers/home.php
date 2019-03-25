@@ -2,10 +2,16 @@
 
 namespace App\Admin\Controller;
 
-class ControllerHome {
+use App\lib\Response;
+use App\system\Controller;
+
+/**
+ * @property Response Response
+ */
+class ControllerHome extends Controller {
 
     public function index()
     {
-        echo "Admin Home/index @controller: ControllerHome @line: 9";
+        $this->Response->setOutPut($this->render("home/index"));
     }
 }

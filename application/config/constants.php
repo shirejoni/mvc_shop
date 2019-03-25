@@ -16,6 +16,8 @@ define("DB_NAME", "myshop");
 define("DEBUG_MODE", true);// DEVELOPMENT True Production False
 
 define("URL", "http://myshop.test/");
+define("ADMIN_URL", "http://myshop.test/admin/");
+define("LOGIN_STATUS_FORM_LOGIN", '1');
 define("ADMIN_ALIAS_NAME", "admin");
 define("MAIN_CONFIG_FILE", 'config');
 

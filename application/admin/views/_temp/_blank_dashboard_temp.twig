@@ -1,0 +1,48 @@
+
+<!doctype html>
+<html lang="en">
+<head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="{{ URL }}assets/admin/css/bootstrap.min.css">
+    <link rel="stylesheet" href="{{ URL }}assets/admin/css/fontawesome-all.min.css">
+    {% block Css %}
+
+    {% endblock %}
+    <link rel="stylesheet" href="{{ URL }}assets/admin/css/style.css">
+
+    <title>Dashboard | {{ Shop_Title }}</title>
+</head>
+<body>
+
+<div id="main">
+    {% include "_inc/_header_dashboard_inc.twig" %}
+    <div class="wrapper">
+        {% include "_inc/_sidebar_dashboard_inc.twig" %}
+        <section id="content">
+            {% block Content %}
+
+            {% endblock %}
+        </section>
+
+    </div>
+
+</div>
+<!-- Optional JavaScript -->
+<!-- jQuery first, then Popper.js, then Bootstrap JS -->
+<script src="{{ URL }}assets/admin/js/jquery-3.3.1.min.js"></script>
+<script src="{{ URL }}assets/admin/js/jquery.nicescroll.min.js"></script>
+<script src="{{ URL }}assets/admin/js/bootstrap.min.js"></script>
+<script src="{{ URL }}assets/admin/js/Chart.js"></script>
+{% block JsBeforeMain %}
+
+{% endblock %}
+<script src="{{ URL }}assets/admin/js/main.js"></script>
+{% block Js %}
+
+{% endblock %}
+</body>
+</html>

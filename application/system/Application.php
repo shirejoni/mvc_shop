@@ -19,6 +19,8 @@ class Application {
     private $url;
     private $registry;
     private $language_id = false;
+    private $requestedUrl;
+
 
     public function __construct()
     {
@@ -98,7 +100,8 @@ class Application {
         }
 
         $this->uri = !empty($sUrl) ? $sUrl : $this->uri;
-        $this->url = trim(URL,"/") . $_SERVER['REQUEST_URI'];
+        $this->url = URL . $_GET['url'];
+        $this->requestedUrl = trim(URL,"/") . $_SERVER['REQUEST_URI'];
 
     }
 
@@ -126,5 +129,12 @@ class Application {
         return $this->url;
     }
 
+    /**
+     * @return mixed
+     */
+    public function getRequestedUrl()
+    {
+        return $this->requestedUrl;
+    }
 
 }

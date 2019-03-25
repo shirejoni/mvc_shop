@@ -22,6 +22,13 @@ class ControllerLogin extends Controller {
         $data = [];
         $messages = [];
         $error = false;
+        if(isset($_SESSION['user']) && !empty($_SESSION['user']['email']) && $_SESSION['login_status'] == LOGIN_STATUS_FORM_LOGIN) {
+            $token = generateToken();
+            $_SESSION['token'] = $token;
+            $_SESSION['login_time_expiry'] = time() + $this->Config->get('max_time_inactive_session_time');
+            header("location:" . ADMIN_URL . '?token=' . $token);
+            exit();
+        }
         if(!empty($this->Request->post['email']) && !empty($this->Request->post['password'])) {
             $email = $this->Request->post['email'];
             $password = $this->Request->post['password'];
@@ -46,7 +53,10 @@ class ControllerLogin extends Controller {
                             $option['ip'] = $ip;
                         }
                         $User->login($option);
-
+                        $token = generateToken();
+                        $_SESSION['token'] = $token;
+                        $_SESSION['token_time_expiry'] = time() + $this->Config->get('token_max_life_time');
+                        $_SESSION['login_status'] = LOGIN_STATUS_FORM_LOGIN;
                         $_SESSION['login_time'] = time();
                         $_SESSION['login_time_expiry'] = time() + $this->Config->get('max_time_inactive_session_time');
                         $_SESSION['ip'] = $ip;
@@ -54,7 +64,8 @@ class ControllerLogin extends Controller {
 
                         $json = array(
                             'status' => 1,
-                            'messages' => [$this->Language->get('success_message')]
+                            'messages' => [$this->Language->get('success_message')],
+                            'redirect' => $this->Application->getUrl() . '?token=' . $token,
                         );
                     }else {
                         $error = true;

@@ -4,6 +4,7 @@
 namespace App\system;
 
 
+use App\lib\Config;
 use App\Lib\Registry;
 use App\model\Language;
 use Twig\Environment;
@@ -12,6 +13,7 @@ use Twig\Loader\FilesystemLoader;
 /**
  * @property Application Application
  * @property Language Language
+ * @property Config Config
  */
 class Controller
 {
@@ -33,7 +35,7 @@ class Controller
         $_ = array(
             'URL'   => URL,
             'CURRENT_URL'   => $this->Application->getUrl(),
-            'Site_Title' => 'فروشگاه من', // TODO : set Site title with Config Class
+            'Shop_Title' => $this->Config->get("site_title"),
             'T'         => $this->Language->all(),
         );
         $data = array_merge($_, $data);
