@@ -38,6 +38,7 @@ class Controller
             'Token'   => isset($_SESSION['token']) ? $_SESSION['token'] : '',
             'Shop_Title' => $this->Config->get("site_title"),
             'T'         => $this->Language->all(),
+            'ADMIN_URL' => ADMIN_URL
         );
         $data = array_merge($_, $data);
         return $this->twig->render($path . '.twig', $data);
