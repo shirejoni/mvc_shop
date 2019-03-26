@@ -35,6 +35,7 @@ class Controller
         $_ = array(
             'URL'   => URL,
             'CURRENT_URL'   => $this->Application->getUrl(),
+            'Token'   => isset($_SESSION['token']) ? $_SESSION['token'] : '',
             'Shop_Title' => $this->Config->get("site_title"),
             'T'         => $this->Language->all(),
         );
