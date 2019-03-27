@@ -85,4 +85,48 @@ class ControllerProductAttribute extends Controller {
 
     }
 
+    public function index() {
+        $data = [];
+        /** @var Attribute $Attribute */
+        $Attribute = $this->load('Attribute', $this->registry);
+        $data['Attributes'] = $Attribute->getAttributes();
+        $data['Languages'] = $this->Language->getLanguages();
+        $data['DefaultLanguageID'] = $this->Language->getDefaultLanguageID();
+        $this->Response->setOutPut($this->render('product/attribute/index', $data));
+    }
+
+    public function delete() {
+        if(!empty($this->Request->post['attributes_id'])) {
+            $json = [];
+            /** @var Attribute $Attribute */
+            $Attribute = $this->load('Attribute', $this->registry);
+            $error = false;
+            $this->Database->db->beginTransaction();
+            foreach ($this->Request->post['attributes_id'] as $attribute_id) {
+                $attribute = $Attribute->getAttribute((int) $attribute_id);
+                if($attribute && (int) $attribute_id) {
+                    $Attribute->deleteAttribute((int) $attribute_id);
+                }else {
+                    $error = true;
+                }
+            }
+            if($error) {
+                $this->Database->db->rollBack();
+                $json['status'] = 0;
+                $json['messages'] = [$this->Language->get('error_done')];
+            }else {
+                $this->Database->db->commit();
+                $json['status'] = 1;
+                $json['messages'] = [$this->Language->get('success_message')];
+                $data['Attributes'] = $Attribute->getAttributes(array(
+                    'language_id'   => $this->Language->getLanguageID(),
+                ));
+                $json['data'] = $this->render('product/attribute/attribute_table', $data);
+            }
+            $this->Response->setOutPut(json_encode($json));
+        }else {
+            return new Action('error/notFound', 'web');
+        }
+    }
+
 }

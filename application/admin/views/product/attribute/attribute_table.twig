@@ -1,0 +1,12 @@
+{% for Attribute in Attributes %}
+    <tr>
+        <td ><input type="checkbox" data-attribute-id="{{ Attribute['attribute_id'] }}"></td>
+        <td>{{ Attribute['attribute_id'] }}</td>
+        <td>{{ Attribute['name'] }}</td>
+        <td>{{ Attribute['attributegroup_name'] }}</td>
+        <td>{{ Attribute['sort_order'] }}</td>
+        <td >
+            <a href="{{ ADMIN_URL }}product/attribute/edit/{{ Attribute['attribute_id'] }}?token={{ Token }}" class="btn btn-warning fa fa-pencil-alt"></a>
+        </td>
+    </tr>
+{% endfor %}

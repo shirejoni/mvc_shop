@@ -115,6 +115,7 @@ class Attributegroup extends Model
             return $rows;
         }
     }
+
     public function deleteAttributeGroup($attribute_group_id, $data = []) {
         if(isset($data['attributegroup_names']) && count($data['attributegroup_names']) > 0) {
             foreach ($data['attributegroup_names'] as $language_id => $attributegroup_name) {

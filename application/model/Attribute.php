@@ -9,16 +9,24 @@ use App\system\Model;
 
 /**
  * @property Database Database
+ * @property Language Language
  */
 class Attribute extends Model
 {
     private $rows = [];
+    private $attribute_id;
+    private $attribute_group_id;
+    private $sort_order;
+    private $language_id;
+    private $name;
+
     public function getAttributes($option = []) {
         $option['sort_order'] = isset($option['sort_order']) ? $option['sort_order'] : '';
         $option['order']   = isset($option['order']) ? $option['order'] : 'ASC';
         $option['language_id'] = isset($option['language_id']) ? $option['language_id'] : $this->Language->getLanguageID();
 
-        $sql = "SELECT * FROM attribute a LEFT  JOIN attribute_language al on a.attribute_id = al.attribute_id
+        $sql = "SELECT *, (SELECT agl.name FROM attribute_group_language agl WHERE agl.attribute_group_id = a.attribute_group_id
+        AND agl.language_id = al.language_id) AS attributegroup_name FROM attribute a LEFT  JOIN attribute_language al on a.attribute_id = al.attribute_id
         WHERE al.language_id = :lID ";
 
         $sort_order = array(
@@ -72,5 +80,60 @@ class Attribute extends Model
             ));
         }
         return $attribute_id;
+    }
+
+    public function getAttribute($attribute_id, $lID = null) {
+        $language_id = $this->Language->getLanguageID();
+        if($lID && $lID != "all") {
+            $language_id = $lID;
+        }
+        if($lID != "all") {
+            $this->Database->query("SELECT * FROM attribute a LEFT  JOIN attribute_language al 
+            on a.attribute_id = al.attribute_id WHERE al.language_id = :lID AND a.attribute_id = :aID", array(
+                'aID'  => $attribute_id,
+                'lID'   => $language_id
+            ));
+            if($this->Database->hasRows()) {
+                $row = $this->Database->getRow();
+                $this->attribute_id = $row['attribute_id'];
+                $this->attribute_group_id = $row['attribute_group_id'];
+                $this->sort_order = $row['sort_order'];
+                $this->language_id = $row['language_id'];
+                $this->name = $row['name'];
+                $this->rows = [];
+                $this->rows[] = $row;
+                return $row;
+            }
+            return false;
+        }else {
+            $this->Database->query("SELECT * FROM attribute a LEFT  JOIN attribute_language al 
+            on a.attribute_id = al.attribute_id WHERE  a.attribute_id = :aID", array(
+                'aID'  => $attribute_id,
+            ));
+            $rows = $this->Database->getRows();
+            if(count($rows) > 0) {
+                $this->attribute_id = $rows[0]['attribute_id'];
+                $this->attribute_group_id = $rows[0]['attribute_group_id'];
+                $this->sort_order = $rows[0]['sort_order'];
+                $this->rows = $rows;
+            }
+            return $rows;
+        }
+    }
+    public function deleteAttribute($attribute_id, $data = []) {
+        if(isset($data['attribute_names']) && count($data['attribute_names']) > 0) {
+            foreach ($data['attribute_names'] as $language_id => $attribute_name) {
+                $this->Database->query("DELETE FROM attribute_language WHERE attribute_id = :aID AND 
+                language_id = :lID", array(
+                    'aID'  => $attribute_id,
+                    'lID'   => $language_id
+                ));
+            }
+        }else {
+            $this->Database->query("DELETE FROM attribute WHERE attribute_id = :aID", array(
+                'aID'  => $attribute_id
+            ));
+        }
+        return $this->Database->numRows();
     }
 }
