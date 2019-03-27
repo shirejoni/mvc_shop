@@ -61,11 +61,13 @@ class Attributegroup extends Model
         return $this->rows;
     }
 
-    public function insertAttributeGroup($data) {
-        $this->Database->query("INSERT INTO attribute_group (sort_order) VALUES (:aGSortOrder)", array(
-            'aGSortOrder' => $data['sort_order']
-        ));
-        $attribute_group_id = $this->Database->insertId();
+    public function insertAttributeGroup($data, $attribute_group_id = null) {
+        if(!$attribute_group_id) {
+            $this->Database->query("INSERT INTO attribute_group (sort_order) VALUES (:aGSortOrder)", array(
+                'aGSortOrder' => $data['sort_order']
+            ));
+            $attribute_group_id = $this->Database->insertId();
+        }
         foreach ($data['attributegroup_names'] as $language_id => $attributegroup_name) {
             $this->Database->query("INSERT INTO attribute_group_language (attribute_group_id, language_id, name) 
             VALUES (:aGID, :lID, :aGName)", array(
@@ -88,30 +90,79 @@ class Attributegroup extends Model
                 'aGID'  => $attributegroup_id,
                 'lID'   => $language_id
             ));
-            $row = $this->Database->getRow();
-            $this->attribute_group_id = $row['attribute_group_id'];
-            $this->sort_order = $row['sort_order'];
-            $this->language_id = $row['language_id'];
-            $this->name = $row['name'];
-            $this->rows = [];
-            $this->rows[] = $row;
-            return $row;
+            if($this->Database->hasRows()) {
+                $row = $this->Database->getRow();
+                $this->attribute_group_id = $row['attribute_group_id'];
+                $this->sort_order = $row['sort_order'];
+                $this->language_id = $row['language_id'];
+                $this->name = $row['name'];
+                $this->rows = [];
+                $this->rows[] = $row;
+                return $row;
+            }
+            return false;
         }else {
             $this->Database->query("SELECT * FROM attribute_group ag LEFT  JOIN attribute_group_language agl 
             on ag.attribute_group_id = agl.attribute_group_id WHERE  ag.attribute_group_id = :aGID", array(
                 'aGID'  => $attributegroup_id,
             ));
             $rows = $this->Database->getRows();
-            $this->attribute_group_id = $rows[0]['attribute_group_id'];
-            $this->sort_order = $rows[0]['sort_order'];
-            $this->rows = $rows;
+            if(count($rows) > 0) {
+                $this->attribute_group_id = $rows[0]['attribute_group_id'];
+                $this->sort_order = $rows[0]['sort_order'];
+                $this->rows = $rows;
+            }
             return $rows;
         }
     }
-    public function deleteAttributeGroup($attribute_group_id) {
-        $this->Database->query("DELETE FROM attribute_group WHERE attribute_group_id = :aGID", array(
-            'aGID'  => $attribute_group_id
-        ));
+    public function deleteAttributeGroup($attribute_group_id, $data = []) {
+        if(isset($data['attributegroup_names']) && count($data['attributegroup_names']) > 0) {
+            foreach ($data['attributegroup_names'] as $language_id => $attributegroup_name) {
+                $this->Database->query("DELETE FROM attribute_group_language WHERE attribute_group_id = :aGID AND 
+                language_id = :lID", array(
+                    'aGID'  => $attribute_group_id,
+                    'lID'   => $language_id
+                ));
+            }
+        }else {
+            $this->Database->query("DELETE FROM attribute_group WHERE attribute_group_id = :aGID", array(
+                'aGID'  => $attribute_group_id
+            ));
+        }
         return $this->Database->numRows();
+    }
+
+    public function editAttributeGroup($attribute_group_id, $data) {
+        $sql = "UPDATE attribute_group SET ";
+        $query = [];
+        $params = [];
+        if(isset($data['sort_order'])) {
+            $query[] = 'sort_order = :aGSortOrder';
+            $params['aGSortOrder'] = $data['sort_order'];
+        }
+
+        $sql .= implode(' , ', $query);
+        $sql .= " WHERE attribute_group_id = :aGID ";
+        $params['aGID'] = $attribute_group_id;
+        if(count($query) > 0) {
+            $this->Database->query($sql, $params);
+        }
+        if(isset($data['attributegroup_names'])) {
+
+            foreach ($data['attributegroup_names'] as $language_id => $attributegroup_name) {
+                $this->Database->query("UPDATE attribute_group_language SET name = :aGName WHERE 
+                attribute_group_id = :aGID AND language_id = :lID", array(
+                    'aGName' => $attributegroup_name,
+                    'aGID'  => $attribute_group_id,
+                    'lID'   => $language_id
+                ));
+            }
+
+        }
+        if($this->Database->numRows() > 0) {
+            return true;
+        }else {
+            return false;
+        }
     }
 }
