@@ -120,6 +120,7 @@ class Attribute extends Model
             return $rows;
         }
     }
+
     public function deleteAttribute($attribute_id, $data = []) {
         if(isset($data['attribute_names']) && count($data['attribute_names']) > 0) {
             foreach ($data['attribute_names'] as $language_id => $attribute_name) {
@@ -135,5 +136,43 @@ class Attribute extends Model
             ));
         }
         return $this->Database->numRows();
+    }
+
+    public function editAttribute($attribute_id, $data) {
+        $sql = "UPDATE attribute SET ";
+        $query = [];
+        $params = [];
+        if(isset($data['sort_order'])) {
+            $query[] = 'sort_order = :aGSortOrder';
+            $params['aGSortOrder'] = $data['sort_order'];
+        }
+        if(isset($data['attribute_group_id'])) {
+            $query[] = 'attribute_group_id = :aGID';
+            $params['aGID'] = $data['attribute_group_id'];
+        }
+
+        $sql .= implode(' , ', $query);
+        $sql .= " WHERE attribute_id = :aID ";
+        $params['aID'] = $attribute_id;
+        if(count($query) > 0) {
+            $this->Database->query($sql, $params);
+        }
+        if(isset($data['attribute_names'])) {
+
+            foreach ($data['attribute_names'] as $language_id => $attribute_name) {
+                $this->Database->query("UPDATE attribute_language SET name = :aName WHERE 
+                attribute_id = :aID AND language_id = :lID", array(
+                    'aName' => $attribute_name,
+                    'aID'  => $attribute_id,
+                    'lID'   => $language_id
+                ));
+            }
+
+        }
+        if($this->Database->numRows() > 0) {
+            return true;
+        }else {
+            return false;
+        }
     }
 }
