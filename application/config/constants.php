@@ -23,3 +23,4 @@ define("MAIN_CONFIG_FILE", 'config');
 
 define('DEFAULT_LANGUAGE_DIR', 'fa');
 define('DEFAULT_LANGUAGE_CODE', 'fa');
+define("CKFINDER_ROUTE", 'ckfinder/ckfinder');
