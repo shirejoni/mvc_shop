@@ -20,6 +20,7 @@ class Application {
     private $registry;
     private $language_id = false;
     private $requestedUrl;
+    private $isCkfinderRequested = false;
 
 
     public function __construct()
@@ -102,7 +103,11 @@ class Application {
         $this->uri = !empty($sUrl) ? $sUrl : $this->uri;
         $this->url = URL . $_GET['url'];
         $this->requestedUrl = trim(URL,"/") . $_SERVER['REQUEST_URI'];
-
+        if($_GET['url'] == "assets/ckfinder/core/connector/php/connector.php") {
+            $this->isAdminRequested = true;
+            $this->isCkfinderRequested = true;
+            $this->uri = CKFINDER_ROUTE;
+        }
     }
 
     /**

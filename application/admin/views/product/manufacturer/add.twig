@@ -1,0 +1,237 @@
+{% extends "_temp/_blank_dashboard_temp.twig" %}
+
+{% block Content %}
+    <div class="container">
+        <section class="row">
+            <div class="col-12 px-5 pt-4">
+                <div class="message-box success-box" id="success-message-box" style="display: none;">
+                    <h4>موفقیت!</h4>
+                    <hr>
+                    <div class="messages">
+
+                    </div>
+                </div>
+                <div class="message-box error-box" id="error-message-box" style="display: none;">
+                    <h4>خطا!</h4>
+                    <hr>
+                    <div class="messages">
+
+                    </div>
+                </div>
+                <div class="row"  style="box-shadow: 0 0 5px rgba(0,0,0,0.1)">
+                    <div class="col-12 p-2">
+                        <dib class="form-group">
+                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                {% for Language in Languages %}
+                                    {% if Language['language_id'] == DefaultLanguageID %}
+
+                                        <li class="nav-item">
+                                            <a class="nav-link active" data-toggle="tab" href="#language-{{ Language['language_id'] }}" role="tab" aria-controls="language-{{ Language['language_id'] }}" aria-selected="true">{{ Language['name'] }}</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-toggle="tab" href="#language-{{ Language['language_id'] }}" role="tab" aria-controls="language-{{ Language['language_id'] }}" aria-selected="false">{{ Language['name'] }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                            <div class="tab-content text-right" id="myTabContent">
+                                {% for Language in Languages %}
+                                    {% if Language['language_id'] == DefaultLanguageID %}
+                                        {% set ClassName = "show active" %}
+                                    {% else %}
+                                        {% set ClassName = "" %}
+                                    {% endif %}
+                                    <div class="tab-pane fade {{ ClassName }} " id="language-{{ Language['language_id'] }}" role="tabpanel" aria-labelledby="language-{{ Language['language_id'] }}-tab">
+                                        <div class="form-group d-flex align-middle mt-3">
+                                            <label class="col-sm-2 control-label text-center">نام</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" placeholder="{{ Language['name'] }}" class="form-control" id="manufacturer-name-{{ Language['language_id'] }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+
+                            </div>
+                        </dib>
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">آدرس تولیدکننده</label>
+                            <div class="col-sm-10">
+                                <input type="text" id="manufacturer-url" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">ترتیب</label>
+                            <div class="col-sm-10">
+                                <input type="text" id="manufacturer-sort-order" class="form-control">
+                            </div>
+                        </div>
+
+                        <div class="card bg-light">
+                            <div class="card-header">
+                                <a href="#" class="float-right fa fa-image btn btn-success btn-lg" id="manufacturer-add-image-btn"></a>
+                            </div>
+                            <div class="card-body row" id="manufacturer-image-preview-box" style="max-height: 250px;">
+                                <p class="text-center"> Nothing to show</p>
+                            </div>
+                        </div>
+
+                        <div class="form-group text-right pt-3 px-3">
+                            <a href="{{ ADMIN_URL }}product/manufacturer/index?token={{ Token }}" class="fa fa-arrow-right btn btn-warning"></a>
+                            <a href="#" id="manufacturer-submit-btn" class="fa fa-plus btn btn-success"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+{% endblock %}
+{% block JsBeforeMain %}
+    <script type="text/javascript" src="{{ URL }}assets/ckfinder/ckfinder.js"></script>
+{% endblock %}
+{% block Js %}
+    {% autoescape false %}
+        <script type="text/javascript">
+            let Url = "{{ CURRENT_URL }}" + "?token=" + "{{ Token }}";
+            let Languages = [
+                {% for Language in Languages %}
+                    "{{ Language['language_id'] }}",
+                {% endfor %}
+            ];
+            let DefaultLanguageID = {{ DefaultLanguageID }};
+            function selectFileWithCKFinder( elementId ) {
+                CKFinder.modal( {
+                    chooseFiles: true,
+                    width: 800,
+                    height: 600,
+                    onInit: function( finder ) {
+                        finder.on( 'files:choose', function( evt ) {
+                            let file = evt.data.files.first();
+                            let output = $("#"+elementId);
+                            output.html('');
+                            let previewImageCardElement = $('<div>').addClass("card bg-secondary col-sm-2 p-0 mx-1");
+                            let previewImageCardImgElement = $('<div>').addClass("card-img p-1");
+                            $('<img />', {
+                                'id'    : "manufacturer-image",
+                                "src"   : file.getUrl(),
+                            }).appendTo(previewImageCardImgElement);
+                            previewImageCardImgElement.appendTo(previewImageCardElement);
+                            let previewImageCardFooterElement = $('<div>').addClass('card-footer py-1 text-center');
+                            $('<a>', {
+                                'href' : "#",
+                                "class" : "fa fa-minus btn btn-danger"
+                            }).click(function (e) {
+                                $('#manufacturer-image-preview-box').html('');
+                                e.preventDefault();
+                            }).appendTo(previewImageCardFooterElement);
+                            previewImageCardFooterElement.appendTo(previewImageCardElement);
+                            previewImageCardElement.appendTo(output);
+                        } );
+                    }
+                } );
+            }
+            $(document).ready(function (e) {
+
+                let addManufacturerImageBtn = $('#manufacturer-add-image-btn');
+                addManufacturerImageBtn.click(function (e) {
+                    selectFileWithCKFinder('manufacturer-image-preview-box');
+                    e.preventDefault();
+                });
+
+                /*
+                * Post Data
+                * */
+                let manufacturerSubmitBtn = $("#manufacturer-submit-btn");
+                let successMessageBoxElement = $("#success-message-box");
+                let errorMessageBoxElement = $("#error-message-box");
+
+                manufacturerSubmitBtn.click(function (e) {
+                    let data  = {};
+                    let messages = [];
+                    let error = false;
+                    let element;
+
+                    Languages.forEach(function (language_id) {
+                       element = $("#manufacturer-name-" + language_id);
+                       if(element.val() != "") {
+                           data["manufacturer-name-" + language_id] = element.val();
+                       }
+                    });
+                    element = $("#manufacturer-name-" + DefaultLanguageID);
+                    if(element.val() == "") {
+                        error = true;
+                        messages.push("{{ T['error_manufacturer_name_empty'] }}")
+                    }
+                    element = $("#manufacturer-sort-order");
+                    if(element.val() != "") {
+                        data['manufacturer-sort-order'] = element.val();
+                    }else {
+                        data['manufacturer-sort-order'] = 0;
+                    }
+
+                    element = $("#manufacturer-url");
+                    if(element.val() != "") {
+                        data['manufacturer-url'] = element.val();
+                    }else {
+                        error = true;
+                        messages.push("{{ T['error_manufacturer_url_empty'] }}")
+                    }
+
+                    element = $("#manufacturer-image");
+                    if(element) {
+                        data['manufacturer-image'] = element.attr('src');
+                    }else {
+                        data['manufacturer-image'] = '';
+                    }
+
+
+                    data['post'] = true;
+                    data['manufacturer-post'] = true;
+                    if(!error) {
+                        $.post(Url, data, function (response) {
+                            response = JSON.parse(response);
+                            if(response['status'] == 1) {
+                                for(let i = 0; i < response['messages'].length; i++) {
+                                    $('<p>').text(response['messages'][i]).appendTo(successMessageBoxElement.find('.messages'));
+                                }
+                                if(response['messages'].length > 0) {
+                                    successMessageBoxElement.css('display', 'block');
+                                }
+
+                                if(response['redirect']) {
+                                    window.setTimeout(function () {
+                                        window.location.href = response['redirect'];
+                                    }, 1000);
+                                }
+
+                            }else {
+                                for(let i = 0; i < response['messages'].length; i++) {
+                                    $('<p>').text(response['messages'][i]).appendTo(errorMessageBoxElement.find('.messages'));
+                                }
+                                if(response['messages'].length > 0) {
+                                    errorMessageBoxElement.css('display', 'block');
+                                }
+                            }
+                        });
+                    }else {
+                        for(let i = 0; i < messages.length; i++) {
+                            $('<p>').text(messages[i]).appendTo(errorMessageBoxElement.find('.messages'));
+                        }
+                        if(messages.length > 0) {
+                            errorMessageBoxElement.css('display', 'block');
+                        }
+                    }
+
+
+
+
+                    e.preventDefault();
+                });
+
+            });
+
+
+        </script>
+    {% endautoescape %}
+{% endblock %}

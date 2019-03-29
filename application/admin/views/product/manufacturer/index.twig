@@ -1,0 +1,200 @@
+{% extends "_temp/_blank_dashboard_temp.twig" %}
+
+{% block Content %}
+    <div class="container">
+        <section class="row">
+            <div class="col-12 px-5 pt-4">
+                <div class="message-box success-box" id="success-message-box" style="display: none;">
+                    <h4>موفقیت!</h4>
+                    <hr>
+                    <div class="messages">
+
+                    </div>
+                </div>
+                <div class="message-box error-box" id="error-message-box" style="display: none;">
+                    <h4>خطا!</h4>
+                    <hr>
+                    <div class="messages">
+
+                    </div>
+                </div>
+                <div class="row"  style="box-shadow: 0 0 5px rgba(0,0,0,0.1)">
+                    <div class="col-12 p-2">
+                        {% if Manufacturers %}
+                            <dib class="form-group">
+                                <table class="table table-bordered text-center">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col"><input type="checkbox" id="select-all-checkbox"></th>
+                                        <th scope="col">#</th>
+                                        <th scope="col">نام گروه خصوصیت</th>
+                                        <th scope="col">ترتیب</th>
+                                        <th scope="col">عملیات</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="table-show-data">
+                                    {% for Manufacturer in Manufacturers %}
+                                        <tr>
+                                            <td ><input type="checkbox" data-manufacturer-id="{{ Manufacturer['manufacturer_id'] }}"></td>
+                                            <td>{{ Manufacturer['manufacturer_id'] }}</td>
+                                            <td>{{ Manufacturer['name'] }}</td>
+                                            <td>{{ Manufacturer['sort_order'] }}</td>
+                                            <td >
+                                                <a href="{{ ADMIN_URL }}product/manufacturer/edit/{{ Manufacturer['manufacturer_id'] }}?token={{ Token }}" class="btn btn-warning fa fa-pencil-alt"></a>
+                                                {% if Manufacturer['status'] == "1" %}
+                                                    <button class="btn btn-success fa fa-toggle-on manufacturer-status" data-manufacturer-id="{{ Manufacturer['manufacturer_id'] }}" data-manufacturer-status="{{ Manufacturer['status'] }}"></button>
+                                                {% else %}
+                                                    <button class="btn btn-danger fa fa-toggle-off manufacturer-status" data-manufacturer-id="{{ Manufacturer['manufacturer_id'] }}" data-manufacturer-status="{{ Manufacturer['status'] }}"></button>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </dib>
+
+                        {% endif %}
+                        <div class="form-group text-right pt-3 px-3">
+                            <a href="{{ ADMIN_URL }}home/index?token={{ Token }}" class="fa fa-arrow-right btn btn-warning"></a>
+                            <a href="#" id="manufacturer-delete-btn" class="fa fa-trash btn btn-danger"></a>
+                            <a href="{{ ADMIN_URL }}product/manufacturer/add?token={{ Token }}" class="fa fa-plus btn btn-success"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+{% endblock %}
+
+{% block Js %}
+    {% autoescape false %}
+        <script type="text/javascript">
+
+            let deleteUrl = "{{ ADMIN_URL }}product/manufacturer/delete?token={{ Token }}";
+            let statusUrl = "{{ ADMIN_URL }}product/manufacturer/status?token={{ Token }}";
+            let Languages = [
+                {% for Language in Languages %}
+                "{{ Language['language_id'] }}",
+                {% endfor %}
+            ];
+            let DefaultLanguageID = {{ DefaultLanguageID }};
+            let selectAllCheckBox = $("#select-all-checkbox");
+            let successMessageBoxElement = $("#success-message-box");
+            let errorMessageBoxElement = $("#error-message-box");
+
+            function init() {
+                selectAllCheckBox.click(function (e) {
+                    let status = false;
+                    if($(this).prop('checked')) {
+                        status = true;
+                    }else {
+                        status = false;
+                    }
+                    $('#table-show-data input[type="checkbox"]').each(function (index, element) {
+                        $(element).prop('checked', status);
+                    });
+                });
+                $("#manufacturer-delete-btn").click(function (e) {
+                    successMessageBoxElement.css('display', 'none');
+                    successMessageBoxElement.find('.messages').html('');
+                    errorMessageBoxElement.css('display', 'none');
+                    errorMessageBoxElement.find('.messages').html('');
+                    let data = {};
+                    data['manufacturers_id'] = [];
+                    if(confirm("{{ T['are_you_sure_?'] }}")) {
+                        $("#table-show-data input[type='checkbox']:checked").each(function (index, element) {
+                            data['manufacturers_id'].push($(element).attr('data-manufacturer-id'));
+                        });
+                        if(data['manufacturers_id'].length > 0) {
+                            data['post'] = true;
+                            data['manufacturer-post'] = true;
+
+                            $.post(deleteUrl, data, function (response) {
+                                response = JSON.parse(response);
+                                if(response.status === 1) {
+                                    for (let i = 0; i < response['messages'].length; i++) {
+                                        $('<p>').text(response['messages'][i]).appendTo(successMessageBoxElement.find('.messages'));
+                                    }
+                                    if(response['messages'].length > 0) {
+                                        successMessageBoxElement.fadeIn(300).delay(2700).fadeOut(300);
+                                    }
+                                    if(response['data']) {
+                                        $('#table-show-data').html(response['data']);
+                                        init();
+                                    }
+                                    if(response['redirect']) {
+                                        window.setTimeout(function () {
+                                            window.location.href = response['redirect'];
+                                        }, 1000)
+                                    }
+                                }else {
+                                    for (let i = 0; i < response['messages'].length; i++) {
+                                        $('<p>').text(response['messages'][i]).appendTo(errorMessageBoxElement.find('.messages'));
+                                    }
+                                    if(response['messages'].length > 0) {
+                                        errorMessageBoxElement.fadeIn(300).delay(2700).fadeOut(300);
+                                    }
+                                }
+
+                            });
+                        }
+                    }
+                    e.preventDefault();
+                });
+
+                $('.manufacturer-status').click(function (e) {
+                    let manufacturer_id = +$(this).attr('data-manufacturer-id');
+                    let manufacturer_status = +$(this).attr('data-manufacturer-status');
+                    if(manufacturer_status === 1) {
+                        manufacturer_status = 0;
+                        $(this).removeClass('btn-success');
+                        $(this).addClass('btn-danger');
+                        $(this).removeClass('fa-toggle-on');
+                        $(this).addClass('fa-toggle-off');
+                    }else {
+                        manufacturer_status = 1;
+                        $(this).addClass('btn-success');
+                        $(this).removeClass('btn-danger');
+                        $(this).addClass('fa-toggle-on');
+                        $(this).removeClass('fa-toggle-off');
+                    }
+                    $(this).attr('data-manufacturer-status', manufacturer_status);
+                    $.post(statusUrl, {"manufacturer_id": manufacturer_id, "manufacturer_status": manufacturer_status, "post" : true }, function (response) {
+                        response = JSON.parse(response);
+                        successMessageBoxElement.find('.messages').html('');
+                        errorMessageBoxElement.find('.messages').html('');
+                        if(response.status === 1) {
+                            for (let i = 0; i < response['messages'].length; i++) {
+                                $('<p>').text(response['messages'][i]).appendTo(successMessageBoxElement.find('.messages'));
+                            }
+                            if(response['messages'].length > 0) {
+                                successMessageBoxElement.fadeIn(300).delay(2700).fadeOut(300);
+                            }
+                            if(response['data']) {
+                                $('#table-show-data').html(response['data']);
+                            }
+                            if(response['redirect']) {
+                                window.setTimeout(function () {
+                                    window.location.href = response['redirect'];
+                                }, 1000)
+                            }
+                        }else {
+                            for (let i = 0; i < response['messages'].length; i++) {
+                                $('<p>').text(response['messages'][i]).appendTo(errorMessageBoxElement.find('.messages'));
+                            }
+                            if(response['messages'].length > 0) {
+                                errorMessageBoxElement.fadeIn(300).delay(2700).fadeOut(300);
+                            }
+                        }
+                    });
+
+                });
+            }
+            $(document).ready(function () {
+                init();
+            });
+
+        </script>
+    {% endautoescape %}
+{% endblock %}
