@@ -1,0 +1,167 @@
+{% extends "_temp/_blank_dashboard_temp.twig" %}
+
+{% block Content %}
+    <div class="container">
+        <section class="row">
+            <div class="col-12 px-5 pt-4">
+                <div class="message-box success-box" id="success-message-box" style="display: none;">
+                    <h4>موفقیت!</h4>
+                    <hr>
+                    <div class="messages">
+
+                    </div>
+                </div>
+                <div class="message-box error-box" id="error-message-box" style="display: none;">
+                    <h4>خطا!</h4>
+                    <hr>
+                    <div class="messages">
+
+                    </div>
+                </div>
+                <div class="row"  style="box-shadow: 0 0 5px rgba(0,0,0,0.1)">
+                    <div class="col-12 p-2">
+                        <dib class="form-group">
+                            <ul class="nav nav-tabs" id="myTab" role="tablist">
+                                {% for Language in Languages %}
+                                    {% if Language['language_id'] == DefaultLanguageID %}
+
+                                        <li class="nav-item">
+                                            <a class="nav-link active" data-toggle="tab" href="#language-{{ Language['language_id'] }}" role="tab" aria-controls="language-{{ Language['language_id'] }}" aria-selected="true">{{ Language['name'] }}</a>
+                                        </li>
+                                    {% else %}
+                                        <li class="nav-item">
+                                            <a class="nav-link" data-toggle="tab" href="#language-{{ Language['language_id'] }}" role="tab" aria-controls="language-{{ Language['language_id'] }}" aria-selected="false">{{ Language['name'] }}</a>
+                                        </li>
+                                    {% endif %}
+                                {% endfor %}
+                            </ul>
+                            <div class="tab-content text-right" id="myTabContent">
+                                {% for Language in Languages %}
+                                    {% if Language['language_id'] == DefaultLanguageID %}
+                                        {% set ClassName = "show active" %}
+                                    {% else %}
+                                        {% set ClassName = "" %}
+                                    {% endif %}
+                                    <div class="tab-pane fade {{ ClassName }} " id="language-{{ Language['language_id'] }}" role="tabpanel" aria-labelledby="language-{{ Language['language_id'] }}-tab">
+                                        <div class="form-group d-flex align-middle mt-3">
+                                            <label class="col-sm-2 control-label text-center">نام</label>
+                                            <div class="col-sm-10">
+                                                <input type="text" value="{{ AttributeGroup['attributegroup_names'][Language['language_id']] }}" placeholder="{{ Language['name'] }}" class="form-control" id="attributegroup-name-{{ Language['language_id'] }}">
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endfor %}
+
+                            </div>
+                        </dib>
+
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">ترتیب</label>
+                            <div class="col-sm-10">
+                                <input type="text" value="{{ AttributeGroup['sort_order'] }}" id="attributegroup-sort-order" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group text-right pt-3 px-3">
+                            <a href="{{ ADMIN_URL }}product/attributegroup/index?token={{ Token }}" class="fa fa-arrow-right btn btn-warning"></a>
+                            <a href="#" id="attributegroup-submit-btn" class="fa fa-plus btn btn-success"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+{% endblock %}
+
+{% block Js %}
+    {% autoescape false %}
+        <script type="text/javascript">
+            let Url = "{{ CURRENT_URL }}" + "?token=" + "{{ Token }}";
+            let Languages = [
+                {% for Language in Languages %}
+                    "{{ Language['language_id'] }}",
+                {% endfor %}
+            ];
+            let DefaultLanguageID = {{ DefaultLanguageID }};
+
+            $(document).ready(function (e) {
+
+                /*
+                * Post Data
+                * */
+                let attributegroupSubmitBtn = $("#attributegroup-submit-btn");
+                let successMessageBoxElement = $("#success-message-box");
+                let errorMessageBoxElement = $("#error-message-box");
+
+                attributegroupSubmitBtn.click(function (e) {
+                    let data  = {};
+                    let messages = [];
+                    let error = false;
+                    let element;
+
+                    Languages.forEach(function (language_id) {
+                       element = $("#attributegroup-name-" + language_id);
+                       if(element.val() != "") {
+                           data["attributegroup-name-" + language_id] = element.val();
+                       }
+                    });
+                    element = $("#attributegroup-name-" + DefaultLanguageID);
+                    if(element.val() == "") {
+                        error = true;
+                        messages.push("{{ T['error_attributegroup_name_empty'] }}")
+                    }
+                    element = $("#attributegroup-sort-order");
+                    if(element.val() != "") {
+                        data['attributegroup-sort-order'] = element.val();
+                    }else {
+                        data['attributegroup-sort-order'] = 0;
+                    }
+                    data['post'] = true;
+                    data['attributegroup-post'] = true;
+                    if(!error) {
+                        $.post(Url, data, function (response) {
+                            response = JSON.parse(response);
+                            if(response['status'] == 1) {
+                                for(let i = 0; i < response['messages'].length; i++) {
+                                    $('<p>').text(response['messages'][i]).appendTo(successMessageBoxElement.find('.messages'));
+                                }
+                                if(response['messages'].length > 0) {
+                                    successMessageBoxElement.css('display', 'block');
+                                }
+
+                                if(response['redirect']) {
+                                    window.setTimeout(function () {
+                                        window.location.href = response['redirect'];
+                                    }, 1000);
+                                }
+
+                            }else {
+                                for(let i = 0; i < response['messages'].length; i++) {
+                                    $('<p>').text(response['messages'][i]).appendTo(errorMessageBoxElement.find('.messages'));
+                                }
+                                if(response['messages'].length > 0) {
+                                    errorMessageBoxElement.css('display', 'block');
+                                }
+                            }
+                        });
+                    }else {
+                        for(let i = 0; i < messages.length; i++) {
+                            $('<p>').text(messages[i]).appendTo(errorMessageBoxElement.find('.messages'));
+                        }
+                        if(messages.length > 0) {
+                            errorMessageBoxElement.css('display', 'block');
+                        }
+                    }
+
+
+
+
+                    e.preventDefault();
+                });
+
+            });
+
+
+        </script>
+    {% endautoescape %}
+{% endblock %}

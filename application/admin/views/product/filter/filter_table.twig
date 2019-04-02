@@ -1,0 +1,11 @@
+{% for Filter in Filters %}
+    <tr>
+        <td ><input type="checkbox" data-filter-id="{{ Filter['filter_group_id'] }}"></td>
+        <td>{{ Filter['filter_group_id'] }}</td>
+        <td>{{ Filter['name'] }}</td>
+        <td>{{ Filter['sort_order'] }}</td>
+        <td >
+            <a href="{{ ADMIN_URL }}product/filter/edit/{{ Filter['filter_group_id'] }}?token={{ Token }}" class="btn btn-warning fa fa-pencil-alt"></a>
+        </td>
+    </tr>
+{% endfor %}
