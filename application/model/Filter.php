@@ -122,9 +122,8 @@ class Filter extends Model
             ));
             if($this->Database->hasRows()) {
                 $this->Database->query("SELECT * FROM filter f LEFT JOIN filter_language fl on f.filter_id = fl.filter_id
-                WHERE f.filter_id = :fID AND fl.language_id = :lID ", array(
+                WHERE fl.language_id = :lID ", array(
                     'lID'   => $language_id,
-                    'fID'   => $filter_group_id
                 ));
                 $filters = $this->Database->getRows();
                 $row = $this->Database->getRow();
@@ -133,7 +132,6 @@ class Filter extends Model
                 $this->language_id = $row['language_id'];
                 $this->name = $row['name'];
                 $this->filters = $filters;
-                $row['filters'] = $filters;
                 $this->rows = [];
                 $this->rows[] = $row;
                 return $row;
@@ -146,16 +144,11 @@ class Filter extends Model
             ));
             $rows = $this->Database->getRows();
             if(count($rows) > 0) {
-                $this->Database->query("SELECT * FROM filter f LEFT JOIN filter_language fl on f.filter_id = fl.filter_id
-                WHERE f.filter_id = :fID ", array(
-                    'lID'   => $language_id,
-                    'fID'   => $filter_group_id
-                ));
+                $this->Database->query("SELECT * FROM filter f LEFT JOIN filter_language fl on f.filter_id = fl.filter_id");
                 $filters = $this->Database->getRows();
                 $this->filter_group_id = $rows[0]['filter_group_id'];
                 $this->sort_order = $rows[0]['sort_order'];
                 $this->filters = $filters;
-                $rows['filters'] = $filters;
                 $this->rows = $rows;
             }
             return $rows;
@@ -177,6 +170,61 @@ class Filter extends Model
             ));
         }
         return $this->Database->numRows();
+    }
+
+    public function editFilterGroup($filter_group_id, $data) {
+        $sql = "UPDATE filter_group SET ";
+        $query = [];
+        $params = [];
+        if(isset($data['sort_order'])) {
+            $query[] = 'sort_order = :fGSortOrder';
+            $params['fGSortOrder'] = $data['sort_order'];
+        }
+
+        $sql .= implode(' , ', $query);
+        $sql .= " WHERE filter_group_id = :fGID ";
+        $params['fGID'] = $filter_group_id;
+        if(count($query) > 0) {
+            $this->Database->query($sql, $params);
+        }
+        if(isset($data['filter_names'])) {
+
+            foreach ($data['filter_names'] as $language_id => $filter_name) {
+                $this->Database->query("UPDATE filter_group_language SET name = :fGName WHERE 
+                attribute_group_id = :fGID AND language_id = :lID", array(
+                    'fGName' => $filter_name,
+                    'fGID'  => $filter_group_id,
+                    'lID'   => $language_id
+                ));
+            }
+        }
+        if(isset($data['filters'])) {
+            $this->Database->query("DELETE FROM filter WHERE filter_group_id = :fGID", array(
+                'fGID'  => $filter_group_id
+            ));
+            foreach ($data['filters'] as $filter) {
+                $this->Database->query("INSERT INTO filter (filter_group_id, sort_order) VALUES (:fGID, :fSortOrder)", array(
+                    'fGID'  => $filter_group_id,
+                    'fSortOrder'    => $filter['sort_order']
+                ));
+                $filter_id = $this->Database->insertId();
+                foreach ($filter['names'] as $language_id => $name) {
+
+                    $this->Database->query("INSERT INTO filter_language (filter_id,language_id, name) VALUES (:fID,:lID, :fName)", array(
+                        'fID'  => $filter_id,
+                        'fName'    => $name,
+                        'lID'   => $language_id
+                    ));
+                }
+            }
+
+
+        }
+        if($this->Database->numRows() > 0) {
+            return true;
+        }else {
+            return false;
+        }
     }
 
 }

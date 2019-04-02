@@ -46,9 +46,61 @@
                                         <div class="form-group d-flex align-middle mt-3">
                                             <label class="col-sm-2 control-label text-center">نام</label>
                                             <div class="col-sm-10">
-                                                <input type="text" value="{{ AttributeGroup['attributegroup_names'][Language['language_id']] }}" placeholder="{{ Language['name'] }}" class="form-control" id="attributegroup-name-{{ Language['language_id'] }}">
+                                                <input type="text" value="{{ Filter['filter_names'][Language['language_id']] }}" placeholder="{{ Language['name'] }}" class="form-control" id="filter-group-name-{{ Language['language_id'] }}">
                                             </div>
                                         </div>
+
+                                        <div class="form-group d-flex align-middle mt-3">
+                                            <table class="table table-bordered text-center">
+                                                <thead>
+                                                <tr>
+                                                    <th class="col-sm-6">نام فیتر</th>
+                                                    {% if Language['language_id'] == DefaultLanguageID %}
+                                                    <th class="col-sm-5">ترتیب</th>
+                                                    {% endif %}
+                                                    <th class="col-sm-2">
+                                                        <a href="#" class="add-table-show-data btn btn-primary fa fa-plus"></a>
+                                                    </th>
+                                                </tr>
+                                                </thead>
+                                                <tbody id="table-show-data-language-{{ Language['language_id'] }}">
+                                                {% set Counter = 0 %}
+                                                {% if  Language['language_id'] == DefaultLanguageID%}
+                                                    {% for FilterItem in Filter['filters'] %}
+                                                        {% set Counter = Counter + 1 %}
+                                                        <tr data-row-id="{{ Counter }}">
+                                                            <td>
+                                                                <input type="text" value="{{ FilterItem['names'][Language['language_id']] }}" class="form-control" placeholder="نام فیلتر">
+                                                            </td>
+                                                            <td>
+                                                                <input type="text" value="{{ FilterItem['sort_order'] }}" class="form-control" placeholder="نام ترتیب">
+                                                            </td>
+                                                            <td>
+                                                                <button class="btn btn-danger fa fa-minus" data-row-id="{{ Counter }}"></button>
+                                                            </td>
+                                                        </tr>
+
+                                                    {% endfor %}
+                                                {% else %}
+                                                    {% for FilterItem in Filter['filters'] %}
+                                                        {% set Counter = Counter + 1 %}
+                                                        <tr data-row-id="{{ Counter }}">
+                                                            <td>
+                                                                <input type="text" value="{{ FilterItem['names'][Language['language_id']] }}" class="form-control" placeholder="نام فیلتر">
+                                                            </td>
+                                                            <td>
+                                                                <button class="btn btn-danger fa fa-minus" data-row-id="{{ Counter }}"></button>
+                                                            </td>
+                                                        </tr>
+
+                                                    {% endfor %}
+
+                                                {% endif %}
+                                                </tbody>
+                                            </table>
+                                        </div>
+
+
                                     </div>
                                 {% endfor %}
 
@@ -58,12 +110,12 @@
                         <div class="form-group d-flex align-middle mt-3">
                             <label class="col-sm-2 control-label text-center">ترتیب</label>
                             <div class="col-sm-10">
-                                <input type="text" value="{{ AttributeGroup['sort_order'] }}" id="attributegroup-sort-order" class="form-control">
+                                <input type="text" value="{{ Filter['sort_order'] }}" id="filter-group-sort-order" class="form-control">
                             </div>
                         </div>
                         <div class="form-group text-right pt-3 px-3">
-                            <a href="{{ ADMIN_URL }}product/attributegroup/index?token={{ Token }}" class="fa fa-arrow-right btn btn-warning"></a>
-                            <a href="#" id="attributegroup-submit-btn" class="fa fa-plus btn btn-success"></a>
+                            <a href="{{ ADMIN_URL }}product/filter/index?token={{ Token }}" class="fa fa-arrow-right btn btn-warning"></a>
+                            <a href="#" id="filter-submit-btn" class="fa fa-plus btn btn-success"></a>
                         </div>
                     </div>
                 </div>
@@ -85,39 +137,91 @@
             let DefaultLanguageID = {{ DefaultLanguageID }};
 
             $(document).ready(function (e) {
+                Languages.forEach(function (language_id) {
+                    $("#table-show-data-language-" + language_id).find('tr button').click(function (e) {
+                        let rowID = $(this).attr('data-row-id');
+                        $('table tr[data-row-id="' + rowID + '"]').remove();
+                    });
+                });
+
+                $('.add-table-show-data').click((function () {
+                    let i = 0;
+                    return function (e) {
+                        i++;
+                        Languages.forEach(function (language_id) {
+                            let newRow = $('<tr>');
+                            newRow.attr('data-row-id', i);
+                            let newCell = $('<td>');
+                            $('<input type="text" class="form-control" placeholder="نام فیلتر">').appendTo(newCell);
+                            newCell.appendTo(newRow);
+                            if(language_id == DefaultLanguageID) {
+                                newCell = $('<td>');
+                                $('<input type="text" class="form-control" placeholder="نام ترتیب">').appendTo(newCell);
+                                newCell.appendTo(newRow);
+                            }
+                            newCell = $('<td>');
+                            let deleteRowBtn = $("<button class='btn btn-danger fa fa-minus'>");
+                            deleteRowBtn.attr('data-row-id', i);
+                            deleteRowBtn.click(function (e) {
+                                let rowID = $(this).attr('data-row-id');
+                                $('table tr[data-row-id="' + rowID + '"]').remove();
+                            });
+                            deleteRowBtn.appendTo(newCell);
+                            newCell.appendTo(newRow);
+                            newRow.appendTo($('#table-show-data-language-'+ language_id));
+                        });
+                        e.preventDefault();
+                    };
+                })());
+
 
                 /*
                 * Post Data
                 * */
-                let attributegroupSubmitBtn = $("#attributegroup-submit-btn");
+                let filterSubmitBtn = $("#filter-submit-btn");
                 let successMessageBoxElement = $("#success-message-box");
                 let errorMessageBoxElement = $("#error-message-box");
 
-                attributegroupSubmitBtn.click(function (e) {
+                filterSubmitBtn.click(function (e) {
                     let data  = {};
                     let messages = [];
                     let error = false;
                     let element;
 
                     Languages.forEach(function (language_id) {
-                       element = $("#attributegroup-name-" + language_id);
+                       element = $("#filter-group-name-" + language_id);
                        if(element.val() != "") {
-                           data["attributegroup-name-" + language_id] = element.val();
+                           data["filter-name-" + language_id] = element.val();
                        }
                     });
-                    element = $("#attributegroup-name-" + DefaultLanguageID);
+                    element = $("#filter-group-name-" + DefaultLanguageID);
                     if(element.val() == "") {
                         error = true;
-                        messages.push("{{ T['error_attributegroup_name_empty'] }}")
+                        messages.push("{{ T['error_filter_name_empty'] }}")
                     }
-                    element = $("#attributegroup-sort-order");
+                    data['filter-items'] = [];
+                    $('#table-show-data-language-' + DefaultLanguageID).find('tr').each(function (index,element) {
+                        if($(element).find('td:first-child input').val() != "") {
+                            let filter = {};
+                            filter['sort_order'] = $(element).find('td:nth-child(2) input').val();
+                            let rowID = $(element).attr('data-row-id');
+                            Languages.forEach(function (language_id) {
+                                if($("#table-show-data-language-" + language_id).find('tr[data-row-id="' + rowID + '"]').find('td:first-child input').val() != "") {
+                                    filter['name-' + language_id] = $("#table-show-data-language-" + language_id).find('tr[data-row-id="' + rowID + '"]').find('td:first-child input').val();
+                                }
+                            });
+                            data['filter-items'].push(filter);
+                        }
+                    });
+                    element = $("#filter-group-sort-order");
                     if(element.val() != "") {
-                        data['attributegroup-sort-order'] = element.val();
+                        data['filter-group-sort-order'] = element.val();
                     }else {
-                        data['attributegroup-sort-order'] = 0;
+                        data['filter-group-sort-order'] = 0;
                     }
                     data['post'] = true;
-                    data['attributegroup-post'] = true;
+                    data['filter-post'] = true;
+                    console.log(data);
                     if(!error) {
                         $.post(Url, data, function (response) {
                             response = JSON.parse(response);
