@@ -120,7 +120,6 @@ class Category extends Model
         return $this->rows;
     }
 
-
     public function insertCategory($data, $category_id = null) {
         if(!$category_id) {
             $this->Database->query("INSERT INTO category (parent_id, top, level, sort_order, status) VALUES 
@@ -232,6 +231,132 @@ class Category extends Model
             }
         }
         return $this->Database->numRows();
+    }
+
+    public function editCategory($category_id, $data) {
+        $sql = "UPDATE category SET ";
+        $query = [];
+        $params = [];
+        if(isset($data['sort_order'])) {
+            $query[] = 'sort_order = :cSortOrder';
+            $params['cSortOrder'] = $data['sort_order'];
+        }
+        if(isset($data['parent_id'])) {
+            $query[] = 'parent_id = :cPID';
+            $params['cPID'] = $data['parent_id'];
+        }
+        if(isset($data['top'])) {
+            $query[] = 'top = :cTop';
+            $params['cTop'] = $data['top'];
+        }
+        if(isset($data['level'])) {
+            $query[] = 'level = :cLevel';
+            $params['cLevel'] = $data['level'];
+        }
+        if(isset($data['status'])) {
+            $query[] = 'status = :cStatus';
+            $params['cStatus'] = $data['status'];
+        }
+
+        $sql .= implode(' , ', $query);
+        $sql .= " WHERE category_id = :cID ";
+        $params['cID'] = $category_id;
+        if(count($query) > 0) {
+            $this->Database->query($sql, $params);
+        }
+        if(isset($data['category_names'])) {
+
+            foreach ($data['category_names'] as $language_id => $category_name) {
+                $this->Database->query("UPDATE category_language SET name = :cName WHERE 
+                category_id = :cID AND language_id = :lID", array(
+                    'cName' => $category_name,
+                    'cID'  => $category_id,
+                    'lID'   => $language_id
+                ));
+            }
+
+        }
+        if(isset($data['parent_id'])) {
+            $this->Database->query("SELECT * FROM category_path WHERE path_id = :cPID", array(
+                'cPID'  => $category_id
+            ));
+            if($this->Database->hasRows()) {
+                foreach ($this->Database->getRows() as $row) {
+                    $this->Database->query("DELETE FROM category_path WHERE category_id = :cID AND level < :cLevel", array(
+                        'cID'   => $row['category_id'],
+                        'cLevel'=> $row['level']
+                    ));
+                    $this->Database->query("SELECT * FROM category_path WHERE category_id = :cID ORDER BY level ASC", array(
+                        'cID'   => $data['parent_id']
+                    ));
+                    $path = [];
+                    foreach ($this->Database->getRows() as $result) {
+                        $pat[] = $result['path_id'];
+                    }
+                    $this->Database->query("SELECT * FROM category_path WHERE category_id = :cID ORDER BY level ASC", array(
+                        'cID'   => $row['category_id']
+                    ));
+                    foreach ($this->Database->getRows() as $result) {
+                        $pat[] = $result['path_id'];
+                    }
+                    $level = 0;
+                    foreach ($path as $path_id) {
+                        $this->Database->query("REPLACE INTO category_path (category_id, path_id, level) VALUES 
+                        (:cID, :cPID, :cLevel)", array(
+                            'cID'   => $row['category_id'],
+                            'cPID'  => $path_id,
+                            'cLevel'=> $level,
+                        ));
+                        $level++;
+                    }
+                }
+            }else {
+                $this->Database->query("DELETE FROM category_path WHERE category_id = :cID", array(
+                    'cID'   => $category_id
+                ));
+                $this->Database->query("SELECT * FROM category_path WHERE category_id = :cID ORDER BY level ASC", array(
+                    'cID'   => $data['parent_id']
+                ));
+                $rows = $this->Database->getRows();
+                $level = 0;
+                foreach ($rows as $row) {
+                    $this->Database->query("INSERT INTO category_path (category_id, path_id, level) VALUES 
+                (:cID, :cPID, :cLevel)", array(
+                        'cID'   => $category_id,
+                        'cPID'  => $row['path_id'],
+                        'cLevel'=> $level
+                    ));
+                    $level++;
+                }
+                $this->Database->query("REPLACE INTO category_path (category_id, path_id, level) VALUES 
+                (:cID, :cPID, :cLevel)", array(
+                    'cID'   => $category_id,
+                    'cPID'  => $category_id,
+                    'cLevel'=> $level
+                ));
+            }
+
+
+
+        }
+        if(isset($data['filters_id'])) {
+            $this->Database->query("DELETE FROM category_filter WHERE category_id = :cID", array(
+                'cID'   => $category_id
+            ));
+            foreach ($data['filters_id'] as $filter_id ) {
+                $this->Database->query("INSERT INTO category_filter (category_id, filter_id) VALUES (:cID, :fID)", array(
+                    'cID'   => $category_id,
+                    'fID'   => $filter_id
+                ));
+            }
+        }
+
+
+        if($this->Database->numRows() > 0) {
+            return true;
+        }else {
+            return false;
+        }
     }
 
 }

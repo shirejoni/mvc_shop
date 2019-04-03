@@ -168,4 +168,27 @@ class ControllerProductCategory extends Controller {
         $this->Response->setOutPut(json_encode($json));
     }
 
+    public function status() {
+        if(isset($this->Request->post['category_id']) && isset($this->Request->post['category_status'])) {
+            $category_id = (int) $this->Request->post['category_id'];
+            $category_status = (int) $this->Request->post['category_status'] == 1 ? 1 : 0;
+            /** @var Category $Category */
+            $Category = $this->load("Category", $this->registry);
+            $json = [];
+            if($category_id &&  $category = $Category->getCategory($category_id)) {
+                $Category->editCategory($category_id, array(
+                    'status'    => $category_status
+                ));
+                $json['status'] = 1;
+                $json['messages'] = [$this->Language->get('success_message')];
+            }else {
+                $json['status'] = 0;
+                $json['messages'] = [$this->Language->get('error_done')];
+            }
+            $this->Response->setOutPut(json_encode($json));
+            return;
+        }
+        return new Action('error/notFound', 'web');
+    }
+
 }

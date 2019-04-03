@@ -41,6 +41,11 @@
                                             <td>{{ Category['sort_order'] }}</td>
                                             <td >
                                                 <a href="{{ ADMIN_URL }}product/category/edit/{{ Category['category_id'] }}?token={{ Token }}" class="btn btn-warning fa fa-pencil-alt"></a>
+                                                {% if Category['status'] == "1" %}
+                                                    <button class="btn btn-success fa fa-toggle-on category-status" data-category-id="{{ Category['category_id'] }}" data-category-status="{{ Category['status'] }}"></button>
+                                                {% else %}
+                                                    <button class="btn btn-danger fa fa-toggle-off category-status" data-category-id="{{ Category['category_id'] }}" data-category-status="{{ Category['status'] }}"></button>
+                                                {% endif %}
                                             </td>
                                         </tr>
                                     {% endfor %}
@@ -67,6 +72,7 @@
         <script type="text/javascript">
 
             let deleteUrl = "{{ ADMIN_URL }}product/category/delete?token={{ Token }}";
+            let statusUrl = "{{ ADMIN_URL }}product/category/status?token={{ Token }}";
             let Languages = [
                 {% for Language in Languages %}
                 "{{ Language['language_id'] }}",
@@ -77,8 +83,7 @@
             let successMessageBoxElement = $("#success-message-box");
             let errorMessageBoxElement = $("#error-message-box");
 
-
-            $(document).ready(function () {
+            function init() {
                 selectAllCheckBox.click(function (e) {
                     let status = false;
                     if($(this).prop('checked')) {
@@ -99,43 +104,94 @@
                     let data = {};
                     data['categories_id'] = [];
                     if(confirm("{{ T['are_you_sure_?'] }}")) {
-                       $("#table-show-data input[type='checkbox']:checked").each(function (index, element) {
-                           data['categories_id'].push($(element).attr('data-category-id'));
-                       });
-                       if(data['categories_id'].length > 0) {
-                           data['post'] = true;
-                           data['category-post'] = true;
-                           $.post(deleteUrl, data, function (response) {
-                               response = JSON.parse(response);
-                               if(response.status === 1) {
-                                   for (let i = 0; i < response['messages'].length; i++) {
-                                       $('<p>').text(response['messages'][i]).appendTo(successMessageBoxElement.find('.messages'));
-                                   }
-                                   if(response['messages'].length > 0) {
-                                       successMessageBoxElement.fadeIn(300).delay(2700).fadeOut(300);
-                                   }
-                                   if(response['data']) {
-                                       $('#table-show-data').html(response['data']);
-                                   }
-                                   if(response['redirect']) {
-                                       window.setTimeout(function () {
-                                           window.location.href = response['redirect'];
-                                       }, 1000)
-                                   }
-                               }else {
-                                   for (let i = 0; i < response['messages'].length; i++) {
-                                       $('<p>').text(response['messages'][i]).appendTo(errorMessageBoxElement.find('.messages'));
-                                   }
-                                   if(response['messages'].length > 0) {
-                                       errorMessageBoxElement.fadeIn(300).delay(2700).fadeOut(300);
-                                   }
-                               }
+                        $("#table-show-data input[type='checkbox']:checked").each(function (index, element) {
+                            data['categories_id'].push($(element).attr('data-category-id'));
+                        });
+                        if(data['categories_id'].length > 0) {
+                            data['post'] = true;
+                            data['category-post'] = true;
+                            $.post(deleteUrl, data, function (response) {
+                                response = JSON.parse(response);
+                                if(response.status === 1) {
+                                    for (let i = 0; i < response['messages'].length; i++) {
+                                        $('<p>').text(response['messages'][i]).appendTo(successMessageBoxElement.find('.messages'));
+                                    }
+                                    if(response['messages'].length > 0) {
+                                        successMessageBoxElement.fadeIn(300).delay(2700).fadeOut(300);
+                                    }
+                                    if(response['data']) {
+                                        $('#table-show-data').html(response['data']);
+                                    }
+                                    if(response['redirect']) {
+                                        window.setTimeout(function () {
+                                            window.location.href = response['redirect'];
+                                        }, 1000)
+                                    }
+                                }else {
+                                    for (let i = 0; i < response['messages'].length; i++) {
+                                        $('<p>').text(response['messages'][i]).appendTo(errorMessageBoxElement.find('.messages'));
+                                    }
+                                    if(response['messages'].length > 0) {
+                                        errorMessageBoxElement.fadeIn(300).delay(2700).fadeOut(300);
+                                    }
+                                }
 
-                           });
-                       }
+                            });
+                        }
                     }
                     e.preventDefault();
                 });
+
+                $('.category-status').click(function (e) {
+                    let category_id = +$(this).attr('data-category-id');
+                    let category_status = +$(this).attr('data-category-status');
+                    if(category_status === 1) {
+                        category_status = 0;
+                        $(this).removeClass('btn-success');
+                        $(this).addClass('btn-danger');
+                        $(this).removeClass('fa-toggle-on');
+                        $(this).addClass('fa-toggle-off');
+                    }else {
+                        category_status = 1;
+                        $(this).addClass('btn-success');
+                        $(this).removeClass('btn-danger');
+                        $(this).addClass('fa-toggle-on');
+                        $(this).removeClass('fa-toggle-off');
+                    }
+                    $(this).attr('data-category-status', category_status);
+                    $.post(statusUrl, {"category_id": category_id, "category_status": category_status, "post" : true }, function (response) {
+                        response = JSON.parse(response);
+                        successMessageBoxElement.find('.messages').html('');
+                        errorMessageBoxElement.find('.messages').html('');
+                        if(response.status === 1) {
+                            for (let i = 0; i < response['messages'].length; i++) {
+                                $('<p>').text(response['messages'][i]).appendTo(successMessageBoxElement.find('.messages'));
+                            }
+                            if(response['messages'].length > 0) {
+                                successMessageBoxElement.fadeIn(300).delay(2700).fadeOut(300);
+                            }
+                            if(response['data']) {
+                                $('#table-show-data').html(response['data']);
+                            }
+                            if(response['redirect']) {
+                                window.setTimeout(function () {
+                                    window.location.href = response['redirect'];
+                                }, 1000)
+                            }
+                        }else {
+                            for (let i = 0; i < response['messages'].length; i++) {
+                                $('<p>').text(response['messages'][i]).appendTo(errorMessageBoxElement.find('.messages'));
+                            }
+                            if(response['messages'].length > 0) {
+                                errorMessageBoxElement.fadeIn(300).delay(2700).fadeOut(300);
+                            }
+                        }
+                    });
+
+                });
+            }
+            $(document).ready(function () {
+                init();
             });
 
         </script>
