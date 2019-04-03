@@ -17,8 +17,12 @@ class Category extends Model
      * @var array
      */
     private $rows = [];
+    private $category_id;
+    private $sort_order;
+    private $language_id;
+    private $name;
 
-    public function getCategories($data = []) {
+    public function getCategories($option = []) {
         $option['sort_order'] = isset($option['sort_order']) ? $option['sort_order'] : '';
         $option['order']   = isset($option['order']) ? $option['order'] : 'ASC';
         $option['language_id'] = isset($option['language_id']) ? $option['language_id'] : $this->Language->getLanguageID();
@@ -66,6 +70,56 @@ class Category extends Model
         return $this->rows;
     }
 
+    public function getCategoriesComp($option = []) {
+        $option['sort_order'] = isset($option['sort_order']) ? $option['sort_order'] : '';
+        $option['order']   = isset($option['order']) ? $option['order'] : 'ASC';
+        $option['language_id'] = isset($option['language_id']) ? $option['language_id'] : $this->Language->getLanguageID();
+
+        $sql = "SELECT cp.category_id, cl2.name,  GROUP_CONCAT(cl1.name ORDER BY cp.level SEPARATOR ',') as `full_name`, 
+                c.parent_id, c.top, c.level, c.sort_order, c.status FROM category c LEFT JOIN category_path cp on c.category_id = cp.category_id LEFT JOIN 
+                category_language cl1 on cp.path_id = cl1.category_id LEFT JOIN category_language cl2 ON cp.category_id = cl2.category_id
+                WHERE cl1.language_id = :lID AND cl2.language_id = :lID ";
+        if(isset($option['filter_name'])) {
+            $sql .= " AND cl.name LIKE :fName";
+        }
+        $sql .= " GROUP BY cp.category_id";
+        $sort_order = array(
+            'name',
+            'sort_order'
+        );
+        if(isset($option['sort_order']) && in_array($option['sort_order'], $sort_order)) {
+            $sql .= " ORDER BY " . $option['sort_order'];
+        }else {
+            $sql .= " ORDER BY cp.category_id";
+        }
+
+        if(isset($option['order']) && $option['order'] == "DESC") {
+            $sql .= " DESC";
+        }else {
+            $sql .= " ASC";
+        }
+
+        if(isset($option['start']) || isset($option['limit'])) {
+            if(!isset($option['start']) || $option['start'] < 0) {
+                $option['start'] = 0;
+            }
+            if(!isset($option['limit']) || $option['limit'] == 0) {
+                $option['limit'] = 20;
+            }
+            $sql .= " LIMIT " . (int) $option['start'] . ',' . (int) $option['limit'];
+        }
+
+        $params = array(
+            'lID'   => $option['language_id']
+        );
+        if(isset($option['filter_name'])) {
+            $params['fName'] = $option['filter_name'] . "%";
+        }
+        $this->Database->query($sql, $params);
+        $this->rows = $this->Database->getRows();
+        return $this->rows;
+    }
+
 
     public function insertCategory($data, $category_id = null) {
         if(!$category_id) {
@@ -93,12 +147,91 @@ class Category extends Model
                 'fID'   => $filter_id
             ));
         }
+        $level = 0;
+        if(isset($data['parent_id']) && $data['parent_id'] != 0) {
+            $this->Database->query("SELECT * FROM category_path WHERE category_id = :cID ORDER BY level ASC", array(
+                'cID'   => $data['parent_id']
+            ));
+            $rows = $this->Database->getRows();
+            foreach ($rows as $row) {
+                $this->Database->query("INSERT INTO category_path (category_id, path_id, level) VALUES 
+                (:cID, :cPID, :cLevel)", array(
+                    'cID'   => $category_id,
+                    'cPID'  => $row['path_id'],
+                    'cLevel'=> $level
+                ));
+                $level++;
+            }
+
+        }
+        $this->Database->query("INSERT INTO category_path (category_id, path_id, level) VALUES 
+                (:cID, :cPID, :cLevel)", array(
+            'cID'   => $category_id,
+            'cPID'  => $category_id,
+            'cLevel'=> $level
+        ));
 
         return $category_id;
     }
 
-    public function getCategory() {
+    public function getCategory($category_id, $lID = null) {
+        $language_id = $this->Language->getLanguageID();
+        if($lID && $lID != "all") {
+            $language_id = $lID;
+        }
+        if($lID != "all") {
+            $this->Database->query("SELECT * FROM category c LEFT JOIN category_language cl on c.category_id = cl.category_id
+            WHERE c.category_id = :cID AND cl.language_id = :lID", array(
+                'cID'  => $category_id,
+                'lID'   => $language_id
+            ));
+            if($this->Database->hasRows()) {
+                $row = $this->Database->getRow();
+                $this->category_id = $row['category_id'];
+                $this->sort_order = $row['sort_order'];
+                $this->language_id = $row['language_id'];
+                $this->name = $row['name'];
+                $this->rows = [];
+                $this->rows[] = $row;
+                return $row;
+            }
+            return false;
+        }else {
+            $this->Database->query("SELECT * FROM category c LEFT JOIN category_language cl on c.category_id = cl.category_id
+            WHERE c.category_id = :cID", array(
+                'cID'  => $category_id,
+            ));
+            $rows = $this->Database->getRows();
+            if(count($rows) > 0) {
+                $this->category_id = $rows[0]['category_id'];
+                $this->sort_order = $rows[0]['sort_order'];
+                $this->rows = $rows;
+            }
+            return $rows;
+        }
+    }
 
+    public function deleteCategory($category_id, $data = []) {
+        if(isset($data['category_names']) && count($data['category_names']) > 0) {
+            foreach ($data['category_names'] as $language_id => $category_name) {
+                $this->Database->query("DELETE FROM category_language WHERE category_id = :cID AND 
+                language_id = :lID", array(
+                    'cID'  => $category_id,
+                    'lID'   => $language_id
+                ));
+            }
+        }else {
+            $this->Database->query("SELECT * FROM category_path WHERE path_id = :cPID", array(
+                'cPID'  => $category_id
+            ));
+            $rows = $this->Database->getRows();
+            foreach ($rows as $row) {
+                $this->Database->query("DELETE FROM category WHERE category_id = :cID", array(
+                    'cID' => $row['category_id']
+                ));
+            }
+        }
+        return $this->Database->numRows();
     }
 
 }

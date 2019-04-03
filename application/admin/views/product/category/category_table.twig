@@ -1,0 +1,11 @@
+{% for Category in Categories %}
+    <tr>
+        <td ><input type="checkbox" data-category-id="{{ Category['category_id'] }}"></td>
+        <td>{{ Category['category_id'] }}</td>
+        <td>{{ Category['full_name'] }}</td>
+        <td>{{ Category['sort_order'] }}</td>
+        <td >
+            <a href="{{ ADMIN_URL }}product/category/edit/{{ Category['category_id'] }}?token={{ Token }}" class="btn btn-warning fa fa-pencil-alt"></a>
+        </td>
+    </tr>
+{% endfor %}

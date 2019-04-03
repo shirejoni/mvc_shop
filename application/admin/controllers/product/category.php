@@ -17,8 +17,19 @@ use App\system\Controller;
 class ControllerProductCategory extends Controller {
 
     public function index() {
-
-
+        $data = [];
+        /** @var Category $Category */
+        $Category = $this->load('Category', $this->registry);
+        $data['Languages'] = $this->Language->getLanguages();
+        $data['DefaultLanguageID'] = $this->Language->getDefaultLanguageID();
+        $data['Categories'] = $Category->getCategoriesComp(array(
+            'language_id'   => $this->Language->getLanguageID(),
+            'order'         => 'DESC'
+        ));
+        foreach ($data['Categories'] as $index =>  $category) {
+            $data['Categories'][$index]['full_name'] = implode(' > ', explode(',', $category['full_name']));
+        }
+        $this->Response->setOutPut($this->render('product/category/index', $data));
     }
 
     public function add() {
@@ -86,6 +97,7 @@ class ControllerProductCategory extends Controller {
                 $Category->insertCategory($data);
                 $json['status'] = 1;
                 $json['messages'] = [$this->Language->get('success_message')];
+                $json['data'] = $data;
                 $json['redirect'] = ADMIN_URL . 'product/category/index?token=' . $_SESSION['token'];
             }
             if($error) {
@@ -101,6 +113,42 @@ class ControllerProductCategory extends Controller {
             $this->Response->setOutPut($this->render('product/category/add', $data));
         }
     }
+
+    public function delete() {
+        if(!empty($this->Request->post['categories_id'])) {
+            $json = [];
+            /** @var Category $Category */
+            $Category = $this->load('Category', $this->registry);
+            $error = false;
+            $this->Database->db->beginTransaction();
+            foreach ($this->Request->post['categories_id'] as $category_id) {
+                $category = $Category->getCategory((int) $category_id);
+                if($category && (int) $category_id) {
+                    $Category->deleteCategory((int) $category_id);
+                }else {
+                    $error = true;
+                }
+            }
+            if($error) {
+                $this->Database->db->rollBack();
+                $json['status'] = 0;
+                $json['messages'] = [$this->Language->get('error_done')];
+            }else {
+                $this->Database->db->commit();
+                $json['status'] = 1;
+                $json['messages'] = [$this->Language->get('success_message')];
+                $data['Categories'] = $Category->getCategoriesComp(array(
+                    'language_id'   => $this->Language->getLanguageID(),
+                    'order'         => 'DESC'
+                ));
+                $json['data'] = $this->render('product/category/category_table', $data);
+            }
+            $this->Response->setOutPut(json_encode($json));
+        }else {
+            return new Action('error/notFound', 'web');
+        }
+    }
+
     public function getcategories() {
         $data = [];
         $language_id = $this->Language->getLanguageID();

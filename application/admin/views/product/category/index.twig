@@ -20,7 +20,7 @@
                 </div>
                 <div class="row"  style="box-shadow: 0 0 5px rgba(0,0,0,0.1)">
                     <div class="col-12 p-2">
-                        {% if AttributeGroups %}
+                        {% if Categories %}
                             <dib class="form-group">
                                 <table class="table table-bordered text-center">
                                     <thead>
@@ -33,14 +33,14 @@
                                     </tr>
                                     </thead>
                                     <tbody id="table-show-data">
-                                    {% for AttributeGroup in AttributeGroups %}
+                                    {% for Category in Categories %}
                                         <tr>
-                                            <td ><input type="checkbox" data-attributegroup-id="{{ AttributeGroup['attribute_group_id'] }}"></td>
-                                            <td>{{ AttributeGroup['attribute_group_id'] }}</td>
-                                            <td>{{ AttributeGroup['name'] }}</td>
-                                            <td>{{ AttributeGroup['sort_order'] }}</td>
+                                            <td ><input type="checkbox" data-category-id="{{ Category['category_id'] }}"></td>
+                                            <td>{{ Category['category_id'] }}</td>
+                                            <td>{{ Category['full_name'] }}</td>
+                                            <td>{{ Category['sort_order'] }}</td>
                                             <td >
-                                                <a href="{{ ADMIN_URL }}product/attributegroup/edit/{{ AttributeGroup['attribute_group_id'] }}?token={{ Token }}" class="btn btn-warning fa fa-pencil-alt"></a>
+                                                <a href="{{ ADMIN_URL }}product/category/edit/{{ Category['category_id'] }}?token={{ Token }}" class="btn btn-warning fa fa-pencil-alt"></a>
                                             </td>
                                         </tr>
                                     {% endfor %}
@@ -51,8 +51,8 @@
                         {% endif %}
                         <div class="form-group text-right pt-3 px-3">
                             <a href="{{ ADMIN_URL }}home/index?token={{ Token }}" class="fa fa-arrow-right btn btn-warning"></a>
-                            <a href="#" id="attributegroup-delete-btn" class="fa fa-trash btn btn-danger"></a>
-                            <a href="{{ ADMIN_URL }}product/attributegroup/add?token={{ Token }}" class="fa fa-plus btn btn-success"></a>
+                            <a href="#" id="category-delete-btn" class="fa fa-trash btn btn-danger"></a>
+                            <a href="{{ ADMIN_URL }}product/category/add?token={{ Token }}" class="fa fa-plus btn btn-success"></a>
                         </div>
                     </div>
                 </div>
@@ -66,7 +66,7 @@
     {% autoescape false %}
         <script type="text/javascript">
 
-            let deleteUrl = "{{ ADMIN_URL }}product/attributegroup/delete?token={{ Token }}";
+            let deleteUrl = "{{ ADMIN_URL }}product/category/delete?token={{ Token }}";
             let Languages = [
                 {% for Language in Languages %}
                 "{{ Language['language_id'] }}",
@@ -91,20 +91,20 @@
                     });
                 });
 
-                $("#attributegroup-delete-btn").click(function (e) {
+                $("#category-delete-btn").click(function (e) {
                     successMessageBoxElement.css('display', 'none');
                     successMessageBoxElement.find('.messages').html('');
                     errorMessageBoxElement.css('display', 'none');
                     errorMessageBoxElement.find('.messages').html('');
                     let data = {};
-                    data['attributegroups_id'] = [];
+                    data['categories_id'] = [];
                     if(confirm("{{ T['are_you_sure_?'] }}")) {
                        $("#table-show-data input[type='checkbox']:checked").each(function (index, element) {
-                           data['attributegroups_id'].push($(element).attr('data-attributegroup-id'));
+                           data['categories_id'].push($(element).attr('data-category-id'));
                        });
-                       if(data['attributegroups_id'].length > 0) {
+                       if(data['categories_id'].length > 0) {
                            data['post'] = true;
-                           data['attributegroup-post'] = true;
+                           data['category-post'] = true;
                            $.post(deleteUrl, data, function (response) {
                                response = JSON.parse(response);
                                if(response.status === 1) {

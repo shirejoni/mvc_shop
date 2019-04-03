@@ -325,6 +325,7 @@ header {
     box-sizing: border-box;
     font: 14px Vazir;
     font-weight: bold;
+    z-index: 1000;
 }
 .auto-recommend-box div {
     box-sizing: border-box;
