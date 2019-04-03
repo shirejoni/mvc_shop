@@ -7,6 +7,7 @@ $_['error_attributegroup_name_empty'] = "نام گروه خصوصیت نباید
 $_['error_manufacturer_name_empty'] = "نام تولیدکننده نباید خالی باشد";
 $_['error_manufacturer_url_empty'] = "آدرس تولیدکننده نباید خالی باشد";
 $_['error_manufacturer_exist'] = "این آدرس قبلا ثبت شده است";
+$_['error_category_name_empty'] = "نام دسته بندی نباید خالی باشد";
 $_['error_filter_name_empty'] = "نام فیلتر نباید خالی باشد";
 $_['error_filter_item_name_empty'] = "نام ایتم فیلتر نباید خالی باشد";
 $_['error_attribute_name_empty'] = "نام خصوصیت نباید خالی باشد";

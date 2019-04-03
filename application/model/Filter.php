@@ -227,4 +227,82 @@ class Filter extends Model
         }
     }
 
+    public function getFiltersSearch($data = []) {
+        $data['sort'] = isset($data['sort']) ? $data['sort'] : '';
+        $data['order'] = isset($data['order']) ? strtoupper($data['order']) : 'ASC';
+        $data['language_id'] = isset($data['language_id']) ? $data['language_id'] : $this->Language->getLanguageID();
+
+        $sql = "SELECT f.filter_id, f.filter_group_id, fl.name, fgl.name as `group`, fl.language_id, sort_order
+        FROM filter f JOIN filter_language fl on f.filter_id = fl.filter_id JOIN filter_group_language fgl ON f.filter_group_id = fgl.filter_group_id
+        WHERE fl.language_id = :lID AND fgl.language_id = :lID ";
+        $sort_data = array(
+            'name',
+            'sort_order'
+        );
+        if(!empty($data['filter_name'])) {
+
+            $sql .= " AND (fl.name LIKE :fName OR fgl.name LIKE :fName ) ";
+        }
+
+        if (isset($data['sort']) && in_array($data['sort'], $sort_data)) {
+            $sql .= " ORDER BY " . $data['sort'];
+        }else {
+            $data['sort'] = '';
+            $sql .= " ORDER BY f.filter_id";
+        }
+
+        if (isset($data['order']) && ($data['order'] == 'DESC')) {
+            $sql .= " DESC";
+        } else {
+            $sql .= " ASC";
+        }
+
+        if (isset($data['start']) || isset($data['limit'])) {
+            if ($data['start'] < 0) {
+                $data['start'] = 0;
+            }
+
+            if ($data['limit'] < 1) {
+                $data['limit'] = 20;
+            }
+
+            $sql .= " LIMIT " . (int)$data['start'] . "," . (int)$data['limit'];
+        }
+        $params = array(
+            'lID'   => $data['language_id'],
+        );
+        if(isset($data['filter_name'])) {
+            $params['fName'] = $data['filter_name'] . '%';
+        }
+        $this->Database->query($sql, $params);
+        $rows = $this->Database->getRows();
+        return $rows;
+    }
+
+    public function getFilterItem($filter_id, $lID = null) {
+        $language_id = $this->Language->getLanguageID();
+        if($lID && $lID != "all") {
+            $language_id = $lID;
+        }
+        if($lID != "all") {
+            $this->Database->query("SELECT * FROM filter f LEFT JOIN filter_language fl on f.filter_id = fl.filter_id
+            WHERE f.filter_id = :fID AND fl.language_id = :lID", array(
+                'fID'  => $filter_id,
+                'lID'   => $language_id
+            ));
+            if($this->Database->hasRows()) {
+                $row = $this->Database->getRow();
+                return $row;
+            }
+            return false;
+        }else {
+            $this->Database->query("SELECT * FROM filter f LEFT JOIN filter_language fl on f.filter_id = fl.filter_id
+            WHERE f.filter_id = :fID ", array(
+                'fID'  => $filter_id,
+            ));
+            $rows = $this->Database->getRows();
+            return $rows;
+        }
+    }
+
 }

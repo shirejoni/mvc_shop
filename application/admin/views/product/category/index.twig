@@ -1,0 +1,143 @@
+{% extends "_temp/_blank_dashboard_temp.twig" %}
+
+{% block Content %}
+    <div class="container">
+        <section class="row">
+            <div class="col-12 px-5 pt-4">
+                <div class="message-box success-box" id="success-message-box" style="display: none;">
+                    <h4>موفقیت!</h4>
+                    <hr>
+                    <div class="messages">
+
+                    </div>
+                </div>
+                <div class="message-box error-box" id="error-message-box" style="display: none;">
+                    <h4>خطا!</h4>
+                    <hr>
+                    <div class="messages">
+
+                    </div>
+                </div>
+                <div class="row"  style="box-shadow: 0 0 5px rgba(0,0,0,0.1)">
+                    <div class="col-12 p-2">
+                        {% if AttributeGroups %}
+                            <dib class="form-group">
+                                <table class="table table-bordered text-center">
+                                    <thead>
+                                    <tr>
+                                        <th scope="col"><input type="checkbox" id="select-all-checkbox"></th>
+                                        <th scope="col">#</th>
+                                        <th scope="col">نام گروه خصوصیت</th>
+                                        <th scope="col">ترتیب</th>
+                                        <th scope="col">عملیات</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody id="table-show-data">
+                                    {% for AttributeGroup in AttributeGroups %}
+                                        <tr>
+                                            <td ><input type="checkbox" data-attributegroup-id="{{ AttributeGroup['attribute_group_id'] }}"></td>
+                                            <td>{{ AttributeGroup['attribute_group_id'] }}</td>
+                                            <td>{{ AttributeGroup['name'] }}</td>
+                                            <td>{{ AttributeGroup['sort_order'] }}</td>
+                                            <td >
+                                                <a href="{{ ADMIN_URL }}product/attributegroup/edit/{{ AttributeGroup['attribute_group_id'] }}?token={{ Token }}" class="btn btn-warning fa fa-pencil-alt"></a>
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+                                    </tbody>
+                                </table>
+                            </dib>
+
+                        {% endif %}
+                        <div class="form-group text-right pt-3 px-3">
+                            <a href="{{ ADMIN_URL }}home/index?token={{ Token }}" class="fa fa-arrow-right btn btn-warning"></a>
+                            <a href="#" id="attributegroup-delete-btn" class="fa fa-trash btn btn-danger"></a>
+                            <a href="{{ ADMIN_URL }}product/attributegroup/add?token={{ Token }}" class="fa fa-plus btn btn-success"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+{% endblock %}
+
+{% block Js %}
+    {% autoescape false %}
+        <script type="text/javascript">
+
+            let deleteUrl = "{{ ADMIN_URL }}product/attributegroup/delete?token={{ Token }}";
+            let Languages = [
+                {% for Language in Languages %}
+                "{{ Language['language_id'] }}",
+                {% endfor %}
+            ];
+            let DefaultLanguageID = {{ DefaultLanguageID }};
+            let selectAllCheckBox = $("#select-all-checkbox");
+            let successMessageBoxElement = $("#success-message-box");
+            let errorMessageBoxElement = $("#error-message-box");
+
+
+            $(document).ready(function () {
+                selectAllCheckBox.click(function (e) {
+                    let status = false;
+                    if($(this).prop('checked')) {
+                        status = true;
+                    }else {
+                        status = false;
+                    }
+                    $('#table-show-data input[type="checkbox"]').each(function (index, element) {
+                        $(element).prop('checked', status);
+                    });
+                });
+
+                $("#attributegroup-delete-btn").click(function (e) {
+                    successMessageBoxElement.css('display', 'none');
+                    successMessageBoxElement.find('.messages').html('');
+                    errorMessageBoxElement.css('display', 'none');
+                    errorMessageBoxElement.find('.messages').html('');
+                    let data = {};
+                    data['attributegroups_id'] = [];
+                    if(confirm("{{ T['are_you_sure_?'] }}")) {
+                       $("#table-show-data input[type='checkbox']:checked").each(function (index, element) {
+                           data['attributegroups_id'].push($(element).attr('data-attributegroup-id'));
+                       });
+                       if(data['attributegroups_id'].length > 0) {
+                           data['post'] = true;
+                           data['attributegroup-post'] = true;
+                           $.post(deleteUrl, data, function (response) {
+                               response = JSON.parse(response);
+                               if(response.status === 1) {
+                                   for (let i = 0; i < response['messages'].length; i++) {
+                                       $('<p>').text(response['messages'][i]).appendTo(successMessageBoxElement.find('.messages'));
+                                   }
+                                   if(response['messages'].length > 0) {
+                                       successMessageBoxElement.fadeIn(300).delay(2700).fadeOut(300);
+                                   }
+                                   if(response['data']) {
+                                       $('#table-show-data').html(response['data']);
+                                   }
+                                   if(response['redirect']) {
+                                       window.setTimeout(function () {
+                                           window.location.href = response['redirect'];
+                                       }, 1000)
+                                   }
+                               }else {
+                                   for (let i = 0; i < response['messages'].length; i++) {
+                                       $('<p>').text(response['messages'][i]).appendTo(errorMessageBoxElement.find('.messages'));
+                                   }
+                                   if(response['messages'].length > 0) {
+                                       errorMessageBoxElement.fadeIn(300).delay(2700).fadeOut(300);
+                                   }
+                               }
+
+                           });
+                       }
+                    }
+                    e.preventDefault();
+                });
+            });
+
+        </script>
+    {% endautoescape %}
+{% endblock %}

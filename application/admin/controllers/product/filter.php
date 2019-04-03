@@ -268,4 +268,23 @@ class ControllerProductFilter extends Controller {
         return new Action('error/notFound', 'web');
     }
 
+    public function getfilters() {
+        $data = [];
+        $language_id = $this->Language->getLanguageID();
+        /** @var Filter $Filter */
+        $Filter = $this->load("Filter", $this->registry);
+        $option = array(
+            'language_id'   => $language_id
+        );
+        if(!empty($this->Request->post['s'])) {
+            $option['filter_name']   = trim($this->Request->post['s']);
+        }
+        $data['Filters'] = $Filter->getFiltersSearch($option);
+        $json = array(
+            'status'    => 1,
+            'filters'   => $data['Filters']
+        );
+        $this->Response->setOutPut(json_encode($json));
+    }
+
 }
