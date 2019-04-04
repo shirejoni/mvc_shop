@@ -285,7 +285,7 @@ class Filter extends Model
             $language_id = $lID;
         }
         if($lID != "all") {
-            $this->Database->query("SELECT * FROM filter f LEFT JOIN filter_language fl on f.filter_id = fl.filter_id
+            $this->Database->query("SELECT *, (SELECT fgl.name FROM filter_group_language fgl WHERE fgl.filter_group_id = f.filter_group_id AND fgl.language_id = fl.language_id) as `group_name` FROM filter f LEFT JOIN filter_language fl on f.filter_id = fl.filter_id
             WHERE f.filter_id = :fID AND fl.language_id = :lID", array(
                 'fID'  => $filter_id,
                 'lID'   => $language_id
@@ -296,7 +296,7 @@ class Filter extends Model
             }
             return false;
         }else {
-            $this->Database->query("SELECT * FROM filter f LEFT JOIN filter_language fl on f.filter_id = fl.filter_id
+            $this->Database->query("SELECT *,(SELECT * FROM filter_group_language fgl WHERE fgl.filter_group_id = f.filter_group_id AND fgl.language_id = fl.language_id) as `group_name` FROM filter f LEFT JOIN filter_language fl on f.filter_id = fl.filter_id
             WHERE f.filter_id = :fID ", array(
                 'fID'  => $filter_id,
             ));

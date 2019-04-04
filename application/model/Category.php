@@ -140,11 +140,13 @@ class Category extends Model
                 'cName'=> $category_name
             ));
         }
-        foreach ($data['filters_id'] as $filter_id ) {
-            $this->Database->query("INSERT INTO category_filter (category_id, filter_id) VALUES (:cID, :fID)", array(
-                'cID'   => $category_id,
-                'fID'   => $filter_id
-            ));
+        if(isset($data['filters_id'])) {
+            foreach ($data['filters_id'] as $filter_id ) {
+                $this->Database->query("INSERT INTO category_filter (category_id, filter_id) VALUES (:cID, :fID)", array(
+                    'cID'   => $category_id,
+                    'fID'   => $filter_id
+                ));
+            }
         }
         $level = 0;
         if(isset($data['parent_id']) && $data['parent_id'] != 0) {
@@ -291,13 +293,13 @@ class Category extends Model
                     ));
                     $path = [];
                     foreach ($this->Database->getRows() as $result) {
-                        $pat[] = $result['path_id'];
+                        $path[] = $result['path_id'];
                     }
                     $this->Database->query("SELECT * FROM category_path WHERE category_id = :cID ORDER BY level ASC", array(
                         'cID'   => $row['category_id']
                     ));
                     foreach ($this->Database->getRows() as $result) {
-                        $pat[] = $result['path_id'];
+                        $path[] = $result['path_id'];
                     }
                     $level = 0;
                     foreach ($path as $path_id) {
@@ -319,6 +321,7 @@ class Category extends Model
                 ));
                 $rows = $this->Database->getRows();
                 $level = 0;
+
                 foreach ($rows as $row) {
                     $this->Database->query("INSERT INTO category_path (category_id, path_id, level) VALUES 
                 (:cID, :cPID, :cLevel)", array(
@@ -359,4 +362,12 @@ class Category extends Model
         }
     }
 
+
+    public function getCategoryFilters($category_id) {
+        $this->Database->query("SELECT * FROM category_filter WHERE category_id = :cID", array(
+            'cID'   => $category_id
+        ));
+        $filters = $this->Database->getRows();
+        return count($filters) > 0 ? $filters : [];
+    }
 }
