@@ -13,6 +13,7 @@ use App\system\Controller;
 class ControllerInitStartup extends Controller {
     public function init() {
         $configs = $this->Database->getRows("SELECT * FROM config");
+
         foreach ($configs as $config) {
             if($config['serialized'] == 1) {
                 $this->Config->set($config['key'], unserialize($config['value']));
