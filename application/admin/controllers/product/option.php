@@ -2,6 +2,7 @@
 
 namespace App\Admin\Controller;
 
+use App\lib\Action;
 use App\Lib\Database;
 use App\lib\Request;
 use App\lib\Response;
@@ -18,7 +19,15 @@ use App\system\Controller;
 class ControllerProductOption extends Controller {
 
     public function index() {
-
+        $data = [];
+        /** @var Option $Option */
+        $Option = $this->load('Option', $this->registry);
+        $data['Languages'] = $this->Language->getLanguages();
+        $data['DefaultLanguageID'] = $this->Language->getDefaultLanguageID();
+        $data['OptionGroups'] = $Option->getOptionGroups(array(
+            'language_id'   => $this->Language->getLanguageID(),
+        ));
+        $this->Response->setOutPut($this->render('product/option/index', $data));
     }
 
     public function add() {
@@ -103,6 +112,40 @@ class ControllerProductOption extends Controller {
             $data['DefaultLanguageID'] = $this->Language->getDefaultLanguageID();
             $data['OptionTypes'] = $this->Config->get('option_type');
             $this->Response->setOutPut($this->render('product/option/add', $data));
+        }
+    }
+
+    public function delete() {
+        if(!empty($this->Request->post['optiongroups_id'])) {
+            $json = [];
+            /** @var Option $Option */
+            $Option = $this->load('Option', $this->registry);
+            $error = false;
+            $this->Database->db->beginTransaction();
+            foreach ($this->Request->post['optiongroups_id'] as $optiongroup_id) {
+                $optionGroup = $Option->getOptionGroup((int) $optiongroup_id);
+                if($optionGroup && (int) $optiongroup_id) {
+                    $Option->deleteOptionGroup((int) $optiongroup_id);
+                }else {
+                    $error = true;
+                }
+            }
+            if($error) {
+                $this->Database->db->rollBack();
+                $json['status'] = 0;
+                $json['messages'] = [$this->Language->get('error_done')];
+            }else {
+                $this->Database->db->commit();
+                $json['status'] = 1;
+                $json['messages'] = [$this->Language->get('success_message')];
+                $data['OptionGroups'] = $Option->getOptionGroups(array(
+                    'language_id'   => $this->Language->getLanguageID(),
+                ));
+                $json['data'] = $this->render('product/option/option_table', $data);
+            }
+            $this->Response->setOutPut(json_encode($json));
+        }else {
+            return new Action('error/notFound', 'web');
         }
     }
 

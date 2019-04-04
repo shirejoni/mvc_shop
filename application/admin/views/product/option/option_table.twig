@@ -1,0 +1,11 @@
+{% for OptionGroup in OptionGroups %}
+    <tr>
+        <td ><input type="checkbox" data-option-group-id="{{ OptionGroup['option_group_id'] }}"></td>
+        <td>{{ OptionGroup['option_group_id'] }}</td>
+        <td>{{ OptionGroup['name'] }}</td>
+        <td>{{ OptionGroup['sort_order'] }}</td>
+        <td >
+            <a href="{{ ADMIN_URL }}product/option/edit/{{ OptionGroup['option_group_id'] }}?token={{ Token }}" class="btn btn-warning fa fa-pencil-alt"></a>
+        </td>
+    </tr>
+{% endfor %}

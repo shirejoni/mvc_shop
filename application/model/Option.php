@@ -17,6 +17,14 @@ class Option extends Model
      * @var array|bool
      */
     private $rows = [];
+    private $option_group_id;
+    private $sort_order;
+    private $language_id;
+    private $name;
+    /**
+     * @var array
+     */
+    private $option_items;
 
     public function getOptionGroups($option = []) {
         $option['sort_order'] = isset($option['sort_order']) ? $option['sort_order'] : '';
@@ -100,4 +108,85 @@ class Option extends Model
 
         return $option_group_id;
     }
+
+    public function getOptionGroup($option_group_id, $lID = null) {
+        $language_id = $this->Language->getLanguageID();
+        if($lID && $lID != "all") {
+            $language_id = $lID;
+        }
+        if($lID != "all") {
+            $this->Database->query("SELECT * FROM option_group og LEFT JOIN option_group_language ogl on og.option_group_id = ogl.option_group_id
+            WHERE og.option_group_id = :oGID AND ogl.language_id = :lID", array(
+                'oGID'  => $option_group_id,
+                'lID'   => $language_id
+            ));
+            if($this->Database->hasRows()) {
+                $row = $this->Database->getRow();
+                $this->Database->query("SELECT * FROM option_item oi LEFT JOIN option_item_language oil ON oi.option_item_id = oil.option_item_id
+                WHERE oil.language_id = :lID AND oi.option_group_id = :oGID", array(
+                    'lID'   => $language_id,
+                    'oGID'   => $option_group_id,
+                ));
+                $option_items = $this->Database->getRows();
+                $this->option_group_id = $row['option_group_id'];
+                $this->sort_order = $row['sort_order'];
+                $this->language_id = $row['language_id'];
+                $this->name = $row['name'];
+                $this->option_items = $option_items;
+                $this->rows = [];
+                $this->rows[] = $row;
+                return $row;
+            }
+            return false;
+        }else {
+            $this->Database->query("SELECT * FROM option_group og LEFT JOIN option_group_language ogl on og.option_group_id = ogl.option_group_id
+            WHERE og.option_group_id = :oGID", array(
+                'oGID'  => $option_group_id,
+            ));
+            $rows = $this->Database->getRows();
+            if(count($rows) > 0) {
+                $this->Database->query("SELECT * FROM option_item oi LEFT JOIN option_item_language oil ON oi.option_item_id = oil.option_item_id
+                WHERE oi.option_group_id = :oGID", array(
+                    'oGID'   => $option_group_id,
+                ));
+                $option_items = $this->Database->getRows();
+                $this->option_group_id = $rows[0]['option_group_id'];
+                $this->sort_order = $rows[0]['sort_order'];
+                $this->option_items = $option_items;
+                $this->rows = $rows;
+            }
+            return $rows;
+        }
+    }
+
+    public function deleteOptionGroup($option_group_id, $data = []) {
+        if(isset($data['optiongroup_names']) && count($data['optiongroup_names']) > 0) {
+            foreach ($data['optiongroup_names'] as $language_id => $filter) {
+                $this->Database->query("DELETE FROM option_group_language WHERE option_group_id = :oGID AND 
+                language_id = :lID", array(
+                    'oGID'  => $option_group_id,
+                    'lID'   => $language_id
+                ));
+            }
+        }else {
+            $this->Database->query("DELETE FROM option_group WHERE option_group_id = :oGID", array(
+                'oGID'  => $option_group_id
+            ));
+        }
+        return $this->Database->numRows();
+    }
+
+    /**
+     * @return array
+     */
+    public function getOptionItems(): array
+    {
+        return $this->option_items;
+    }
+
+
+
+
+
+
 }
