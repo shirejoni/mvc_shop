@@ -176,6 +176,50 @@ class Option extends Model
         return $this->Database->numRows();
     }
 
+    public function editOptionGroup($option_group_id, $data) {
+        $sql = "UPDATE option_group SET ";
+        $query = [];
+        $params = [];
+        if(isset($data['sort_order'])) {
+            $query[] = 'sort_order = :oGSortOrder';
+            $params['oGSortOrder'] = $data['sort_order'];
+        }
+        if(isset($data['type'])) {
+            $query[] = 'type = :oGType';
+            $params['oGType'] = $data['type'];
+        }
+
+        $sql .= implode(' , ', $query);
+        $sql .= " WHERE option_group_id = :oGID ";
+        $params['oGID'] = $option_group_id;
+        if(count($query) > 0) {
+            $this->Database->query($sql, $params);
+        }
+        if(isset($data['optiongroup_names'])) {
+
+            foreach ($data['optiongroup_names'] as $language_id => $optiongroup_name) {
+                $this->Database->query("UPDATE option_group_language SET name = :oGName WHERE 
+                option_group_id = :oGID AND language_id = :lID", array(
+                    'oGName' => $optiongroup_name,
+                    'oGID'  => $option_group_id,
+                    'lID'   => $language_id
+                ));
+            }
+        }
+        if(isset($data['options'])) {
+            $this->Database->query("DELETE FROM option_item WHERE option_group_id = :oGID", array(
+                'oGID'  => $option_group_id
+            ));
+            $this->insertOptionItems($option_group_id, $data['options']);
+
+        }
+        if($this->Database->numRows() > 0) {
+            return true;
+        }else {
+            return false;
+        }
+    }
+
     /**
      * @return array
      */
