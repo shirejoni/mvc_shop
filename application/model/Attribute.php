@@ -28,7 +28,9 @@ class Attribute extends Model
         $sql = "SELECT *, (SELECT agl.name FROM attribute_group_language agl WHERE agl.attribute_group_id = a.attribute_group_id
         AND agl.language_id = al.language_id) AS attributegroup_name FROM attribute a LEFT  JOIN attribute_language al on a.attribute_id = al.attribute_id
         WHERE al.language_id = :lID ";
-
+        if(isset($option['filter_name'])) {
+            $sql .= " AND al.name LIKE :fName ";
+        }
         $sort_order = array(
             'name',
             'sort_order'
@@ -58,6 +60,9 @@ class Attribute extends Model
         $params = array(
             'lID'   => $option['language_id']
         );
+        if(isset($option['filter_name'])) {
+            $params['fName'] = $option['filter_name'] . "%";
+        }
         $this->Database->query($sql, $params);
         $this->rows = $this->Database->getRows();
         return $this->rows;

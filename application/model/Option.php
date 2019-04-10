@@ -33,7 +33,9 @@ class Option extends Model
 
         $sql = "SELECT * FROM option_group og LEFT  JOIN option_group_language ogl on og.option_group_id = ogl.option_group_id
         WHERE ogl.language_id = :lID ";
-
+        if(isset($option['filter_name'])) {
+            $sql .= " AND ogl.name LIKE :fName ";
+        }
         $sort_order = array(
             'name',
             'sort_order'
@@ -63,6 +65,9 @@ class Option extends Model
         $params = array(
             'lID'   => $option['language_id']
         );
+        if(isset($option['filter_name'])) {
+            $params['fName'] = $option['filter_name'] . "%";
+        }
         $this->Database->query($sql, $params);
         $this->rows = $this->Database->getRows();
         return $this->rows;

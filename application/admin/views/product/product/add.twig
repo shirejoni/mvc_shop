@@ -33,6 +33,13 @@
                                     <a class="nav-link" data-toggle="tab" href="#link" role="tab" aria-controls="link" aria-selected="true">ارتباط</a>
                                 </li>
 
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="tab" href="#attribute" role="tab" aria-controls="attribute" aria-selected="true">خصوصیت محصول</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="tab" href="#option" role="tab" aria-controls="option" aria-selected="true">گزینه محصول</a>
+                                </li>
+
                             </ul>
                             <div class="tab-content">
                                 {#
@@ -224,6 +231,52 @@
                                     </div>
 
                                 </div>
+                                {#
+                                    Attribute Tab
+                                #}
+                                <div class="tab-pane p-2" id="attribute">
+                                    <table class="table table-bordered text-center">
+                                        <thead>
+                                        <tr>
+                                            <th class="col-5">نام خصوصیت</th>
+                                            <th class="col-5">مقدار</th>
+                                            <th class="col-2">
+                                                <a href="#" id="add-attribute-row-table" class="btn btn-primary fa fa-plus"></a>
+                                            </th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="table-attribute-show-data">
+
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {#
+                                    Option Tab
+                                #}
+                                <div class="tab-pane p-2" id="option">
+                                    <div class="row">
+                                        <div class="col-3">
+                                            <div class="nav text-right flex-column nav-pills" id="option-head-tab" role="tablist" aria-orientation="vertical">
+
+                                            </div>
+                                            <div class="row mt-2">
+                                                <div class="col">
+                                                    <input type="text" id="option-input-search" class="form-control">
+                                                    <div class="auto-recommend-box" id="product-option-auto-recommend-box" style="display: none;">
+                                                    </div>
+                                                </div>
+                                                <div class="col p-0 mt-1 text-right"><a href="#" id="add-head-option-tab-btn" class="btn btn-warning fa fa-plus"></a></div>
+                                            </div>
+                                        </div>
+                                        <div class="col-9">
+                                            <div class="tab-content" id="option-body-tab">
+
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+
+
                             </div>
 
 
@@ -251,11 +304,20 @@
             let manufacturerUrl = "{{ ADMIN_URL }}product/manufacturer/getmanufacturers?token={{ Token }}";
             let categoryUrl = "{{ ADMIN_URL }}product/category/getcategories?token={{ Token }}";
             let filterUrl = "{{ ADMIN_URL }}product/filter/getfilters?token={{ Token }}";
+            let searchAttributeUrl = "{{ ADMIN_URL }}product/attribute/getattributes?token={{ Token }}";
+            let searchOptionUrl = "{{ ADMIN_URL }}product/option/getoptions?token={{ Token }}";
+            let getOptionInfo = "{{ ADMIN_URL }}product/option/get?token={{ Token }}";
             let Languages = [
                 {% for Language in Languages %}
                     "{{ Language['language_id'] }}",
                 {% endfor %}
             ];
+            let optionData = {};
+            let LanguageNames = {
+                {% for Language in Languages %}
+                "{{ Language['language_id'] }}" : "{{ Language['name'] }}",
+                {% endfor %}
+            };
             let DefaultLanguageID = {{ DefaultLanguageID }};
             CKFinder.setupCKEditor();
             $(document).ready(function (e) {
@@ -270,10 +332,107 @@
 
 
 
+                /*
+                * Product Options
+                * */
+                let productOptionSearchInput = $("#option-input-search");
+                let optionAutoRecommendBox = $("#product-option-auto-recommend-box");
+                let optionAddHeadTabBtn = $("#add-head-option-tab-btn");
+                let optionHeadTabBox = $('#option-head-tab');
+                let timeOutOption;
+                productOptionSearchInput.on("keyup", function (e) {
+
+                    clearTimeout(timeOutOption);
+                    timeOutOption = setTimeout(function () {
+                        let data = {};
+                        data['s'] = productOptionSearchInput.val();
+                        data['post'] = true;
+                        $.post(searchOptionUrl, data, function (response) {
+                            response = JSON.parse(response);
+                            optionAutoRecommendBox.css('display', 'none');
+                            optionAutoRecommendBox.html('');
+                            if(response.status === 1) {
+                                for(let i = 0;  i < response['options'].length; i++) {
+                                    $('<div>').attr('data-option-id', response['options'][i]['option_group_id']).text(response['options'][i]['name'])
+                                        .click(function (e) {
+                                            optionAutoRecommendBox.css('display', 'none');
+                                            optionAutoRecommendBox.html('');
+                                            productOptionSearchInput.val($(this).text());
+                                            productOptionSearchInput.attr('data-option-id', $(this).attr('data-option-id'));
+                                        }).appendTo(optionAutoRecommendBox);
+                                }
+                                if(response['options'].length > 0) {
+                                    optionAutoRecommendBox.css('display', 'block');
+                                }
+                            }
+
+                        });
+
+                    }, 800);
+                });
+                optionAddHeadTabBtn.click(function (e) {
+                    let option_id = productOptionSearchInput.attr("data-option-id");
+                    let option_name = productOptionSearchInput.val();
+                    if(option_id && option_name) {
+                        let newTabHead = $('<a class="nav-link" id="option-head-tab-'+ option_id +'" data-toggle="pill" href="#option-body-tab-'+ option_id +'" role="tab" aria-controls="option-body-tab-1" aria-selected="false"></a>')
+                        let minus = $('<i class="fa fa-minus ml-1"></i>').attr('data-option-id', option_id).click(function (e) {
+                            let option_id = $(this).attr('data-option-id');
+                            $("#option-head-tab-" + option_id).remove();
+                        });
+                        minus.appendTo(newTabHead);
+                        newTabHead.append(option_name);
+                        newTabHead.appendTo(optionHeadTabBox);
+                        $.post(getOptionInfo, {"post": true, "option_group_id" : option_id}, function (data) {
+                            let response = JSON.parse(data);
+                            if(response['status'] == 1) {
+                                optionData['option-' + response['option']['option_group_id']] = {
+                                    "option_type": response['option']['option_type'],
+                                    "sort_order": response['option']['sort_order'],
+                                    "language_id": response['option']['language_id'],
+                                    "name": response['option']['name'],
+                                    "option_items": [],
+                                };
 
 
+                                for (let i = 0; i < response['option']['options'].length; i++) {
+                                    optionData['option-' + response['option']['option_group_id']]['option_items'][i] = {
+                                        "option_value_id": response['option']['options'][i]['option_value_id'],
+                                        "option_value_name": response['option']['options'][i]['name'],
+                                        "option_value_image": response['option']['options'][i]['image'],
+                                    };
+                                }
+                            }
+                        });
+                        addOptionTabBody(option_id);
+                        console.log(optionData);
+
+                    }
+                    productOptionSearchInput.val('');
+                    productOptionSearchInput.attr('data-option-id', 0);
+                    e.preventDefault();
+                });
 
 
+                let AddAttributeRowBtn = $("#add-attribute-row-table");
+                let AttributeTableShowData = $("#table-attribute-show-data");
+                AddAttributeRowBtn.click(function (e) {
+                    let newRow = $('<tr>');
+                    $('<td><input class="form-control" data-attribute-id="0" type="text" placeholder="نام خصوصیت" onkeyup="searchAttribute(this)"><div class="auto-recommend-box" style="display: none;"></div></td>').appendTo(newRow);
+                    let newCell = $("<td>");
+                    Languages.forEach(function (language_id) {
+                       let textarea = $('<textarea>');
+                       textarea.addClass('form-control mb-1');
+                       textarea.attr('data-language-id', language_id);
+                       textarea.attr('placeholder', LanguageNames[language_id]);
+                       textarea.appendTo(newCell);
+                    });
+                    newCell.appendTo(newRow);
+                    newCell = $("<td>");
+                    $('<button onclick="deleteRow(this)">').addClass('btn btn-danger fa fa-minus').appendTo(newCell);
+                    newCell.appendTo(newRow);
+                    newRow.appendTo(AttributeTableShowData);
+                    e.preventDefault();
+                });
 
                 let productManufacturerInput = $("#manufacturer-input");
                 let productManufacturerAutoRecommendBox = $("#manufacturer-auto-recommend-box");
@@ -400,7 +559,117 @@
 
 
             });
+            let timeOut;
+            function searchAttribute(element) {
+                clearTimeout(timeOut);
+                let attributeInput = $(element);
+                timeOut = setTimeout(function () {
+                    let data = {};
+                    data['s'] = attributeInput.val();
+                    data['post'] = true;
+                    attributeInput.next().text('');
+                    attributeInput.next().css('display', 'none');
+                    $.post(searchAttributeUrl, data, function (response) {
+                        response = JSON.parse(response);
+                        if(response['status'] == 1) {
+                            for(i = 0; i < response['attributes'].length; i++) {
+                                $('<div>').attr('data-attribute-id', response['attributes'][i]['attribute_id']).text(response['attributes'][i]['attributegroup_name'] + " > " + response['attributes'][i]['name']).click(function (e) {
+                                    let attribute_id = +$(this).attr('data-attribute-id');
+                                    attributeInput.val($(this).text());
+                                    attributeInput.attr('data-attribute-id', attribute_id);
+                                    attributeInput.next().text('');
+                                    attributeInput.next().css('display', 'none');
+                                }).appendTo(attributeInput.next());
+                            }
+                            if(response['attributes'].length > 0) {
+                                attributeInput.next().css('display', 'block');
+                            }
+                        }
+                    });
+                }, 800);
+            }
+            let optionRow = 0;
+            function addOptionRow(id) {
+                optionRow++;
+                let table = $("#table-option-"+ id +"-show-data");
+                let html = '<tr id="table-option-'+ id +'-row-'+ optionRow +'">';
+                html += '<td>';
+                html += '<select class="form-control">';
+                if(optionData['option-' + id]) {
+                    let items = optionData['option-' + id]['option_items'];
+                    for(let i = 0; i < items.length; i++) {
+                        html += '<option value="'+ items[i]["option_value_id"] +'">'+ items[i]["option_value_name"] +'</option>';
+                    }
+                }
+                html += '</select>';
+                html += '</td>';
+                html += '<td>';
+                html += '<input type="text" class="form-control count-option-item" >';
+                html += '</td>';
+                html += '<td>';
+                html += '<select class="form-control">';
+                html += '<option value="1">بله</option>';
+                html += '<option value="0">خیر</option>';
+                html += '</select>';
+                html += '</td>';
+                html += '<td>';
+                html += '<select class="form-control">';
+                html += '<option value="+">+</option>';
+                html += '<option value="-">-</option>';
+                html += '</select>';
+                html += '<input type="text" class="form-control">';
+                html += '</td>';
+                html += '<td>';
+                html += '<select class="form-control">';
+                html += '<option value="+">+</option>';
+                html += '<option value="-">-</option>';
+                html += '</select>';
+                html += '<input type="text" class="form-control">';
+                html += '</td>';
+                html += '<td>';
+                html += '<a href="#" onclick="deleteRow('+ id +','+ optionRow +')" class="btn btn-danger fa fa-minus"></a>';
+                html += '</td>';
+                html += '</tr>';
 
+                table.append(html);
+            }
+            function deleteRow(id, optionRow) {
+                $('#table-option-'+ id +'-row-'+ optionRow ).remove();
+            }
+            function addOptionTabBody(id) {
+                let tabsBox = $("#option-body-tab");
+                let html = '<div class="tab-pane fade" id="option-body-tab-'+ id +'" role="tabpanel" aria-labelledby="option-body-tab-'+ id +'">';
+                html += '<div class="form-group d-flex align-middle mt-3">';
+                html += '<label class="col-sm-2 control-label text-center">الزامی</label>';
+                html += '<div class="col-sm-10">';
+                html += '<select class="form-control">';
+                html += '<option value="1">بله</option>';
+                html += '<option value="0">خیر</option>';
+                html += '</select>';
+                html += '</div>';
+                html += '</div>';
+                html += '<div class="form-group d-flex align-middle mt-3">';
+                html += '<table class="table table-bordered text-center">';
+                html += '<thead>';
+                html += '<tr>';
+                html += '<th class="col-3">مقدار گزینه</th>';
+                html += '<th>تعداد</th>';
+                html += '<th>اثر در موجودی</th>';
+                html += '<th>قیمت</th>';
+                html += '<th>وزن</th>';
+                html += '<th>';
+                html += '<a href="javascript:void(0);" id="add-row-option-table" onclick="addOptionRow('+ id +')" class="add-table-show-data btn btn-primary fa fa-plus"></a>';
+                html += '</th>';
+                html += '</tr>';
+                html += '</thead>';
+                html += '<tbody id="table-option-'+ id +'-show-data">';
+                html += '</tbody>';
+                html += '</table>';
+                html += '</div>';
+                html += '</div>';
+
+                tabsBox.append(html);
+            }
 
         </script>
     {% endautoescape %}
