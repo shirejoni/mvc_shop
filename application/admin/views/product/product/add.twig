@@ -29,6 +29,10 @@
                                     <a class="nav-link" data-toggle="tab" href="#information" role="tab" aria-controls="information" aria-selected="true">اطلاعات</a>
                                 </li>
 
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="tab" href="#link" role="tab" aria-controls="link" aria-selected="true">ارتباط</a>
+                                </li>
+
                             </ul>
                             <div class="tab-content">
                                 {#
@@ -172,6 +176,54 @@
                                         </div>
                                     </div>
                                 </div>
+                                {#
+                                    Link Tab
+                                #}
+                                <div class="tab-pane p-2" id="link">
+                                    <div class="form-group d-flex align-middle mt-3">
+                                        <label class="col-sm-2 control-label text-center">تولیدکننده</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" data-manufacturer-id="0" id="manufacturer-input" class="form-control">
+                                            <div class="auto-recommend-box" id="manufacturer-auto-recommend-box" style="display: none;">
+                                            </div>
+
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group d-flex align-middle mt-3">
+                                        <label class="col-sm-2 control-label text-center">دسته بندی</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" id="product-category-input" class="form-control">
+                                            <div class="auto-recommend-box" id="category-auto-recommend-box" style="display: none;"></div>
+                                            <div class="show-connect-data" id="category-show-connect-data">
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group d-flex align-middle mt-3">
+                                        <label class="col-sm-2 control-label text-center">فیلتر</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" id="product-filter-input" class="form-control">
+                                            <div class="auto-recommend-box" id="filter-auto-recommend-box" style="display: none;"></div>
+                                            <div class="show-connect-data" id="filter-show-connect-data">
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="form-group d-flex align-middle mt-3">
+                                        <label class="col-sm-2 control-label text-center">مرتبط</label>
+                                        <div class="col-sm-10">
+                                            <input type="text" id="product-related-input" class="form-control">
+                                            <div class="auto-recommend-box" id="related-auto-recommend-box" style="display: none;"></div>
+                                            <div class="show-connect-data" id="related-show-connect-data">
+
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                </div>
                             </div>
 
 
@@ -196,6 +248,9 @@
     {% autoescape false %}
         <script type="text/javascript">
             let Url = "{{ CURRENT_URL }}" + "?token=" + "{{ Token }}";
+            let manufacturerUrl = "{{ ADMIN_URL }}product/manufacturer/getmanufacturers?token={{ Token }}";
+            let categoryUrl = "{{ ADMIN_URL }}product/category/getcategories?token={{ Token }}";
+            let filterUrl = "{{ ADMIN_URL }}product/filter/getfilters?token={{ Token }}";
             let Languages = [
                 {% for Language in Languages %}
                     "{{ Language['language_id'] }}",
@@ -210,6 +265,139 @@
                         'filebrowserBrowseUrl' : "{{ ADMIN_URL }}ckfinder/choose?token={{ Token }}",
                     });
                 });
+
+
+
+
+
+
+
+
+
+
+                let productManufacturerInput = $("#manufacturer-input");
+                let productManufacturerAutoRecommendBox = $("#manufacturer-auto-recommend-box");
+                let timeOut;
+                productManufacturerInput.on('keyup', function (e) {
+                    clearTimeout(timeOut);
+                    timeOut = setTimeout(function () {
+                        let data = {};
+                        data['s'] = productManufacturerInput.val();
+                        data['post'] = true;
+                        productManufacturerAutoRecommendBox.text('');
+                        productManufacturerAutoRecommendBox.css('display', 'none');
+                        $.post(manufacturerUrl, data, function (response) {
+                            response = JSON.parse(response);
+                            if(response['status'] == 1) {
+                                for (i = 0; i < response['manufacturers'].length; i++) {
+                                    $('<div>').attr('data-manufacturer-id', response['manufacturers'][i]['manufacturer_id']).text(response['manufacturers'][i]['name']).click(function (e) {
+                                        let manufacturer_id = +$(this).attr('data-manufacturer-id');
+                                        productManufacturerInput.val($(this).text());
+                                        productManufacturerInput.attr('data-manufacturer-id', manufacturer_id);
+                                        productManufacturerAutoRecommendBox.text('');
+                                        productManufacturerAutoRecommendBox.css('display', 'none');
+                                    }).appendTo(productManufacturerAutoRecommendBox);
+                                }
+                                if(response['manufacturers'].length > 0) {
+                                    productManufacturerAutoRecommendBox.css('display', 'block');
+                                }
+                            }
+                        });
+                    }, 800)
+                });
+
+                let productCategoryInput = $("#product-category-input");
+                let productCategoryAutoRecommendBox = $("#category-auto-recommend-box");
+                let categoryShowConnected = $("#category-show-connect-data");
+                let Categories_id = [];
+                productCategoryInput.on('keyup', function (e) {
+                    clearTimeout(timeOut);
+                    timeOut = setTimeout(function () {
+                        let data = {};
+                        data['s'] = productCategoryInput.val();
+                        data['post'] = true;
+                        productCategoryAutoRecommendBox.text('');
+                        productCategoryAutoRecommendBox.css('display', 'none');
+                        $.post(categoryUrl, data, function (response) {
+                            response = JSON.parse(response);
+                            if(response['status'] == 1) {
+                                for(i = 0; i < response['categories'].length; i++) {
+                                    $('<div>').attr('data-category-id', response['categories'][i]['category_id']).text(response['categories'][i]['name']).click(function (e) {
+                                        let category_id = +$(this).attr('data-category-id');
+                                        addCategoryToProductCategories(categoryShowConnected, $(this).text(), category_id);
+                                        productCategoryInput.val('');
+                                        productCategoryAutoRecommendBox.text('');
+                                        productCategoryAutoRecommendBox.css('display', 'none');
+                                    }).appendTo(productCategoryAutoRecommendBox);
+                                }
+                                if(response['categories'].length > 0) {
+                                    productCategoryAutoRecommendBox.css('display', 'block');
+                                }
+                            }
+                        });
+                    }, 800);
+                });
+                function addCategoryToProductCategories(showConnected, categoryName, categoryID) {
+                    if(Categories_id.indexOf(categoryID) < 0) {
+                        let p = $('<p>');
+                        $('<i class="fa fa-minus">').attr('data-category-id', categoryID).click(function (e) {
+                            let category_id = +$(this).attr('data-category-id');
+                            let index = Categories_id.indexOf(category_id);
+                            Categories_id.splice(index, 1);
+                            $(this).closest('p').remove();
+                        }).appendTo(p);
+                        p.append(categoryName);
+                        Categories_id.push(categoryID);
+                        p.appendTo(showConnected);
+                    }
+                }
+
+                let productFilterInput = $("#product-filter-input");
+                let productFilterAutoRecommendBox = $("#filter-auto-recommend-box");
+                let filterShowConnected = $("#filter-show-connect-data");
+                let Filters_id = [];
+                productFilterInput.on('keyup', function (e) {
+                    clearTimeout(timeOut);
+                    timeOut = setTimeout(function () {
+                        let data = {};
+                        data['s'] = productFilterInput.val();
+                        data['post'] = true;
+                        productFilterAutoRecommendBox.text('');
+                        productFilterAutoRecommendBox.css('display', 'none');
+                        $.post(filterUrl, data, function (response) {
+                            response = JSON.parse(response);
+                            if(response['status'] == 1) {
+                                for(i = 0; i < response['filters'].length; i++) {
+                                    $('<div>').attr('data-filter-id', response['filters'][i]['filter_id']).text(response['filters'][i]['group'] + " > " + response['filters'][i]['name']).click(function (e) {
+                                        let filter_id = +$(this).attr('data-filter-id');
+                                        addFilterToProductFilters(filterShowConnected, $(this).text(), filter_id);
+                                        productFilterInput.val('');
+                                        productFilterAutoRecommendBox.text('');
+                                        productFilterAutoRecommendBox.css('display', 'none');
+                                    }).appendTo(productFilterAutoRecommendBox);
+                                }
+                                if(response['filters'].length > 0) {
+                                    productFilterAutoRecommendBox.css('display', 'block');
+                                }
+                            }
+                        });
+                    }, 800);
+                });
+                function addFilterToProductFilters(showConnected, filterName, filterID) {
+                    if(Filters_id.indexOf(filterID) < 0) {
+                        let p = $('<p>');
+                        $('<i class="fa fa-minus">').attr('data-filter-id', filterID).click(function (e) {
+                            let filter_id = +$(this).attr('data-filter-id');
+                            let index = Filters_id.indexOf(filter_id);
+                            Filters_id.splice(index, 1);
+                            $(this).closest('p').remove();
+                        }).appendTo(p);
+                        p.append(filterName);
+                        Filters_id.push(filterID);
+                        p.appendTo(showConnected);
+                    }
+                }
+
 
             });
 

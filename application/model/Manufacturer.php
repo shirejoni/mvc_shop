@@ -29,7 +29,9 @@ class Manufacturer extends Model
 
         $sql = "SELECT * FROM manufacturer m LEFT JOIN manufacturer_language ml on m.manufacturer_id = ml.manufacturer_id
         WHERE ml.language_id = :lID ";
-
+        if(isset($option['filter_name'])) {
+            $sql .= " AND ml.name LIKE :fName ";
+        }
         $sort_order = array(
             'name',
             'sort_order'
@@ -59,6 +61,9 @@ class Manufacturer extends Model
         $params = array(
             'lID'   => $option['language_id']
         );
+        if(isset($option['filter_name'])) {
+            $params['fName'] = '%' . $option['filter_name'] . '%';
+        }
         $this->Database->query($sql, $params);
         $this->rows = $this->Database->getRows();
         return $this->rows;

@@ -292,4 +292,23 @@ class ControllerProductManufacturer extends Controller {
         return new Action('error/notFound', 'web');
     }
 
+    public function getmanufacturers() {
+        $data = [];
+        $language_id = $this->Language->getLanguageID();
+        /** @var Manufacturer $Manufacturer */
+        $Manufacturer = $this->load("Manufacturer", $this->registry);
+        $option = array(
+            'language_id'   => $language_id
+        );
+        if(!empty($this->Request->post['s'])) {
+            $option['filter_name']   = trim($this->Request->post['s']);
+        }
+        $data['Manufacturers'] = $Manufacturer->getManufacturers($option);
+        $json = array(
+            'status'    => 1,
+            'manufacturers'   => $data['Manufacturers']
+        );
+        $this->Response->setOutPut(json_encode($json));
+    }
+
 }
