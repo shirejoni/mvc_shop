@@ -39,6 +39,12 @@
                                 <li class="nav-item">
                                     <a class="nav-link" data-toggle="tab" href="#option" role="tab" aria-controls="option" aria-selected="true">گزینه محصول</a>
                                 </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="tab" href="#special" role="tab" aria-controls="special" aria-selected="true">تخفیف</a>
+                                </li>
+                                <li class="nav-item">
+                                    <a class="nav-link" data-toggle="tab" href="#image" role="tab" aria-controls="image" aria-selected="true">عکس</a>
+                                </li>
 
                             </ul>
                             <div class="tab-content">
@@ -275,11 +281,49 @@
                                         </div>
                                     </div>
                                 </div>
+                                {#
+                                    Special Tab
+                                #}
+                                <div class="tab-pane p-2" id="special">
+                                    <table class="table table-bordered text-center">
+                                        <thead>
+                                        <tr>
+                                            <th class="col-2">اولویت</th>
+                                            <th class="col-2">قیمت</th>
+                                            <th class="col-3">تاریخ شروع</th>
+                                            <th class="col-3">تاریخ پایان</th>
+                                            <th class="col-2">
+                                                <a href="#" id="add-special-row-table" class="btn btn-primary fa fa-plus"></a>
+                                            </th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="table-special-show-data">
 
+                                        </tbody>
+                                    </table>
+                                </div>
+                                {#
+                                    Image Tab
+                                #}
+                                <div class="tab-pane p-2" id="image">
+                                    <table class="table table-bordered text-center">
+                                        <thead>
+                                        <tr>
+                                            <th class="col-3">عکس پیش فرض</th>
+                                            <th class="col-4">پیش نمایش عکس</th>
+                                            <th class="col-3">ترتیب</th>
+                                            <th class="col-2">
+                                                <a href="#" id="add-image-row-table" class="btn btn-primary fa fa-plus"></a>
+                                            </th>
+                                        </tr>
+                                        </thead>
+                                        <tbody id="table-image-show-data">
+
+                                        </tbody>
+                                    </table>
+                                </div>
 
                             </div>
-
-
                         </dib>
 
                         <div class="form-group text-right pt-3 px-3">
@@ -293,9 +337,14 @@
 
     </div>
 {% endblock %}
+{% block Css %}
+    <link rel="stylesheet" href="{{ URL }}assets/persian_date/persian-datepicker.min.css">
+{% endblock %}
 {% block JsBeforeMain %}
     <script type="text/javascript" src="{{ URL }}assets/ckfinder/ckfinder.js"></script>
     <script type="text/javascript" src="{{ URL }}assets/ckeditor/ckeditor.js"></script>
+    <script type="text/javascript" src="{{ URL }}assets/persian_date/persian-date.min.js"></script>
+    <script type="text/javascript" src="{{ URL }}assets/persian_date/persian-datepicker.min.js"></script>
 {% endblock %}
 {% block Js %}
     {% autoescape false %}
@@ -319,6 +368,28 @@
                 {% endfor %}
             };
             let DefaultLanguageID = {{ DefaultLanguageID }};
+
+            function selectFileWithCKFinder( elementId ) {
+                CKFinder.modal( {
+                    chooseFiles: true,
+                    width: 800,
+                    height: 600,
+                    onInit: function( finder ) {
+                        finder.on( 'files:choose', function( evt ) {
+                            let file = evt.data.files.first();
+                            let parent = elementId.parent();
+                            parent.html('');
+                            let image = $("<img>").css('width', "100%");
+                            image.attr('src', file.getUrl());
+                            image.appendTo(parent);
+                            let input = $("<input type='hidden'>");
+                            input.val(file.getUrl());
+                            input.appendTo(parent);
+                        } );
+                    }
+                } );
+            }
+
             CKFinder.setupCKEditor();
             $(document).ready(function (e) {
                 let editor = {};
@@ -328,8 +399,68 @@
                     });
                 });
 
+                $("#product-date").persianDatepicker({
+                    'format' : "YYYY/MM/DD",
+                });
+
+                let productImageAddRowBtn = $("#add-image-row-table");
+                let productImageTableShowData = $("#table-image-show-data");
+                productImageAddRowBtn.click(function (e) {
+                    console.log("Hello");
+                    let newRow = $('<tr>');
+                    $("<td><input type='radio' name='defaultImage' class='form-control'></td>").appendTo(newRow);
+                    let newCell = $("<td>");
+                    let ImageBox = $("<div>");
+                    ImageBox.css({
+                        'width' : "150px",
+                        'border': "2px dashed black",
+                        'text-align' : 'center',
+                        'margin': "0 auto",
+                    });
+                    $("<a href='#' class='btn btn-warning fa fa-image'></a>").css("margin", "40px").click(function (e) {
+                        selectFileWithCKFinder($(this));
+                        e.preventDefault();
+                    }).appendTo(ImageBox);
+                    ImageBox.appendTo(newCell);
+                    newCell.appendTo(newRow);
+                    $("<td><input type='number' placeholder='ترتیب' class='form-control'></td>").appendTo(newRow);
+                    newCell = $("<td>");
+                    $('<button onclick="deleteRowTable(this)">').addClass('btn btn-danger fa fa-minus').appendTo(newCell);
+                    newCell.appendTo(newRow);
+                    newRow.appendTo(productImageTableShowData);
+                    e.preventDefault();
+                });
 
 
+
+
+                let productSpecialAddRowBtn = $("#add-special-row-table");
+                let productSpecialTableShowData = $("#table-special-show-data");
+                productSpecialAddRowBtn.click(function (e) {
+                    let newRow = $('<tr>');
+                    $("<td><input type='number' class='form-control' placeholder='اولویت'></td>").appendTo(newRow);
+                    $("<td><input type='number' class='form-control' placeholder='قیمت'></td>").appendTo(newRow);
+
+                    let newCell = $("<td>");
+                    let input = $("<input type='text' class='form-control' placeholder='تاریخ شروع'>");
+                    input.persianDatepicker({
+                        'format' : 'YYYY/MM/DD',
+                    });
+                    input.appendTo(newCell);
+                    newCell.appendTo(newRow);
+                    newCell = $("<td>");
+                    input = $("<input type='text' class='form-control' placeholder='تاریخ شروع'>");
+                    input.persianDatepicker({
+                        'format' : 'YYYY/MM/DD',
+                    });
+                    input.appendTo(newCell);
+                    newCell.appendTo(newRow);
+                    newCell = $("<td>");
+                    $('<button onclick="deleteRowTable(this)">').addClass('btn btn-danger fa fa-minus').appendTo(newCell);
+                    newCell.appendTo(newRow);
+                    newRow.appendTo(productSpecialTableShowData);
+                    e.preventDefault();
+                });
 
 
                 /*
@@ -428,7 +559,7 @@
                     });
                     newCell.appendTo(newRow);
                     newCell = $("<td>");
-                    $('<button onclick="deleteRow(this)">').addClass('btn btn-danger fa fa-minus').appendTo(newCell);
+                    $('<button onclick="deleteRowTable(this)">').addClass('btn btn-danger fa fa-minus').appendTo(newCell);
                     newCell.appendTo(newRow);
                     newRow.appendTo(AttributeTableShowData);
                     e.preventDefault();
@@ -670,7 +801,9 @@
 
                 tabsBox.append(html);
             }
-
+            function deleteRowTable(element) {
+                $(element).closest('tr').remove();
+            }
         </script>
     {% endautoescape %}
 {% endblock %}
