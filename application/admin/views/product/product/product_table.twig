@@ -1,0 +1,26 @@
+{% for Product in Products %}
+    <tr>
+        <td ><input type="checkbox" data-product-id="{{ Product['product_id'] }}"></td>
+        <td>{{ Product['product_id'] }}</td>
+        <td><img src="{{ Product['image'] }}" alt="" width="100px"></td>
+        <td>{{ Product['name'] }}</td>
+        <td>{{ Product['sort_order'] }}</td>
+        <td>
+            {% if Product['special'] %}
+                <span style="text-decoration: line-through">{{ Product['price'] }}</span>
+                <span style="color: #1c7430">{{ Product['special'] }}</span>
+            {% else %}
+                {{ Product['price'] }}
+            {% endif %}
+        </td>
+        <td >
+            <a href="{{ ADMIN_URL }}product/product/edit/{{ Product['product_id'] }}?token={{ Token }}" class="btn btn-warning fa fa-pencil-alt"></a>
+            {% if Product['status'] == "1" %}
+                <button class="btn btn-success fa fa-toggle-on product-status" data-product-id="{{ Product['manufacturer_id'] }}" data-product-status="{{ Product['status'] }}"></button>
+            {% else %}
+                <button class="btn btn-danger fa fa-toggle-off product-status" data-product-id="{{ Product['manufacturer_id'] }}" data-product-status="{{ Product['status'] }}"></button>
+            {% endif %}
+        </td>
+    </tr>
+
+{% endfor %}

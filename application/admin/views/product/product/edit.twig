@@ -77,13 +77,16 @@
                                                 <div class="form-group d-flex align-middle mt-3">
                                                     <label class="col-sm-2 control-label text-center">نام</label>
                                                     <div class="col-sm-10">
-                                                        <input type="text" placeholder="{{ Language['name'] }}" class="form-control" id="product-name-{{ Language['language_id'] }}">
+                                                        <input type="text" value="{{ Product['product_descriptions'][Language['language_id']]['name'] }}" placeholder="{{ Language['name'] }}" class="form-control" id="product-name-{{ Language['language_id'] }}">
                                                     </div>
                                                 </div>
                                                 <div class="form-group d-flex align-middle mt-3">
                                                     <label class="col-sm-2 control-label text-center">توضیحات</label>
                                                     <div class="col-sm-10">
-                                                        <textarea id="ckeditor-language-{{ Language['language_id'] }}"></textarea>
+                                                        <textarea id="ckeditor-language-{{ Language['language_id'] }}">
+
+                                                            {{ Product['product_descriptions'][Language['language_id']]['description'] }}
+                                                        </textarea>
                                                     </div>
                                                 </div>
                                             </div>
@@ -100,7 +103,7 @@
                                         <div class="form-group d-flex align-middle mt-3">
                                             <label class="col-sm-2 control-label text-center">قیمت</label>
                                             <div class="col-sm-10">
-                                                <input type="text" class="form-control" id="product-price">
+                                                <input type="text" value="{{ Product['price'] }}" class="form-control" id="product-price">
                                             </div>
                                         </div>
                                     </div>
@@ -108,21 +111,21 @@
                                     <div class="form-group d-flex align-middle mt-3">
                                         <label class="col-sm-2 control-label text-center">تاریخ</label>
                                         <div class="col-sm-10">
-                                            <input type="text" id="product-date" class="form-control">
+                                            <input type="text" value="{{ Product['date_available'] }}" id="product-date" class="form-control">
                                         </div>
                                     </div>
 
                                     <div class="form-group d-flex align-middle mt-3">
                                         <label class="col-sm-2 control-label text-center">تعداد</label>
                                         <div class="col-sm-10">
-                                            <input type="text" id="product-quantity" class="form-control">
+                                            <input type="text" value="{{ Product['quantity'] }}" id="product-quantity" class="form-control">
                                         </div>
                                     </div>
 
                                     <div class="form-group d-flex align-middle mt-3">
                                         <label class="col-sm-2 control-label text-center">حداقل تعداد انتخاب</label>
                                         <div class="col-sm-10">
-                                            <input type="text" id="product-min-quantity-per-amount" class="form-control">
+                                            <input type="text" value="{{ Product['minimum'] }}" id="product-min-quantity-per-amount" class="form-control">
                                         </div>
                                     </div>
 
@@ -131,7 +134,11 @@
                                         <div class="col-sm-10">
                                             <select class="form-control" id="product-stock-status">
                                                 {% for StockStatus in StocksStatus %}
-                                                    <option value="{{ StockStatus['stock_status_id'] }}">{{ StockStatus['name'] }}</option>
+                                                    {% if StockStatus['stock_status_id'] == Product['stock_status_id'] %}
+                                                        <option value="{{ StockStatus['stock_status_id'] }}" selected>{{ StockStatus['name'] }}</option>
+                                                    {% else %}
+                                                        <option value="{{ StockStatus['stock_status_id'] }}">{{ StockStatus['name'] }}</option>
+                                                    {% endif %}
                                                 {% endfor %}
                                             </select>
                                         </div>
@@ -140,7 +147,7 @@
                                     <div class="form-group d-flex align-middle mt-3">
                                         <label class="col-sm-2 control-label text-center">وزن</label>
                                         <div class="col-sm-10">
-                                            <input type="text" id="product-weight-value" class="form-control">
+                                            <input type="text" value="{{ Product['weight'] }}" id="product-weight-value" class="form-control">
                                         </div>
                                     </div>
 
@@ -149,7 +156,11 @@
                                         <div class="col-sm-10">
                                             <select id="product-weight-unit" class="form-control">
                                                 {% for Weight in Weights %}
-                                                    <option value="{{ Weight['weight_id'] }}">{{ Weight['name'] }}</option>
+                                                    {% if Weight['weight_id'] == Product['weight_id'] %}
+                                                        <option value="{{ Weight['weight_id'] }}" selected>{{ Weight['name'] }}</option>
+                                                    {% else %}
+                                                        <option value="{{ Weight['weight_id'] }}">{{ Weight['name'] }}</option>
+                                                    {% endif %}
                                                 {% endfor %}
                                             </select>
                                         </div>
@@ -159,13 +170,13 @@
                                         <div class="col-sm-10">
                                             <div class="row">
                                                 <div class="col-sm-4">
-                                                    <input type="text" id="product-length" class="form-control" placeholder="طول">
+                                                    <input type="text" value="{{ Product['length'] }}" id="product-length" class="form-control" placeholder="طول">
                                                 </div>
                                                 <div class="col-sm-4">
-                                                    <input type="text" id="product-width" class="form-control" placeholder="عرض">
+                                                    <input type="text" value="{{ Product['width'] }}" id="product-width" class="form-control" placeholder="عرض">
                                                 </div>
                                                 <div class="col-sm-4">
-                                                    <input type="text" id="product-height" class="form-control" placeholder="ارتفاع">
+                                                    <input type="text" value="{{ Product['height'] }}" id="product-height" class="form-control" placeholder="ارتفاع">
                                                 </div>
                                             </div>
                                         </div>
@@ -176,7 +187,11 @@
                                         <div class="col-sm-10">
                                             <select id="product-length-unit" class="form-control">
                                                 {% for Length in Lengths %}
-                                                    <option value="{{ Length['length_id'] }}">{{ Length['name'] }}</option>
+                                                    {% if Length['length_id'] == Product['length_id'] %}
+                                                        <option value="{{ Length['length_id'] }}" selected>{{ Length['name'] }}</option>
+                                                    {% else %}
+                                                        <option value="{{ Length['length_id'] }}">{{ Length['name'] }}</option>
+                                                    {% endif %}
                                                 {% endfor %}
                                             </select>
                                         </div>
@@ -185,7 +200,7 @@
                                     <div class="form-group d-flex align-middle mt-3">
                                         <label class="col-sm-2 control-label text-center">ترتیب</label>
                                         <div class="col-sm-10">
-                                            <input type="text" class="form-control" id="product-sort-order">
+                                            <input type="text" value="{{ Product['sort_order'] }}" class="form-control" id="product-sort-order">
                                         </div>
                                     </div>
                                 </div>
@@ -196,7 +211,7 @@
                                     <div class="form-group d-flex align-middle mt-3">
                                         <label class="col-sm-2 control-label text-center">تولیدکننده</label>
                                         <div class="col-sm-10">
-                                            <input type="text" data-manufacturer-id="0" id="manufacturer-input" class="form-control">
+                                            <input type="text" data-manufacturer-id="{{ Product['manufacturer_id'] }}" value="{{ Product['manufacturer_name'] }}" id="manufacturer-input" class="form-control">
                                             <div class="auto-recommend-box" id="manufacturer-auto-recommend-box" style="display: none;">
                                             </div>
 
@@ -209,7 +224,9 @@
                                             <input type="text" id="product-category-input" class="form-control">
                                             <div class="auto-recommend-box" id="category-auto-recommend-box" style="display: none;"></div>
                                             <div class="show-connect-data" id="category-show-connect-data">
-
+                                                {% for Category in Product['categories'] %}
+                                                <p><i class="fa fa-minus" data-category-id="{{ Category['category_id'] }}"></i>{{ Category['name'] }}</p>
+                                                {% endfor %}
                                             </div>
                                         </div>
                                     </div>
@@ -220,7 +237,9 @@
                                             <input type="text" id="product-filter-input" class="form-control">
                                             <div class="auto-recommend-box" id="filter-auto-recommend-box" style="display: none;"></div>
                                             <div class="show-connect-data" id="filter-show-connect-data">
-
+                                                {% for Filter in Product['filters'] %}
+                                                    <p><i class="fa fa-minus" data-category-id="{{ Filter['filter_id'] }}"></i>{{ Filter['group_name'] }} > {{ Filter['name'] }}</p>
+                                                {% endfor %}
                                             </div>
                                         </div>
                                     </div>
@@ -252,7 +271,22 @@
                                         </tr>
                                         </thead>
                                         <tbody id="table-attribute-show-data">
-
+                                            {% for Attribute in Product['attributes'] %}
+                                                <tr>
+                                                    <td><input class="form-control" value="{{ Attribute['group_name'] }} > {{ Attribute['name'] }}" data-attribute-id="{{ Attribute['attribute_id'] }}" type="text"
+                                                               placeholder="نام خصوصیت" onkeyup="searchAttribute(this)">
+                                                        <div class="auto-recommend-box" style="display: none;"></div>
+                                                    </td>
+                                                    <td>
+                                                        {% for Language in Languages %}
+                                                            <textarea class="form-control mb-1" data-language-id="{{ Language['language_id'] }}" placeholder="{{ Language['name'] }}">{{ Attribute['values'][Language['language_id']] }}</textarea>
+                                                        {% endfor %}
+                                                    <td>
+                                                        <button onclick="deleteRowTable(this)"
+                                                                class="btn btn-danger fa fa-minus"></button>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
                                         </tbody>
                                     </table>
                                 </div>
@@ -263,7 +297,9 @@
                                     <div class="row">
                                         <div class="col-3">
                                             <div class="nav text-right flex-column nav-pills" id="option-head-tab" role="tablist" aria-orientation="vertical">
-
+                                                {% for ProductOption in Product['options'] %}
+                                                    <a class="nav-link active show" id="option-head-tab-{{ ProductOption['option_group_id'] }}" data-toggle="pill" href="#option-body-tab-{{ ProductOption['option_group_id'] }}" role="tab" aria-controls="option-body-tab-1" aria-selected="true"><i class="fa fa-minus ml-1" data-option-id="{{ ProductOption['option_group_id'] }}"></i>{{ ProductOption['name'] }}</a>
+                                                {% endfor %}
                                             </div>
                                             <div class="row mt-2">
                                                 <div class="col">
@@ -275,9 +311,96 @@
                                             </div>
                                         </div>
                                         <div class="col-9">
+                                            {% for ProductOption in Product['options'] %}
                                             <div class="tab-content" id="option-body-tab">
+                                                <div class="tab-pane fade active show" id="option-body-tab-{{ ProductOption['option_group_id'] }}"
+                                                     role="tabpanel" aria-labelledby="option-body-tab-{{ ProductOption['option_group_id'] }}">
+                                                    <div class="form-group d-flex align-middle mt-3"><label
+                                                                class="col-sm-2 control-label text-center">الزامی</label>
+                                                        <div class="col-sm-10">
+                                                            <select class="form-control">
+                                                                {% if ProductOption['required'] == 1 %}
+                                                                    <option value="1" selected>بله</option>
+                                                                    <option value="0">خیر</option>
+                                                                {% else %}
+                                                                    <option value="1">بله</option>
+                                                                    <option value="0" selected>خیر</option>
+                                                                {% endif %}
+                                                            </select></div>
+                                                    </div>
+                                                    <div class="form-group d-flex align-middle mt-3">
+                                                        <table class="table table-bordered text-center">
+                                                            <thead>
+                                                            <tr>
+                                                                <th class="col-3">مقدار گزینه</th>
+                                                                <th>تعداد</th>
+                                                                <th>اثر در موجودی</th>
+                                                                <th>قیمت</th>
+                                                                <th>وزن</th>
+                                                                <th><a href="javascript:void(0);"
+                                                                       id="add-row-option-table"
+                                                                       onclick="addOptionRow(3)"
+                                                                       class="add-table-show-data btn btn-primary fa fa-plus"></a>
+                                                                </th>
+                                                            </tr>
+                                                            </thead>
+                                                            <tbody id="table-option-3-show-data">
+                                                                {% set Counter = 0 %}
 
+                                                                {% for ProductOptionItem in ProductOption['option_items'] %}
+                                                                    {% set Counter = Counter + 1 %}
+                                                                    <tr id="table-option-{{ ProductOption['option_group_id'] }}-row-{{ Counter }}">
+                                                                        <td><select class="form-control">
+                                                                                {% for OptionItem in Options[ProductOption['option_group_id']]['option_items'] %}
+                                                                                    {% if ProductOptionItem['option_item_id'] == OptionItem['option_item_id'] %}
+                                                                                        <option value="{{ OptionItem['option_item_id'] }}" selected>{{ OptionItem['name'] }}</option>
+                                                                                    {% else %}
+                                                                                    <option value="{{ OptionItem['option_item_id'] }}">{{ OptionItem['name'] }}</option>
+                                                                                    {% endif %}
+                                                                                {% endfor %}
+                                                                            </select></td>
+                                                                        <td>
+                                                                            <input type="text" value="{{ ProductOptionItem['quantity'] }}" class="form-control count-option-item">
+                                                                        </td>
+                                                                        <td><select class="form-control">
+                                                                                {% if ProductOptionItem['subtract'] == 1 %}
+                                                                                    <option value="1" selected>بله</option>
+                                                                                    <option value="0">خیر</option>
+                                                                                {% else %}
+                                                                                    <option value="1">بله</option>
+                                                                                    <option value="0" selected>خیر</option>
+                                                                                {% endif %}
+                                                                            </select></td>
+                                                                        <td><select class="form-control">
+                                                                                {% if ProductOptionItem['price_sign'] == '+' %}
+                                                                                    <option value="+" selected>+</option>
+                                                                                    <option value="-">-</option>
+                                                                                {% else %}
+                                                                                    <option value="+">+</option>
+                                                                                    <option value="-" selected>-</option>
+                                                                                {% endif %}
+                                                                            </select><input type="text" value="{{ ProductOptionItem['price'] }}" class="form-control"></td>
+                                                                        <td><select class="form-control">
+                                                                                {% if ProductOptionItem['weight_sign'] == '+' %}
+                                                                                    <option value="+" selected>+</option>
+                                                                                    <option value="-">-</option>
+                                                                                {% else %}
+                                                                                    <option value="+">+</option>
+                                                                                    <option value="-" selected>-</option>
+                                                                                {% endif %}
+                                                                            </select><input type="text" value="{{ ProductOptionItem['weight'] }}" class="form-control"></td>
+                                                                        <td><a href="#" onclick="deleteRow(3,1)"
+                                                                               class="btn btn-danger fa fa-minus"></a>
+                                                                        </td>
+                                                                    </tr>
+                                                                {% endfor %}
+                                                            </tbody>
+                                                        </table>
+                                                    </div>
+                                                    <div></div>
+                                                </div>
                                             </div>
+                                            {% endfor %}
                                         </div>
                                     </div>
                                 </div>
@@ -298,7 +421,24 @@
                                         </tr>
                                         </thead>
                                         <tbody id="table-special-show-data">
-
+                                            {% for Special in Product['specials'] %}
+                                                <tr>
+                                                    <td><input type="number" value="{{ Special['priority'] }}" class="form-control" placeholder="اولویت">
+                                                    </td>
+                                                    <td><input type="number" value="{{ Special['price'] }}" class="form-control" placeholder="قیمت">
+                                                    </td>
+                                                    <td><input type="text"  value="{{ Special['date_start'] }}"
+                                                               class="form-control pwt-datepicker-input-element"
+                                                               placeholder="تاریخ شروع"></td>
+                                                    <td><input type="text"  value="{{ Special['date_end'] }}"
+                                                               class="form-control pwt-datepicker-input-element"
+                                                               placeholder="تاریخ پایان"></td>
+                                                    <td>
+                                                        <button onclick="deleteRowTable(this)"
+                                                                class="btn btn-danger fa fa-minus"></button>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
                                         </tbody>
                                     </table>
                                 </div>
@@ -318,7 +458,29 @@
                                         </tr>
                                         </thead>
                                         <tbody id="table-image-show-data">
-
+                                            {% for Image in Product['images'] %}
+                                                <tr>
+                                                    <td>
+                                                        {% if Image['default'] == '1' %}
+                                                            <input type="radio" checked  name="defaultImage" class="form-control">
+                                                        {% else %}
+                                                            <input type="radio"  name="defaultImage" class="form-control">
+                                                        {% endif %}
+                                                    </td>
+                                                    <td>
+                                                        <div style="width: 150px; border: 2px dashed black; text-align: center; margin: 0px auto;">
+                                                            <img style="width: 100%;" src="{{ Image['src'] }}">
+                                                            <input type="hidden" value="{{ Image['image'] }}">
+                                                        </div>
+                                                    </td>
+                                                    <td><input type="number" value="{{ Image['sort_order'] }}" placeholder="ترتیب" class="form-control">
+                                                    </td>
+                                                    <td>
+                                                        <button onclick="deleteRowTable(this)"
+                                                                class="btn btn-danger fa fa-minus"></button>
+                                                    </td>
+                                                </tr>
+                                            {% endfor %}
                                         </tbody>
                                     </table>
                                 </div>
@@ -361,7 +523,37 @@
                     "{{ Language['language_id'] }}",
                 {% endfor %}
             ];
-            let optionData = {};
+            // optionData['option-' + response['option']['option_group_id']] = {
+            //                         "option_type": response['option']['option_type'],
+            //                         "sort_order": response['option']['sort_order'],
+            //                         "language_id": response['option']['language_id'],
+            //                         "name": response['option']['name'],
+            //                         "option_items": [],
+            //                     };
+            // optionData['option-' + response['option']['option_group_id']]['option_items'][i] = {
+            //                             "option_value_id": response['option']['options'][i]['option_item_id'],
+            //                             "option_value_name": response['option']['options'][i]['name'],
+            //                             "option_value_image": response['option']['options'][i]['image'],
+            //                         };
+            let optionData = {
+            {% for ProductOption in Product['options'] %}
+                "option-{{ ProductOption['option_group_id'] }}" : {
+                    "option_type" : "{{ Options[ProductOption['option_group_id']]['option_type'] }}",
+                    "sort_order" : "{{ Options[ProductOption['option_group_id']]['sort_order'] }}",
+                    "language_id" : "{{ Options[ProductOption['option_group_id']]['language_id'] }}",
+                    "name" : "{{ Options[ProductOption['option_group_id']]['name'] }}",
+                    "option_items" : [
+                        {% for OptionItem in Options[ProductOption['option_group_id']]['option_items'] %}
+                        {
+                            "option_value_id"   : "{{ OptionItem['option_item_id'] }}",
+                            "option_value_name"   : "{{ OptionItem['name'] }}",
+                            "option_value_image"   : "{{ OptionItem['image'] }}",
+                        },
+                        {% endfor %}
+                    ]
+                }
+            {% endfor %}
+            };
             let LanguageNames = {
                 {% for Language in Languages %}
                 "{{ Language['language_id'] }}" : "{{ Language['name'] }}",
@@ -401,13 +593,24 @@
 
                 $("#product-date").persianDatepicker({
                     'format' : "YYYY/MM/DD",
+                    initialValueType: 'persian'
+                });
+                $('#category-show-connect-data').find('p i').click(function (e) {
+                    let category_id = +$(this).attr('data-category-id');
+                    let index = Categories_id.indexOf(category_id);
+                    Categories_id.splice(index, 1);
+                    $(this).closest('p').remove();
+                });
+                $('#filter-show-connect-data').find('p i').click(function (e) {
+                    let filter_id = +$(this).attr('data-filter-id');
+                    let index = Filters_id.indexOf(filter_id);
+                    Filters_id.splice(index, 1);
+                    $(this).closest('p').remove();
                 });
 
 
 
-                /*
-                * Post Data
-                * */
+
                 /*
                 * Post Data
                 * */
@@ -929,7 +1132,11 @@
                 let productCategoryInput = $("#product-category-input");
                 let productCategoryAutoRecommendBox = $("#category-auto-recommend-box");
                 let categoryShowConnected = $("#category-show-connect-data");
-                let Categories_id = [];
+                let Categories_id = [
+                    {% for Category in Product['categories'] %}
+                    "{{ Category['category_id'] }}",
+                    {% endfor %}
+                ];
                 productCategoryInput.on('keyup', function (e) {
                     clearTimeout(timeOut);
                     timeOut = setTimeout(function () {
@@ -975,7 +1182,11 @@
                 let productFilterInput = $("#product-filter-input");
                 let productFilterAutoRecommendBox = $("#filter-auto-recommend-box");
                 let filterShowConnected = $("#filter-show-connect-data");
-                let Filters_id = [];
+                let Filters_id = [
+                    {% for Filter in Product['filters'] %}
+                    "{{ Filter['filter_id'] }}",
+                    {% endfor %}
+                ];
                 productFilterInput.on('keyup', function (e) {
                     clearTimeout(timeOut);
                     timeOut = setTimeout(function () {

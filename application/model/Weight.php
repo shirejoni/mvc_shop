@@ -46,4 +46,30 @@ class Weight extends Model
 
     }
 
+    public function getWeight($weight_id, $lID = null) {
+        $language_id = $this->Language->getLanguageID();
+        if($lID && $lID != "all") {
+            $language_id = $lID;
+        }
+        if($lID != "all") {
+            $this->Database->query("SELECT * FROM weight w LEFT JOIN weight_language wl on w.weight_id = wl.weight_id 
+            WHERE w.weight_id = :wID AND language_id = :lID ", array(
+                'wID'  => $weight_id,
+                'lID'   => $language_id
+            ));
+            if($this->Database->hasRows()) {
+                $row = $this->Database->getRow();
+                return $row;
+            }
+            return false;
+        }else {
+            $this->Database->query("SELECT * FROM weight w LEFT JOIN weight_language wl on w.weight_id = wl.weight_id 
+            WHERE w.weight_id = :wID", array(
+                'wID'  => $weight_id,
+            ));
+            $rows = $this->Database->getRows();
+            return $rows;
+        }
+    }
+
 }

@@ -93,7 +93,7 @@ class Attribute extends Model
             $language_id = $lID;
         }
         if($lID != "all") {
-            $this->Database->query("SELECT * FROM attribute a LEFT  JOIN attribute_language al 
+            $this->Database->query("SELECT *, (SELECT agl.name FROM attribute_group_language agl WHERE a.attribute_group_id = agl.attribute_group_id AND agl.language_id = al.language_id) as `attribute_group_name` FROM attribute a LEFT  JOIN attribute_language al 
             on a.attribute_id = al.attribute_id WHERE al.language_id = :lID AND a.attribute_id = :aID", array(
                 'aID'  => $attribute_id,
                 'lID'   => $language_id

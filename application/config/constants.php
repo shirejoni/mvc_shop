@@ -7,6 +7,7 @@ define("LIB_PATH", APP_PATH . DS . 'lib');
 define("SYSTEM_PATH", APP_PATH . DS . 'system');
 define("MODEL_PATH", APP_PATH . DS . 'model');
 define("LANGUAGE_PATH", APP_PATH . DS . 'language');
+define("ASSETS_PATH", PUB_PATH . DS . 'assets');
 
 define("MODEL_NAMESPACE", 'App\\Model');
 define("DB_SERVER", "localhost");
@@ -17,6 +18,7 @@ define("DEBUG_MODE", true);// DEVELOPMENT True Production False
 
 define("URL", "http://myshop.test/");
 define("ADMIN_URL", "http://myshop.test/admin/");
+define("ASSETS_URL", "http://myshop.test/assets/");
 define("LOGIN_STATUS_FORM_LOGIN", '1');
 define("ADMIN_ALIAS_NAME", "admin");
 define("MAIN_CONFIG_FILE", 'config');

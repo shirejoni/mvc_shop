@@ -46,4 +46,30 @@ class Length extends Model
 
     }
 
+    public function getLength($length_id, $lID = null) {
+        $language_id = $this->Language->getLanguageID();
+        if($lID && $lID != "all") {
+            $language_id = $lID;
+        }
+        if($lID != "all") {
+            $this->Database->query("SELECT * FROM length l LEFT JOIN length_langugae ll ON l.length_id = ll.length_id 
+            WHERE l.length_id = :lengthID AND language_id = :lID ", array(
+                'lengthID'  => $length_id,
+                'lID'   => $language_id
+            ));
+            if($this->Database->hasRows()) {
+                $row = $this->Database->getRow();
+                return $row;
+            }
+            return false;
+        }else {
+            $this->Database->query("SELECT * FROM length l LEFT JOIN length_langugae ll ON l.length_id = ll.length_id 
+            WHERE l.length_id = :lengthID ", array(
+                'lengthID'  => $length_id,
+            ));
+            $rows = $this->Database->getRows();
+            return $rows;
+        }
+    }
+
 }

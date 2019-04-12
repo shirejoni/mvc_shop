@@ -46,4 +46,28 @@ class Stock extends Model
 
     }
 
+    public function getStock($stock_status_id, $lID = null) {
+        $language_id = $this->Language->getLanguageID();
+        if($lID && $lID != "all") {
+            $language_id = $lID;
+        }
+        if($lID != "all") {
+            $this->Database->query("SELECT * FROM stock_status WHERE stock_status_id = :sSID AND language_id = :lID ", array(
+                'sSID'  => $stock_status_id,
+                'lID'   => $language_id
+            ));
+            if($this->Database->hasRows()) {
+                $row = $this->Database->getRow();
+                return $row;
+            }
+            return false;
+        }else {
+            $this->Database->query("SELECT * FROM stock_status WHERE stock_status_id = :sSID", array(
+                'sSID'  => $stock_status_id,
+            ));
+            $rows = $this->Database->getRows();
+            return $rows;
+        }
+    }
+
 }
