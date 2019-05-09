@@ -54,6 +54,11 @@ class Application {
 
         $Router = new Router($this->registry);
         $this->registry->Router = $Router;
+        if($this->isAdminRequested) {
+
+        }else {
+            require_once SYSTEM_PATH . DS . 'web.php';
+        }
         $preActions = $Config->get('pre_actions');
         if(count($preActions) > 0) {
             foreach ($preActions as $preAction) {
@@ -71,7 +76,6 @@ class Application {
         $this->registry->Language->load($Config->get('default_language_file_path'));
 
         $Router->dispatch();
-
         $Response->outPut();
 
     }
