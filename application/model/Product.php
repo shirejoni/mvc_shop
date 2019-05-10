@@ -569,7 +569,9 @@ class Product extends Model
             ));
             $row = $this->Database->getRow();
         }
-
+        if(!$row) {
+            return false;
+        }
         return array(
             'product_id'    => $row['product_id'],
             'special'    => $row['special'],

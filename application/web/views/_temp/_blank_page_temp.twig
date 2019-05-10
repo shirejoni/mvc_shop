@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>فروشگاه من</title>
+    <link rel="stylesheet" href="{{ URL }}assets/css/fontawesome-all.min.css">
+    {% block Css %}
+
+    {% endblock %}
+    <link rel="stylesheet" href="{{ URL }}assets/css/style.css">
+</head>
+<body>
+<div id="main">
+    {% include "_inc/_header_inc.twig" %}
+    {% include "_inc/_breadcrumb_inc.twig" %}
+    {% block Content %}
+
+    {% endblock %}
+    {% include "_inc/_footer_inc.twig" %}
+</div>
+<script type="text/javascript" src="{{ URL }}assets/js/jquery-3.3.1.min.js"></script>
+{% block BeforeMainJS %}
+
+{% endblock %}
+<script type="text/javascript" src="{{ URL }}assets/js/main.js"></script>
+{% block Js %}
+
+{% endblock %}
+</body>
+</html>
