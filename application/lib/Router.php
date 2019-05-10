@@ -80,7 +80,7 @@ class Router
             }
 
         }
-        if(!empty($action) && !$this->isResponsed) {
+        if(!empty($action)) {
             foreach ($this->data as $key => $value) {
                 $action->setData($key, $value);
             }
@@ -199,5 +199,25 @@ class Router
         }
         return $method;
     }
+    public function getRequestHeaders()
+    {
+        $headers = [];
+        // If getallheaders() is available, use that
+        if (function_exists('getallheaders')) {
+            $headers = getallheaders();
+            // getallheaders() can return false if something went wrong
+            if ($headers !== false) {
+                return $headers;
+            }
+        }
+        // Method getallheaders() not available or went wrong: manually extract 'm
+        foreach ($_SERVER as $name => $value) {
+            if ((substr($name, 0, 5) == 'HTTP_') || ($name == 'CONTENT_TYPE') || ($name == 'CONTENT_LENGTH')) {
+                $headers[str_replace([' ', 'Http'], ['-', 'HTTP'], ucwords(strtolower(str_replace('_', ' ', substr($name, 5)))))] = $value;
+            }
+        }
+        return $headers;
+    }
+
 
 }

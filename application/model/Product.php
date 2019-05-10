@@ -533,4 +533,73 @@ class Product extends Model
         ));
         return $this->Database->getRows();
     }
+
+    public function getProductComplete($product_id, $lID = null) {
+        $language_id = $this->Language->getLanguageID();
+        if($lID) {
+            $language_id = $lID;
+        }
+        $this->Database->query("SELECT *,p.image as `image`, pl.name AS name, ml.name AS manufacturer_name ,(SELECT ps.price FROM product_special ps WHERE ps.product_id = p.product_id 
+        AND ps.date_start < UNIX_TIMESTAMP() AND ps.date_end > UNIX_TIMESTAMP() ORDER BY ps.priority DESC  LIMIT 0,1) AS special, (SELECT ss.name FROM
+         stock_status ss WHERE ss.stock_status_id = p.stock_status_id AND ss.language_id = pl.language_id) as `stock_status_name`,
+         (SELECT wl.unit FROM weight_language wl WHERE wl.weight_id = p.weight_id AND wl.language_id = pl.language_id ) AS weight_unit,
+         (SELECT ll.unit FROM length_langugae ll WHERE ll.length_id = p.length_id AND ll.language_id = pl.language_id ) AS `length_unit`,
+         (SELECT AVG(r1.rate) FROM review r1 WHERE r1.product_id = p.product_id AND r1.status = 1)  AS rating, (SELECT COUNT(*) FROM 
+         review r2 WHERE r2.product_id = p.product_id AND r2.status = 1) AS reviews
+          FROM product p LEFT JOIN product_language pl ON p.product_id = pl.product_id
+        LEFT JOIN manufacturer m ON m.manufacturer_id = p.manufacturer_id LEFT JOIN manufacturer_language ml ON ml.manufacturer_id = m.manufacturer_id 
+        WHERE p.product_id = :pID  AND pl.language_id = :lID ", array(
+            'pID'   => $product_id,
+            'lID'   => $language_id
+        ));
+        $row = $this->Database->getRow();
+        if(!$row) {
+            $this->Database->query("SELECT *,p.image as `image`, pl.name AS name, ml.name AS manufacturer_name ,(SELECT ps.price FROM product_special ps WHERE ps.product_id = p.product_id 
+        AND ps.date_start < UNIX_TIMESTAMP() AND ps.date_end > UNIX_TIMESTAMP() ORDER BY ps.priority DESC  LIMIT 0,1) AS special, (SELECT ss.name FROM
+         stock_status ss WHERE ss.stock_status_id = p.stock_status_id AND ss.language_id = pl.language_id) as `stock_status_name`,
+         (SELECT wl.unit FROM weight_language wl WHERE wl.weight_id = p.weight_id AND wl.language_id = pl.language_id ) AS weight_unit,
+         (SELECT ll.unit FROM length_langugae ll WHERE ll.length_id = p.length_id AND ll.language_id = pl.language_id ) AS `length_unit`,
+         (SELECT AVG(r1.rate) FROM review r1 WHERE r1.product_id = p.product_id AND r1.status = 1)  AS rating, (SELECT COUNT(*) FROM 
+         review r2 WHERE r2.product_id = p.product_id AND r2.status = 1) AS reviews
+          FROM product p LEFT JOIN product_language pl ON p.product_id = pl.product_id
+        LEFT JOIN manufacturer m ON m.manufacturer_id = p.manufacturer_id LEFT JOIN manufacturer_language ml ON ml.manufacturer_id = m.manufacturer_id 
+        WHERE p.product_id = :pID  AND pl.language_id = :lID ", array(
+                'pID'   => $product_id,
+                'lID'   => $this->Language->getDefaultLanguageID()
+            ));
+            $row = $this->Database->getRow();
+        }
+
+        return array(
+            'product_id'    => $row['product_id'],
+            'special'    => $row['special'],
+            'rate'      => round($row['rating']),
+            'reviews_count'   => $row['reviews'],
+            'name'    => $row['name'],
+            'description'    => $row['description'],
+            'language_id'    => $row['language_id'],
+            'quantity'      => $row['quantity'],
+            'stock_status_id'   => $row['stock_status_id'],
+            'stock_status'      => $row['stock_status_name'],
+            'image'             => $row['image'],
+            'manufacturer_id'   => $row['manufacturer_id'],
+            'manufacturer_name'   => $row['manufacturer_name'],
+            'price'             => $row['price'],
+            'date_available'    => $row['date_available'],
+            'date_added'        => $row['date_added'],
+            'date_updated'      => $row['date_updated'],
+            'weight'            => $row['weight'],
+            'weight_id'            => $row['weight_id'],
+            'weight_unit'       => $row['weight_unit'],
+            'length'            => $row['length'],
+            'length_id'            => $row['length_id'],
+            'width'             => $row['width'],
+            'height'            => $row['height'],
+            'length_unit'       => $row['length_unit'],
+            'minimum'           => $row['minimum'],
+            'views'            => $row['views'],
+            'sort_order'        => $row['sort_order']
+        );
+    }
+
 }

@@ -118,7 +118,7 @@ class ControllerProductProduct extends Controller {
             require_once LIB_PATH . DS . 'jdate/jdf.php';
             if(!empty($this->Request->post['product-date'])) {
                 $parts = explode('/', $this->Request->post['product-date']);
-                if(count($parts) > 3 && jcheckdate($parts[1], $parts[2], $parts[0])){
+                if(count($parts) == 3 && jcheckdate($parts[1], $parts[2], $parts[0])){
                     $data['product-date'] = jmktime(0,0,0, $parts[1], $parts[2], $parts[0]);
                 }
             }
@@ -308,7 +308,7 @@ class ControllerProductProduct extends Controller {
                         }
                         if(!empty($product_special['date-start'])) {
                             $parts = explode('/', $product_special['date-start']);
-                            if(count($parts) > 3 && jcheckdate($parts[1], $parts[2], $parts[0])){
+                            if(count($parts) == 3 && jcheckdate($parts[1], $parts[2], $parts[0])){
                                 $productSpecial['date_start'] = jmktime(0,0,0, $parts[1], $parts[2], $parts[0]);
                             }
                         }
@@ -317,7 +317,7 @@ class ControllerProductProduct extends Controller {
                         }
                         if(!empty($product_special['date-end'])) {
                             $parts = explode('/', $product_special['date-end']);
-                            if(count($parts) > 3 && jcheckdate($parts[1], $parts[2], $parts[0])){
+                            if(count($parts) == 3 && jcheckdate($parts[1], $parts[2], $parts[0])){
                                 $productSpecial['date_end'] = jmktime(0,0,0, $parts[1], $parts[2], $parts[0]);
                             }
                         }
@@ -618,7 +618,7 @@ class ControllerProductProduct extends Controller {
                     require_once LIB_PATH . DS . 'jdate/jdf.php';
                     if(!empty($this->Request->post['product-date'])) {
                         $parts = explode('/', $this->Request->post['product-date']);
-                        if(count($parts) > 3 && jcheckdate($parts[1], $parts[2], $parts[0])){
+                        if(count($parts) == 3 && jcheckdate($parts[1], $parts[2], $parts[0])){
                             $data['product-date'] = jmktime(0,0,0, $parts[1], $parts[2], $parts[0]);
                         }
                     }
@@ -808,7 +808,7 @@ class ControllerProductProduct extends Controller {
                                 }
                                 if(!empty($product_special['date-start'])) {
                                     $parts = explode('/', $product_special['date-start']);
-                                    if(count($parts) > 3 && jcheckdate($parts[1], $parts[2], $parts[0])){
+                                    if(count($parts) == 3 && jcheckdate($parts[1], $parts[2], $parts[0])){
                                         $productSpecial['date_start'] = jmktime(0,0,0, $parts[1], $parts[2], $parts[0]);
                                     }
                                 }
@@ -817,7 +817,7 @@ class ControllerProductProduct extends Controller {
                                 }
                                 if(!empty($product_special['date-end'])) {
                                     $parts = explode('/', $product_special['date-end']);
-                                    if(count($parts) > 3 && jcheckdate($parts[1], $parts[2], $parts[0])){
+                                    if(count($parts) == 3 && jcheckdate($parts[1], $parts[2], $parts[0])){
                                         $productSpecial['date_end'] = jmktime(0,0,0, $parts[1], $parts[2], $parts[0]);
                                     }
                                 }
