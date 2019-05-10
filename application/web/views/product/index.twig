@@ -1,19 +1,7 @@
 {% extends "_temp/_blank_page_temp.twig" %}
 {% block Content %}
 
-    <div id="breadcrumb">
-
-        <div class="bigWrap">
-            <ul>
-                <li><a href="http://myshopdemo.test/" dideo-checked="true">فروشگاه اینترنتی من</a></li>/
-                <li><a href="http://myshopdemo.test/category/2" dideo-checked="true">کالای دیجیتال</a></li>/
-                <li><a href="http://myshopdemo.test/category/6" dideo-checked="true">موبایل</a></li>/
-                <li><a class="active" href="#" dideo-checked="true"> گوشی موبایل سامسونگ مدل Galaxy A7 2018 دو سیم‌کارت </a></li>
-
-            </ul>
-        </div>
-
-    </div>
+    
     <div class="bigWrap">
         <div class="message-box success-box" id="top-success-message-box" style="display: none;">
             <h4>موفقیت!</h4>
@@ -48,11 +36,11 @@
                 <div class="product-manufacturer-category-box clearfix">
                     <div class="product-manufacturer">
                         نام تولیدکننده:
-                        <a href="#" dideo-checked="true">سامسونگ</a>
+                        <a href="#" >سامسونگ</a>
                     </div>
                     <div class="product-category">
                         دسته بندی:
-                        <a href="#" dideo-checked="true">موبایل</a>
+                        <a href="{{ URL }}category/{{ Product['category_id'] }}" >{{ Product['category_name'] }}</a>
                     </div>
                 </div>
                 <div class="product-rating">
@@ -163,9 +151,9 @@
         <section class="product-description">
             <div class="section-tittle" id="product-head-tab">
                 <ul>
-                    <li class="selected"><a href="#product-description" dideo-checked="true">نقد و بررسی</a></li>
-                    <li><a href="#product-attributes" dideo-checked="true">مشخصات</a></li>
-                    <li><a href="#product-reviews" dideo-checked="true">نظرات</a></li>
+                    <li class="selected"><a href="#product-description" >نقد و بررسی</a></li>
+                    <li><a href="#product-attributes" >مشخصات</a></li>
+                    <li><a href="#product-reviews" >نظرات</a></li>
                 </ul>
             </div>
             <div class="section-body" id="product-content-tab">

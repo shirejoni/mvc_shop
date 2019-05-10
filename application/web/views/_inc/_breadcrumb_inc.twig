@@ -1,0 +1,18 @@
+{% if Breadcrumbs %}
+    <div id="breadcrumb">
+
+        <div class="bigWrap">
+            <ul>
+                {% for Breadcrumb in Breadcrumbs %}
+                    {% if Breadcrumb['active'] == 1 %}
+                        <li><a class="active" href="{{ Breadcrumb['link'] }}" >{{ Breadcrumb['text'] }}</a></li>
+                    {% else %}
+                        <li><a href="{{ Breadcrumb['link'] }}" >{{ Breadcrumb['text'] }}</a></li>/
+                    {% endif %}
+                {% endfor %}
+
+            </ul>
+        </div>
+
+    </div>
+{% endif %}

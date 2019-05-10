@@ -604,4 +604,28 @@ class Product extends Model
         );
     }
 
+    public function getCategory($product_id, $lID = null) {
+        $language_id = $this->Language->getLanguageID();
+        if($lID) {
+            $language_id = $lID;
+        }
+        $this->Database->query("SELECT * FROM product_category pc LEFT JOIN category c on pc.category_id = c.category_id
+        LEFT JOIN category_language cl on c.category_id = cl.category_id WHERE pc.product_id = :pID AND cl.language_id = :lID ORDER 
+        BY c.level DESC", array(
+            'pID'   => $product_id,
+            'lID'   => $language_id
+        ));
+        $row = $this->Database->getRow();
+        if(!$row) {
+            $this->Database->query("SELECT * FROM product_category pc LEFT JOIN category c on pc.category_id = c.category_id
+        LEFT JOIN category_language cl on c.category_id = cl.category_id WHERE pc.product_id = :pID AND cl.language_id = :lID ORDER 
+        BY c.level DESC", array(
+                'pID'   => $product_id,
+                'lID'   => $this->Language->getDefaultLanguageID()
+            ));
+            $row = $this->Database->getRow();
+        }
+        return $row;
+    }
+
 }

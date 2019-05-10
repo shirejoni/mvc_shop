@@ -370,4 +370,30 @@ class Category extends Model
         $filters = $this->Database->getRows();
         return count($filters) > 0 ? $filters : [];
     }
+
+    public function getCategoryInfoInPath($category_id, $lID = null) {
+        $language_id = $this->Language->getLanguageID();
+        if($lID) {
+            $language_id = $lID;
+        }
+        $this->Database->query("SELECT *, cp.level as `level` FROM category_path cp LEFT JOIN category c on cp.path_id = c.category_id
+        LEFT JOIN category_language cl on c.category_id = cl.category_id WHERE cp.category_id = :cID AND cl.language_id = :lID ORDER BY cp.level ASC", array(
+            'cID'   => $category_id,
+            'lID'   => $language_id
+        ));
+        $rows =$this->Database->getRows();
+        if(!$rows) {
+            $this->Database->query("SELECT *, cp.level as `level` FROM category_path cp LEFT JOIN category c on cp.path_id = c.category_id
+        LEFT JOIN category_language cl on c.category_id = cl.category_id WHERE cp.category_id = :cID AND cl.language_id = :lID ORDER BY cp.level ASC", array(
+                'cID'   => $category_id,
+                'lID'   => $this->Language->getDefaultLanguageID()
+            ));
+            $rows =$this->Database->getRows();
+        }
+        $result = [];
+        foreach ($rows as $row) {
+            $result[$row['category_id']] = $row;
+        }
+        return $result;
+    }
 }
