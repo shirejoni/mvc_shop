@@ -44,7 +44,30 @@ class ControllerProduct extends Controller {
                 );
                 $product_info['category_name'] = $category['name'];
                 $product_info['category_id'] = $category['category_id'];
-
+                switch ($product_info['stock_status_id']) {
+                    case '1' :
+                        $product_info['stock_status_class'] = "green";
+                        break;
+                    case '2' :
+                        $product_info['stock_status_class'] = "red";
+                    default:
+                        $product_info['stock_status_class'] = 'yellow';
+                }
+                $attributes = [];
+                foreach ($Product->getAttributes($product_id) as $attribute) {
+                   if(!isset($attributes[$attribute['attribute_group_id']])) {
+                       $attributes[$attribute['attribute_group_id']] = array(
+                           'attribute_group_id' => $attribute['attribute_group_id'],
+                           'name'               => $attribute['attribute_group_name']
+                       );
+                   }
+                   $attributes[$attribute['attribute_group_id']]['attributes'][] = array(
+                       'attribute_id'   => $attribute['attribute_id'],
+                       'name'           => $attribute['name'],
+                       'value'          => $attribute['value']
+                   );
+                }
+                $product_info['attributes'] = $attributes;
                 $data['Product'] = $product_info;
                 $this->Response->setOutPut($this->render('product/index', $data));
                 return;

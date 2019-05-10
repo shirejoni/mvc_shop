@@ -586,6 +586,7 @@ class Product extends Model
             'image'             => $row['image'],
             'manufacturer_id'   => $row['manufacturer_id'],
             'manufacturer_name'   => $row['manufacturer_name'],
+            'manufacturer_url'   => $row['url'],
             'price'             => $row['price'],
             'date_available'    => $row['date_available'],
             'date_added'        => $row['date_added'],
@@ -626,6 +627,43 @@ class Product extends Model
             $row = $this->Database->getRow();
         }
         return $row;
+    }
+
+    public function getAttributes($product_id, $lID = null) {
+        $language_id = $this->Language->getLanguageID();
+        if($lID) {
+            $language_id = $lID;
+        }
+        $this->Database->query("SELECT *, al.name as `name`, agl.name as `group_name` FROM product_attribute pa LEFT JOIN attribute a on pa.attribute_id = a.attribute_id 
+        LEFT JOIN attribute_language al on a.attribute_id = al.attribute_id LEFT JOIN attribute_group ag on a.attribute_group_id = ag.attribute_group_id LEFT JOIN 
+        attribute_group_language agl on ag.attribute_group_id = agl.attribute_group_id WHERE pa.product_id = :pID AND al.language_id = :lID AND agl.language_id = :lID 
+        ORDER BY ag.sort_order, a.attribute_group_id, a.sort_order ASC", array(
+            'pID'   => $product_id,
+            'lID'   => $language_id
+        ));
+        $rows = $this->Database->getRows();
+        if(!$rows) {
+            $this->Database->query("SELECT *, al.name as `name`, agl.name as `group_name` FROM product_attribute pa LEFT JOIN attribute a on pa.attribute_id = a.attribute_id 
+        LEFT JOIN attribute_language al on a.attribute_id = al.attribute_id LEFT JOIN attribute_group ag on a.attribute_group_id = ag.attribute_group_id LEFT JOIN 
+        attribute_group_language agl on ag.attribute_group_id = agl.attribute_group_id WHERE pa.product_id = :pID AND al.language_id = :lID AND agl.language_id = :lID 
+        ORDER BY ag.sort_order, a.attribute_group_id, a.sort_order ASC", array(
+                'pID'   => $product_id,
+                'lID'   => $this->Language->getDefaultLanguageID()
+            ));
+            $rows = $this->Database->getRows();
+        }
+
+        $result = [];
+        foreach ($rows as $row) {
+            $result[] =array(
+                'attribute_id'  => $row['attribute_id'],
+                'attribute_group_id'    => $row['attribute_group_id'],
+                'attribute_group_name'  => $row['group_name'],
+                'value'                 => $row['value'],
+                'name'                  => $row['name']
+            );
+        }
+        return $result;
     }
 
 }
