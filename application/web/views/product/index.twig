@@ -26,6 +26,7 @@
                     {% for ProductImage in Product['images'] %}
                         {% if ProductImage['image'] == Product['image'] %}
                             <div class="product-header-image-thumbnail selected">
+
                         {% else %}
                             <div class="product-header-image-thumbnail">
                         {% endif %}
@@ -48,7 +49,7 @@
                     </div>
                 </div>
                 <div class="product-rating">
-                    <div class="rating-stars text-center" data-review-value="5">
+                    <div class="rating-stars text-center" data-review-value="{{ Product['rate'] }}">
                         <ul id="stars">
                             <li class="star selected" title="Poor" data-value="1">
                                 <i class="fa fa-star fa-fw"></i>
@@ -67,7 +68,7 @@
                             </li>
                         </ul>
                         <span class="rating-counter">
-                            از 3 رای
+                            از {{ Product['reviews_count'] }} رای
                         </span>
                     </div>
                 </div>
@@ -101,7 +102,7 @@
                             </div>
                             <div class="product-option-items">
                                 {% for ProductOptionItem in ProductOption['option_items'] %}
-                                    <div class="product-option-item" data-price-value="{{ ProductOptionItem['price'] }}" data-price-prefix="{{ ProductOptionItem['price_sign'] }}" data-product-option-id="{{ ProductOption['product_option_id'] }}" data-product-option-value-id="{{ ProductOptionItem['product_option_value_id'] }}">
+                                    <div class="product-option-item" data-price-value="{{ ProductOptionItem['price'] }}"  data-price-sign="{{ ProductOptionItem['price_sign'] }}" data-product-option-id="{{ ProductOption['product_option_id'] }}" data-product-option-value-id="{{ ProductOptionItem['product_option_value_id'] }}">
                                         {% if ProductOptionItem['image'] %}
                                             <div class="product-option-item-image">
                                                 <img src="{{ ProductOptionItem['image'] }}" alt="">
@@ -337,7 +338,26 @@
 {% block Js %}
     <script type="text/javascript">
         {% autoescape false %}
+            function updateAddonPrice() {
+                $("#addon-price").html('');
+                $('.product-option-item.selected').each(function (index, element) {
+                    let price = +$(element).attr('data-price-value');
+                    let price_sign = $(element).attr('data-price-sign');
+                    if(price_sign == "+") {
+                        $("#addon-price").append($('<p class="green">+'+ price + " تومان" +'</p>'))
+                    }else {
+                        $("#addon-price").append($('<p class="red">-'+ price + " تومان" +'</p>'))
+                    }
+                });
+            }
             $(document).ready(function () {
+                $('.rating-stars[data-review-value]').each(function (index, element) {
+                    let stars = +$(element).attr('data-review-value');
+                    $(element).find('.star').removeClass('selected');
+                    for(i = 1; i <= stars; i++) {
+                        $(element).find('.star:nth-child('+ i +')').addClass('selected');
+                    }
+                });
                 $(".product-header-image-thumbnail").click(function () {
                     let src = $(this).find('img').attr('data-image-src');
                     $(this).parent().find('.selected').removeClass('selected');
@@ -351,6 +371,7 @@
                         $(this).parent().find('.selected').removeClass('selected');
                         $(this).addClass('selected');
                     }
+                    updateAddonPrice();
                 });
                 $('#product-head-tab > ul >  li > a').click(function (e) {
                     let elementId = $(this).attr('href');
