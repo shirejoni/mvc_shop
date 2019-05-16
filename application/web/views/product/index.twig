@@ -85,53 +85,34 @@
 
                 </div>
                 <div class="product-options">
-                    <div class="product-option option-color" id="product-option-25">
-                        <div class="product-option-title">
-                            رنگ محصول:
-                        </div>
-                        <div class="product-option-items">
-                            <div class="product-option-item" data-price-value="0" data-price-prefix="+" data-product-option-id="25" data-product-option-value-id="37">
-                                <div class="product-option-item-image">
-                                    <img src="http://myshopdemo.test/assets/img/option/yellow.jpg" alt="">
-                                </div>
-                                <div class="product-option-item-title">
-                                    زرد
-                                </div>
+                    {% for ProductOption in Product['options'] %}
+                        {% if ProductOption['option_type'] == "color" %}
+                            {% set OptionType = "option-color" %}
+                        {% else %}
+                            {% set OptionType = "" %}
+                        {% endif %}
+                        <div class="product-option {{ OptionType }}" id="product-option-{{ ProductOption['product_option_id'] }}">
+                            <div class="product-option-title">
+                                {{ ProductOption['name'] }}:
                             </div>
-                            <div class="product-option-item" data-price-value="20000" data-price-prefix="+" data-product-option-id="25" data-product-option-value-id="38">
-                                <div class="product-option-item-image">
-                                    <img src="http://myshopdemo.test/assets/img/option/black.jpg" alt="">
-                                </div>
-                                <div class="product-option-item-title">
-                                    سیاه
-                                </div>
+                            <div class="product-option-items">
+                                {% for ProductOptionItem in ProductOption['option_items'] %}
+                                    <div class="product-option-item" data-price-value="{{ ProductOptionItem['price'] }}" data-price-prefix="{{ ProductOptionItem['price_sign'] }}" data-product-option-id="{{ ProductOption['product_option_id'] }}" data-product-option-value-id="{{ ProductOptionItem['product_option_value_id'] }}">
+                                        {% if ProductOptionItem['image'] %}
+                                            <div class="product-option-item-image">
+                                                <img src="{{ ProductOptionItem['image'] }}" alt="">
+                                            </div>
+                                        {% endif %}
+                                        <div class="product-option-item-title">
+                                            {{ ProductOptionItem['name'] }}
+                                        </div>
+                                    </div>
+                                {% endfor %}
                             </div>
                         </div>
-                    </div>
 
-                    <div class="product-option " id="product-option-26">
-                        <div class="product-option-title">
-                            گارانتی:
-                        </div>
-                        <div class="product-option-items">
-                            <div class="product-option-item" data-price-value="10000" data-price-prefix="+" data-product-option-id="26" data-product-option-value-id="39">
-                                <div class="product-option-item-image">
-                                    <img src="http://myshopdemo.test/assets/img/guarantee/avagang.png" alt="">
-                                </div>
-                                <div class="product-option-item-title">
-                                    آواژنگ
-                                </div>
-                            </div>
-                            <div class="product-option-item" data-price-value="5000" data-price-prefix="+" data-product-option-id="26" data-product-option-value-id="40">
-                                <div class="product-option-item-image">
-                                    <img src="http://myshopdemo.test/assets/img/guarantee/hami.png" alt="">
-                                </div>
-                                <div class="product-option-item-title">
-                                    حامی
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    {% endfor %}
+
 
 
 

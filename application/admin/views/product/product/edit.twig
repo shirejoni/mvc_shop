@@ -298,7 +298,7 @@
                                         <div class="col-3">
                                             <div class="nav text-right flex-column nav-pills" id="option-head-tab" role="tablist" aria-orientation="vertical">
                                                 {% for ProductOption in Product['options'] %}
-                                                    <a class="nav-link active show" id="option-head-tab-{{ ProductOption['option_group_id'] }}" data-toggle="pill" href="#option-body-tab-{{ ProductOption['option_group_id'] }}" role="tab" aria-controls="option-body-tab-1" aria-selected="true"><i class="fa fa-minus ml-1" data-option-id="{{ ProductOption['option_group_id'] }}"></i>{{ ProductOption['name'] }}</a>
+                                                    <a class="nav-link" id="option-head-tab-{{ ProductOption['option_group_id'] }}" data-toggle="pill" href="#option-body-tab-{{ ProductOption['option_group_id'] }}" role="tab" aria-controls="option-body-tab-1" aria-selected="true"><i class="fa fa-minus ml-1" data-option-id="{{ ProductOption['option_group_id'] }}"></i>{{ ProductOption['name'] }}</a>
                                                 {% endfor %}
                                             </div>
                                             <div class="row mt-2">
@@ -311,9 +311,9 @@
                                             </div>
                                         </div>
                                         <div class="col-9">
-                                            {% for ProductOption in Product['options'] %}
                                             <div class="tab-content" id="option-body-tab">
-                                                <div class="tab-pane fade active show" id="option-body-tab-{{ ProductOption['option_group_id'] }}"
+                                            {% for ProductOption in Product['options'] %}
+                                                <div class="tab-pane fade" id="option-body-tab-{{ ProductOption['option_group_id'] }}"
                                                      role="tabpanel" aria-labelledby="option-body-tab-{{ ProductOption['option_group_id'] }}">
                                                     <div class="form-group d-flex align-middle mt-3"><label
                                                                 class="col-sm-2 control-label text-center">الزامی</label>
@@ -399,8 +399,8 @@
                                                     </div>
                                                     <div></div>
                                                 </div>
-                                            </div>
                                             {% endfor %}
+                                            </div>
                                         </div>
                                     </div>
                                 </div>
@@ -551,7 +551,7 @@
                         },
                         {% endfor %}
                     ]
-                }
+                },
             {% endfor %}
             };
             let LanguageNames = {

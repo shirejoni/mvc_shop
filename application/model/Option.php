@@ -132,7 +132,10 @@ class Option extends Model
                     'lID'   => $language_id,
                     'oGID'   => $option_group_id,
                 ));
-                $option_items = $this->Database->getRows();
+                $option_items = [];
+                foreach ($this->Database->getRows() as $r) {
+                    $option_items[$r['option_item_id']] = $r;
+                }
                 $this->option_group_id = $row['option_group_id'];
                 $this->sort_order = $row['sort_order'];
                 $this->language_id = $row['language_id'];

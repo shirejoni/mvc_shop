@@ -5,6 +5,7 @@ namespace App\Web\Controller;
 use App\lib\Action;
 use App\lib\Response;
 use App\model\Category;
+use App\model\Option;
 use App\model\Product;
 use App\system\Controller;
 
@@ -21,6 +22,8 @@ class ControllerProduct extends Controller {
             $Product = $this->load("Product", $this->registry);
             /** @var Category $Category */
             $Category = $this->load("Category", $this->registry);
+            /** @var Option $Option */
+            $Option = $this->load("Option", $this->registry);
             if($product_id && $product_info = $Product->getProductComplete($product_id)) {
                 $data['Breadcrumbs'] = [];
                 $data['Breadcrumbs'][] = array(
@@ -68,6 +71,32 @@ class ControllerProduct extends Controller {
                    );
                 }
                 $product_info['attributes'] = $attributes;
+                foreach ($Product->getProductOptions($product_id) as $option_group) {
+                    $productOption = [];
+                    $productOption['product_option_id'] = $option_group['product_option_id'];
+                    $productOption['option_group_id'] = $option_group['option_group_id'];
+                    $productOption['required'] = $option_group['required'];
+                    $productOption['option_type'] = $option_group['option_type'];
+                    $productOption['name'] = $option_group['name'];
+                    $Option->getOptionGroup($option_group['option_group_id']);
+                    $productOptionValues = [];
+                    $option_items = $Option->getOptionItems();
+                    foreach ($option_group['option_items'] as $productOptionValue) {
+                        if($productOptionValue['subtract'] != 0 || $productOptionValue['quantity'] > 0) {
+                            $productOptionValues[] = array(
+                                'name'      => $productOptionValue['name'],
+                                'price'     => $productOptionValue['price'],
+                                'price_sign'=> $productOptionValue['price_sign'],
+                                'image'     => $option_items[$productOptionValue['option_item_id']]['image'],
+                                'option_group_id'   => $option_items[$productOptionValue['option_item_id']]['option_group_id'],
+                                'product_option_value_id'   => $productOptionValue['product_option_value_id']
+                            );
+                        }
+                    }
+                    $productOption['option_items'] = $productOptionValues;
+                    $product_info['options'][$option_group['sort_order']] = $productOption;
+                }
+
                 $data['Product'] = $product_info;
                 $this->Response->setOutPut($this->render('product/index', $data));
                 return;

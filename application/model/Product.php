@@ -482,10 +482,16 @@ class Product extends Model
         if($lID) {
             $language_id = $lID;
         }
-        $this->Database->query("SELECT * FROM product_option po LEFT JOIN option_group_language ogl ON po.option_group_id = ogl.option_group_id  WHERE product_id = :pID AND language_id = :lID ", array(
+        $this->Database->query("SELECT * FROM product_option po LEFT JOIN option_group og ON og.option_group_id = po.option_group_id LEFT JOIN option_group_language ogl ON po.option_group_id = ogl.option_group_id  WHERE product_id = :pID AND language_id = :lID ", array(
             'pID'   => $product_id,
             'lID'   => $language_id
         ));
+        if(!$this->Database->hasRows()) {
+            $this->Database->query("SELECT * FROM product_option po LEFT JOIN option_group og ON og.option_group_id = po.option_group_id LEFT JOIN option_group_language ogl ON po.option_group_id = ogl.option_group_id  WHERE product_id = :pID AND language_id = :lID ", array(
+                'pID'   => $product_id,
+                'lID'   => $this->Language->getDefaultLanguageID(),
+            ));
+        }
         $option_groups = [];
         foreach ($this->Database->getRows() as $row) {
             $option_groups[$row['product_option_id']] = array(
@@ -493,6 +499,8 @@ class Product extends Model
                 'option_group_id'   => $row['option_group_id'],
                 'product_id'        => $row['product_id'],
                 'required'          => $row['required'],
+                'sort_order'        => $row['sort_order'],
+                'option_type'       => $row['type'],
                 'language_id'       => $row['language_id'],
                 'name'              => $row['name']
             );
@@ -504,6 +512,13 @@ class Product extends Model
                 'pOID'  => $option_group['product_option_id'],
                 'lID'   => $language_id
             ));
+            if(!$this->Database->hasRows()) {
+                $this->Database->query("SELECT * FROM product_option_value pov LEFT JOIN option_item_language oil on 
+            pov.option_item_id = oil.option_item_id WHERE prodct_option_id = :pOID AND language_id = :lID", array(
+                    'pOID'  => $option_group['product_option_id'],
+                    'lID'   => $this->Language->getDefaultLanguageID()
+                ));
+            }
             foreach ($this->Database->getRows() as $row) {
                 $product_option_items[$row['product_option_value_id']] = array(
                     'product_option_value_id'   => $row['product_option_value_id'],
