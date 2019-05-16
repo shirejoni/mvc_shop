@@ -96,7 +96,29 @@ class ControllerProduct extends Controller {
                     $productOption['option_items'] = $productOptionValues;
                     $product_info['options'][$option_group['sort_order']] = $productOption;
                 }
-
+                $images = $Product->getProductImages($product_id);
+                $Image = $this->load("Image", $this->registry);
+                if(isset($product_info['image'])) {
+                    if(is_file(ASSETS_PATH . DS . substr($product_info['image'], strlen(ASSETS_URL)))) {
+                        $product_info['image'] = ASSETS_URL . $Image->resize(substr($product_info['image'], strlen(ASSETS_URL)), 700, 490);
+                    }
+                }
+                $product_images = [];
+                foreach ($images as $image) {
+                    $img = $image['image'];
+                    $thumbnail_img = $image['image'];
+                    if(is_file(ASSETS_PATH . DS . substr($image['image'], strlen(ASSETS_URL)))) {
+                        $img = ASSETS_URL . $Image->resize(substr($image['image'], strlen(ASSETS_URL)), 700, 490);
+                    }
+                    if(is_file(ASSETS_PATH . DS . substr($image['image'], strlen(ASSETS_URL)))) {
+                        $thumbnail_img = ASSETS_URL . $Image->resize(substr($image['image'], strlen(ASSETS_URL)), 200, 200);
+                    }
+                    $product_images[] = array(
+                        'image' => $img,
+                        'thumbnail_img'  => $thumbnail_img
+                    );
+                }
+                $product_info['images'] = $product_images;
                 $data['Product'] = $product_info;
                 $this->Response->setOutPut($this->render('product/index', $data));
                 return;

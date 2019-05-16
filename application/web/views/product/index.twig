@@ -20,15 +20,19 @@
         <section class="product-header clearfix">
             <div class="product-header-images-box">
                 <div class="product-header-show-image">
-                    <img src="http://myshopdemo.test/assets/cache/img/product/53828791-700x490.jpg" alt="Product Image">
+                    <img src="{{ Product['image'] }}" alt="Product Image">
                 </div>
                 <div class="product-header-images-thumbnail" style="direction: rtl">
-                    <div class="product-header-image-thumbnail selected">
-                        <img src="http://myshopdemo.test/assets/cache/cache/img/product/53828791-700x490-100x100.jpg" data-image-src="http://myshopdemo.test/assets/cache/img/product/53828791-700x490.jpg" alt="Product Thumbnail">
-                    </div>
-                    <div class="product-header-image-thumbnail ">
-                        <img src="http://myshopdemo.test/assets/cache/cache/img/product/53828651-700x490-100x100.jpg" data-image-src="http://myshopdemo.test/assets/cache/img/product/53828651-700x490.jpg" alt="Product Thumbnail">
-                    </div>
+                    {% for ProductImage in Product['images'] %}
+                        {% if ProductImage['image'] == Product['image'] %}
+                            <div class="product-header-image-thumbnail selected">
+                        {% else %}
+                            <div class="product-header-image-thumbnail">
+                        {% endif %}
+                            <img src="{{ ProductImage['thumbnail_img'] }}" data-image-src="{{ ProductImage['image'] }}" alt="Product Thumbnail">
+                        </div>
+                    {% endfor %}
+
                 </div>
             </div>
             <div class="product-header-information-box">
@@ -144,12 +148,12 @@
                 </ul>
             </div>
             <div class="section-body" id="product-content-tab">
-                <div id="product-description" >
+                <div id="product-description" class="active" >
                     {% autoescape false %}
                         {{ Product['description'] }}
                     {% endautoescape %}
                 </div>
-                <div id="product-attributes" class="active">
+                <div id="product-attributes" >
                     <table>
                         {% for AttributeGroupRow in Product['attributes'] %}
                             <tr class="group">
@@ -328,4 +332,38 @@
         </section>
     </div>
 
+{% endblock %}
+
+{% block Js %}
+    <script type="text/javascript">
+        {% autoescape false %}
+            $(document).ready(function () {
+                $(".product-header-image-thumbnail").click(function () {
+                    let src = $(this).find('img').attr('data-image-src');
+                    $(this).parent().find('.selected').removeClass('selected');
+                    $(this).addClass('selected');
+                    $(".product-header-show-image").find('img').attr('src', src);
+                });
+                $(".product-option-item").click(function () {
+                    if($(this).hasClass('selected')) {
+                        $(this).removeClass('selected');
+                    }else {
+                        $(this).parent().find('.selected').removeClass('selected');
+                        $(this).addClass('selected');
+                    }
+                });
+                $('#product-head-tab > ul >  li > a').click(function (e) {
+                    let elementId = $(this).attr('href');
+                    $(this).parent().parent().find('li').removeClass('selected');
+                    $(this).parent().addClass('selected');
+                    $("#product-content-tab > div").removeClass('active');
+                    $(elementId).addClass('active');
+                    e.preventDefault();
+                });
+
+
+            });
+
+        {% endautoescape %}
+    </script>
 {% endblock %}
