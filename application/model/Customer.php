@@ -48,11 +48,14 @@ class Customer extends Model
             $this->address_id = $row['address_id'];
             $this->newsletter = $row['newsletter'];
             $this->date_added = $row['date_added'];
+            return $row;
+
         }
         return false;
     }
 
-    public function getCustomerByEmail($email) {
+    public function
+    getCustomerByEmail($email) {
         $this->Database->query("SELECT * FROM customer WHERE email = :email", array(
             'email'   => $email
         ));
@@ -72,6 +75,7 @@ class Customer extends Model
             $this->address_id = $row['address_id'];
             $this->newsletter = $row['newsletter'];
             $this->date_added = $row['date_added'];
+            return $row;
         }
         return false;
     }
@@ -96,6 +100,7 @@ class Customer extends Model
             $this->address_id = $row['address_id'];
             $this->newsletter = $row['newsletter'];
             $this->date_added = $row['date_added'];
+            return $row;
         }
         return false;
     }
@@ -117,6 +122,23 @@ class Customer extends Model
             'cDAdded'       => time()
         ));
         return $this->Database->insertId();
+    }
+
+    public function login() {
+        if(!empty($this->customer_id) && !empty($this->email)) {
+
+            $_SESSION['customer'] = [];
+            $_SESSION['session_old_id'] = session_id();
+            session_regenerate_id();
+            $_SESSION['customer'] = array(
+                'customer_id'   => $this->customer_id,
+                'email'     => $this->email,
+                'status'    => $this->status
+            );
+            return true;
+        }else {
+            throw new \Exception("You Should First Get User Data form Database and then login");
+        }
     }
 
 }

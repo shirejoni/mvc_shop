@@ -120,7 +120,7 @@
 .form .register-form {
   display: none;
 }
-.form button {
+.form button, p.message {
   font: 15px Vazir;
 }
 .container {
