@@ -1,0 +1,149 @@
+{% extends "user/_temp/blank_dashboard_temp.twig" %}
+
+{% block Content %}
+    <div class="container">
+        <section class="row">
+            <div class="col-12 px-5 pt-4">
+                <div class="message-box success-box" id="success-message-box" style="display: none;">
+                    <h4>موفقیت!</h4>
+                    <hr>
+                    <div class="messages">
+
+                    </div>
+                </div>
+                <div class="message-box error-box" id="error-message-box" style="display: none;">
+                    <h4>خطا!</h4>
+                    <hr>
+                    <div class="messages">
+
+                    </div>
+                </div>
+                <div class="row"  style="box-shadow: 0 0 5px rgba(0,0,0,0.1)">
+                    <div class="col-12 p-2">
+
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">نام:</label>
+                            <div class="col-sm-10">
+                                <input type="text" value="{{ Customer['first_name'] }}" id="customer-first-name" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">نام خانوادگی:</label>
+                            <div class="col-sm-10">
+                                <input type="text" value="{{ Customer['last_name'] }}" id="customer-last-name" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">شماره موبایل:</label>
+                            <div class="col-sm-10">
+                                <input type="text" value="{{ Customer['mobile'] }}" id="customer-phone-number" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">ایمیل:</label>
+                            <div class="col-sm-10">
+                                <input type="text" value="{{ Customer['email'] }}" id="customer-email" disabled class="form-control">
+                            </div>
+                        </div>
+
+
+                        <div class="form-group text-right pt-3 px-3">
+                            <a href="{{ URL }}user/index?token={{ Token }}" class="fa fa-arrow-right btn btn-warning"></a>
+                            <a href="#" id="customer-submit-btn" class="fa fa-plus btn btn-success"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+{% endblock %}
+
+{% block Js %}
+    {% autoescape %}
+        <script type="text/javascript">
+            let url = "{{ CURRENT_URL }}?token={{ Token }}";
+            $(document).ready(function () {
+
+
+                /*
+                * Post Data
+                * */
+                let customerSubmitBtn = $("#customer-submit-btn");
+                let successMessageBoxElement = $("#success-message-box");
+                let errorMessageBoxElement = $("#error-message-box");
+                customerSubmitBtn.click(function (e) {
+                    let data = {};
+                    let error = false;
+                    let element;
+                    let messages = [];
+
+                    successMessageBoxElement.find(".messages").html('');
+                    successMessageBoxElement.css("display", "none");
+                    errorMessageBoxElement.find(".messages").html('');
+                    errorMessageBoxElement.css("display", "none");
+
+                    element = $('#customer-first-name');
+                    if(element.val() != '') {
+                        data['customer-first-name'] = element.val();
+                    }else {
+                        error = true;
+                        messages.push("{{ T['error_first_name_empty'] }}");
+                    }
+                    element = $('#customer-last-name');
+                    if(element.val() != '') {
+                        data['customer-last-name'] = element.val();
+                    }else {
+                        error = true;
+                        messages.push("{{ T['error_last_name_empty'] }}");
+                    }
+                    element = $('#customer-phone-number');
+                    if(element.val() != '') {
+                        data['customer-mobile'] = element.val();
+                    }else {
+                        error = true;
+                        messages.push("{{ T['error_mobile_empty'] }}");
+                    }
+                    data['post'] = true;
+                    data['customer-post'] = true;
+
+                    if(!error) {
+                        $.post(url, data, function (response) {
+                            response = JSON.parse(response);
+                            if(response.status === 1) {
+                                for (let i = 0; i < response['messages'].length; i++) {
+                                    $('<p>').text(response['messages'][i]).appendTo(successMessageBoxElement.find('.messages'));
+                                }
+                                if(response['messages'].length > 0) {
+                                    successMessageBoxElement.css("display", "block");
+                                }
+
+                                if(response['redirect']) {
+                                    window.setTimeout(function () {
+                                        window.location.href = response['redirect'];
+                                    }, 1000)
+                                }
+                            }else {
+                                for (let i = 0; i < response['messages'].length; i++) {
+                                    $('<p>').text(response['messages'][i]).appendTo(errorMessageBoxElement.find('.messages'));
+                                }
+                                if(response['messages'].length > 0) {
+                                    errorMessageBoxElement.css("display", "block");
+                                }
+                            }
+                        });
+                    }else {
+                        for (let i = 0; i < messages.length; i++) {
+                            $('<p>').text(messages[i]).appendTo(errorMessageBoxElement.find('.messages'));
+                        }
+                        if(messages.length > 0) {
+                            errorMessageBoxElement.css("display", "block");
+                        }
+                    }
+                    e.preventDefault();
+                });
+            });
+
+        </script>
+    {% endautoescape %}
+{% endblock %}

@@ -1,0 +1,18 @@
+<nav id="sidebar" >
+    <div class="navbar">
+        <div class="navbar-nav flex-column sidebar-navigation-box align-items-start">
+
+            <a href="#" class="nav-item nav-link d-block dropdown-toggle" data-toggle="collapse" data-target="#userMenu" role="button" aria-expanded="true" >
+                <span class="fa fa-user" style="margin-left: 5px"></span>
+                کاربری
+            </a>
+            <div class="collapse show" id="userMenu">
+                <nav class="nav flex-column align-items-start pr-4">
+                    <a href="{{ URL }}user/index?token={{ Token }}" class="nav-link">صفحه اصلی</a>
+                    <a href="{{ URL }}user/edit?token={{ Token }}" class="nav-link">ویرایش کاربر</a>
+                </nav>
+            </div>
+
+        </div>
+    </div>
+</nav>
