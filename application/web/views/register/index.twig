@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en" >
+
+<head>
+    <meta charset="UTF-8">
+    <title>Dashboard | {{ PageTitle }}</title>
+
+
+
+    <link rel="stylesheet" href="{{ URL }}assets/user/css/login.css">
+
+
+</head>
+
+<body>
+
+<div class="login-page">
+    <div class="message-box success-box" id="success-message-box" style="display: none;">
+        <h4>موفقیت!</h4>
+        <hr>
+        <div class="messages">
+
+        </div>
+    </div>
+    <div class="message-box error-box" id="error-message-box" style="display: none;">
+        <h4>خطا!</h4>
+        <hr>
+        <div class="messages">
+
+        </div>
+    </div>
+    <div class="form">
+        <form class="login-form">
+            <input type="text" id="fist_name" placeholder="First Name"/>
+            <input type="text" id="last_name" placeholder="Last Name"/>
+            <input type="text" id="mobile" placeholder="mobile"/>
+            <input type="text" id="email" placeholder="email"/>
+            <input type="password" id="password" placeholder="password"/>
+            <button id="login-submit-btn">ثبت نام</button>
+        </form>
+    </div>
+</div>
+
+<script type="text/javascript" src="{{ URL }}assets/admin/js/jquery-3.3.1.min.js"></script>
+<script type="text/javascript">
+    {% autoescape false %}
+    let url = "{{ CURRENT_URL }}";
+    let successMessageBoxElement = $("#success-message-box");
+    let errorMessageBoxElement = $("#error-message-box");
+    $(document).ready(function () {
+        $('#login-submit-btn').click(function (e) {
+            let data = {};
+            let messages = [];
+            let error = false;
+            let element = $("#email");
+
+            successMessageBoxElement.find(".messages").html('');
+            successMessageBoxElement.css("display", "none");
+
+            errorMessageBoxElement.find(".messages").html('');
+            errorMessageBoxElement.css("display", "none");
+
+            if(element.val() != "") {
+                data['email'] = element.val();
+            }else {
+                error = true;
+                messages.push("{{ T['error_email_invalid'] }}");
+            }
+            element = $("#password");
+            if(element.val() != "") {
+                data['password'] = element.val();
+            }else {
+                error = true;
+                messages.push("{{ T['error_password_invalid'] }}");
+            }
+            element = $("#fist_name");
+            if(element.val() != "") {
+                data['first_name'] = element.val();
+            }else {
+                error = true;
+                messages.push("{{ T['error_first_name_empty'] }}");
+            }
+            element = $("#last_name");
+            if(element.val() != "") {
+                data['last_name'] = element.val();
+            }else {
+                error = true;
+                messages.push("{{ T['error_last_name_empty'] }}");
+            }
+            element = $("#mobile");
+            if(element.val() != "") {
+                data['mobile'] = element.val();
+            }else {
+                error = true;
+                messages.push("{{ T['error_mobile_empty'] }}");
+            }
+            data['post'] = true;
+            data['register-post'] = true;
+            if(!error) {
+                $.post(url, data, function (response) {
+                    response = JSON.parse(response);
+                    if(response.status === 1) {
+                        for (let i = 0; i < response['messages'].length; i++) {
+                            $('<p>').text(response['messages'][i]).appendTo(successMessageBoxElement.find('.messages'));
+                        }
+                        if(response['messages'].length > 0) {
+                            successMessageBoxElement.css("display", "block");
+                        }
+
+                        if(response['redirect']) {
+                            window.setTimeout(function () {
+                                window.location.href = response['redirect'];
+                            }, 1000)
+                        }
+                    }else {
+                        for (let i = 0; i < response['messages'].length; i++) {
+                            $('<p>').text(response['messages'][i]).appendTo(errorMessageBoxElement.find('.messages'));
+                        }
+                        if(response['messages'].length > 0) {
+                            errorMessageBoxElement.css("display", "block");
+                        }
+                    }
+                });
+            }else {
+                for (let i = 0; i < messages.length; i++) {
+                    $('<p>').text(messages[i]).appendTo(errorMessageBoxElement.find('.messages'));
+                }
+                if(messages.length > 0) {
+                    errorMessageBoxElement.css("display", "block");
+                }
+            }
+            e.preventDefault();
+        });
+
+    });
+    {% endautoescape %}
+
+</script>
+
+
+
+
+</body>
+
+</html>

@@ -22,4 +22,8 @@ class Validate
         return preg_match('/^[a-zA-Z0-9!@\#\$%&\*\-_\.]{8,64}$/', $password);
     }
 
+    public static function mobileValid($mobile) {
+        return preg_match('/^09[0-9]{9}$/', $mobile);
+    }
+
 }
