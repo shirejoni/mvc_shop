@@ -26,6 +26,7 @@ class ControllerLogin extends Controller {
             exit();
         }
         if(!empty($this->Request->post['email']) && !empty($this->Request->post['password'])) {
+
             $email = $this->Request->post['email'];
             $password = $this->Request->post['password'];
             if(!Validate::emailValid($email)) {

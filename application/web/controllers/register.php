@@ -18,6 +18,13 @@ class ControllerRegister extends Controller {
         $data = [];
         $messages = [];
         $error = false;
+        if(isset($_SESSION['customer']) && !empty($_SESSION['customer']['email']) && $_SESSION['login_status'] == LOGIN_STATUS_FORM_LOGIN) {
+            $token = generateToken();
+            $_SESSION['token'] = $token;
+            $_SESSION['login_time_expiry'] = time() + $this->Config->get('max_time_inactive_session_time');
+            header("location:" . URL . 'user/index?token=' . $token);
+            exit();
+        }
         if(isset($this->Request->post['register-post'])) {
             $first_name = isset($this->Request->post['first_name']) ? $this->Request->post['first_name'] : false;
             $last_name = isset($this->Request->post['last_name']) ? $this->Request->post['last_name'] : false;
@@ -59,7 +66,19 @@ class ControllerRegister extends Controller {
                     $data['last_name'] = $last_name;
                     $data['password'] = password_hash($password, PASSWORD_DEFAULT);
                     $data['mobile'] = $mobile;
-                    $Customer->insertCustomer($data);
+                    $customer_id = $Customer->insertCustomer($data);
+                    $Customer->getCustomerByID($customer_id);
+                    $ip = get_ip_address();
+                    $Customer->login();
+                    $token = generateToken();
+                    $_SESSION['token'] = $token;
+                    $_SESSION['token_time_expiry'] = time() + $this->Config->get('token_max_life_time');
+                    $_SESSION['login_status'] = LOGIN_STATUS_FORM_LOGIN;
+                    $_SESSION['login_time'] = time();
+                    $_SESSION['login_time_expiry'] = time() + $this->Config->get('max_time_inactive_session_time');
+                    $_SESSION['ip'] = $ip;
+                    $_SESSION['user_agent'] = $_SERVER['HTTP_USER_AGENT'];
+
                     $json['status'] = 1;
                     $json['messages'] = [$this->Language->get('success_message')];
                     $json['redirect'] = URL . 'user/index';
