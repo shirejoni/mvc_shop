@@ -30,7 +30,7 @@ class Customer extends Model
 
     public function getCustomerByID($customer_id) {
         $this->Database->query("SELECT * FROM customer WHERE customer_id = :cID", array(
-            'customer_id'   => $customer_id
+            'cID'   => $customer_id
         ));
         if($this->Database->hasRows()) {
             $row = $this->Database->getRow();
@@ -140,5 +140,178 @@ class Customer extends Model
             throw new \Exception("You Should First Get User Data form Database and then login");
         }
     }
+
+    public function edit($customer_id, $data) {
+        $sql = "UPDATE customer SET ";
+        $query = [];
+        $params = [];
+        if(isset($data['email'])) {
+            $query[] = 'email = :cEmail';
+            $params['cEmail'] = $data['email'];
+        }
+        if(isset($data['password'])) {
+            $query[] = 'password = :uPassword';
+            $params['uPassword'] = $data['password'];
+        }
+        if(isset($data['mobile'])) {
+            $query[] = 'mobile = :cMobile';
+            $params['cMobile'] = $data['mobile'];
+        }
+        if(isset($data['language_id'])) {
+            $query[] = 'language_id = :lID';
+            $params['lID'] = $data['language_id'];
+        }
+        if(isset($data['first_name'])) {
+            $query[] = 'first_name = :cFirstName';
+            $params['cFirstName'] = $data['first_name'];
+        }
+        if(isset($data['last_name'])) {
+            $query[] = 'last_name = :cLastName';
+            $params['cLastName'] = $data['last_name'];
+        }
+        if(isset($data['cart'])) {
+            $query[] = 'cart = :cCart';
+            $params['cCart'] = json_encode($data['cart']);
+        }
+        if(isset($data['wishlist'])) {
+            $query[] = 'wishlist = :cWishlist';
+            $params['cWishlist'] = json_encode($data['wishlist']);
+        }
+        if(isset($data['newsletter'])) {
+            $query[] = 'newsletter = :cNewsLetter';
+            $params['cNewsLetter'] = $data['newsletter'];
+        }
+        if(isset($data['address_id'])) {
+            $query[] = 'address_id = :cAddressID';
+            $params['cAddressID'] = $data['address_id'];
+        }
+        if(isset($data['status'])) {
+            $query[] = 'status = :cStatus';
+            $params['cStatus'] = $data['status'];
+        }
+        if(isset($data['token'])) {
+            $query[] = 'token = :cToken';
+            $params['cToken'] = $data['token'];
+        }
+
+        if(isset($data['code'])) {
+            $query[] = 'code = :cCode';
+            $params['cCode'] = $data['code'];
+        }
+        $sql .= implode(' , ', $query);
+        $sql .= " WHERE customer_id = :cID ";
+        $params['cID'] = $customer_id;
+        $this->Database->query($sql, $params);
+        if($this->Database->numRows() > 0) {
+            return true;
+        }else {
+            return false;
+        }
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCustomerId()
+    {
+        return $this->customer_id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getFirstName()
+    {
+        return $this->first_name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getLastName()
+    {
+        return $this->last_name;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getEmail()
+    {
+        return $this->email;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getMobile()
+    {
+        return $this->mobile;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCart()
+    {
+        return $this->cart;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getWishlist()
+    {
+        return $this->wishlist;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getNewsletter()
+    {
+        return $this->newsletter;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getAddressId()
+    {
+        return $this->address_id;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getToken()
+    {
+        return $this->token;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getCode()
+    {
+        return $this->code;
+    }
+
+    /**
+     * @return mixed
+     */
+    public function getDateAdded()
+    {
+        return $this->date_added;
+    }
+
 
 }

@@ -68,11 +68,15 @@ class Router
                         }
                     }
                 }
+
                 if(!$this->isResponsed && !isset($action)) {
                     if($uri == "" || $uri == "/") {
                         $uri = $this->registry->Config->get('default_route');// TODO: Set default uri with Config class
                     }
                     $action = new Action($uri);
+                    if(!$action->getMethod()) {
+                        $action->setMethod('index');
+                    }
                     if(!$action->isStatus()) {
                         $action = new Action("error/notFound", "web"); // TODO: set Error uri with Config Class
                     }

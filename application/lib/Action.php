@@ -16,6 +16,22 @@ class Action
     private $status = false;
     private $data = [];
 
+    /**
+     * @return mixed
+     */
+    public function getMethod()
+    {
+        return $this->method;
+    }
+
+    /**
+     * @param mixed $method
+     */
+    public function setMethod($method): void
+    {
+        $this->method = $method;
+    }
+
     public function __construct($route, $preRoute = false)
     {
         switch ($preRoute) {
@@ -43,10 +59,6 @@ class Action
             }else {
                 $this->method = array_pop($parts);
             }
-        }
-
-        if(!empty($this->route) && !empty($this->method)) {
-            $this->status = true;
         }
 
     }
@@ -86,6 +98,9 @@ class Action
      */
     public function isStatus(): bool
     {
+        if(!empty($this->route) && !empty($this->method)) {
+            $this->status = true;
+        }
         return $this->status;
     }
 

@@ -1,4 +1,4 @@
-{% extends "user/_temp/blank_dashboard_temp.twig" %}
+{% extends "user/_temp/_blank_dashboard_temp.twig" %}
 
 {% block Content %}
     <div class="container">
@@ -24,25 +24,25 @@
                         <div class="form-group d-flex align-middle mt-3">
                             <label class="col-sm-2 control-label text-center">نام:</label>
                             <div class="col-sm-10">
-                                <input type="text" value="{{ Customer['first_name'] }}" id="customer-first-name" class="form-control">
+                                <input type="text" value="{{ Customer.getFirstName() }}" id="customer-first-name" class="form-control">
                             </div>
                         </div>
                         <div class="form-group d-flex align-middle mt-3">
                             <label class="col-sm-2 control-label text-center">نام خانوادگی:</label>
                             <div class="col-sm-10">
-                                <input type="text" value="{{ Customer['last_name'] }}" id="customer-last-name" class="form-control">
+                                <input type="text" value="{{ Customer.getLastName() }}" id="customer-last-name" class="form-control">
                             </div>
                         </div>
                         <div class="form-group d-flex align-middle mt-3">
                             <label class="col-sm-2 control-label text-center">شماره موبایل:</label>
                             <div class="col-sm-10">
-                                <input type="text" value="{{ Customer['mobile'] }}" id="customer-phone-number" class="form-control">
+                                <input type="text" value="{{ Customer.getMobile() }}" id="customer-phone-number" class="form-control">
                             </div>
                         </div>
                         <div class="form-group d-flex align-middle mt-3">
                             <label class="col-sm-2 control-label text-center">ایمیل:</label>
                             <div class="col-sm-10">
-                                <input type="text" value="{{ Customer['email'] }}" id="customer-email" disabled class="form-control">
+                                <input type="text" value="{{ Customer.getEmail() }}" id="customer-email" disabled class="form-control">
                             </div>
                         </div>
 
