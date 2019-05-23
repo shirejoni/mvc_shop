@@ -26,4 +26,8 @@ class Validate
         return preg_match('/^09[0-9]{9}$/', $mobile);
     }
 
+    public static function zipCodeValid($zipCode) {
+        return preg_match('/^[0-9]{10}$/', $zipCode);
+    }
+
 }

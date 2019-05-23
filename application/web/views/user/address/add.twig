@@ -1,0 +1,217 @@
+{% extends "user/_temp/_blank_dashboard_temp.twig" %}
+
+{% block Content %}
+    <div class="container">
+        <section class="row">
+            <div class="col-12 px-5 pt-4">
+                <div class="message-box success-box" id="success-message-box" style="display: none;">
+                    <h4>موفقیت!</h4>
+                    <hr>
+                    <div class="messages">
+
+                    </div>
+                </div>
+                <div class="message-box error-box" id="error-message-box" style="display: none;">
+                    <h4>خطا!</h4>
+                    <hr>
+                    <div class="messages">
+
+                    </div>
+                </div>
+                <div class="row"  style="box-shadow: 0 0 5px rgba(0,0,0,0.1)">
+                    <div class="col-12 p-2">
+
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">نام:</label>
+                            <div class="col-sm-10">
+                                <input type="text" id="address-first-name" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">نام خانوادگی:</label>
+                            <div class="col-sm-10">
+                                <input type="text" id="address-last-name" class="form-control">
+                            </div>
+                        </div>
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">آدرس:</label>
+                            <div class="col-sm-10">
+                                <textarea   id="address-address" cols="30" rows="10" class="form-control"></textarea>
+                            </div>
+                        </div>
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">استان:</label>
+                            <div class="col-sm-10">
+                                <select  id="address-province-id" class="form-control">
+                                    <option value=""></option>
+                                    {% for Province in Provinces %}
+                                        <option value="{{ Province['province_id'] }}">{{ Province['name'] }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">شهر:</label>
+                            <div class="col-sm-10">
+                                <select  id="address-city-id" disabled class="form-control">
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">کدپستی:</label>
+                            <div class="col-sm-10">
+                                <input  id="address-zip-code" type="text" class="form-control">
+                            </div>
+                        </div>
+
+
+                        <div class="form-group text-right pt-3 px-3">
+                            <a href="{{ URL }}user/address/index?token={{ Token }}" class="fa fa-arrow-right btn btn-warning"></a>
+                            <a href="#" id="address-submit-btn" class="fa fa-plus btn btn-success"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+{% endblock %}
+
+{% block Js %}
+    {% autoescape %}
+        <script type="text/javascript">
+            let url = "{{ CURRENT_URL }}?token={{ Token }}";
+            let getCityUrl = "{{ URL }}user/address/getcity?token={{ Token }}";
+            $(document).ready(function () {
+
+                $('#address-province-id').on('change',function (e) {
+                    let province_id = $(this).val();
+                    let data = {};
+                    data['province_id'] = province_id;
+                    data['post'] = true;
+                    data['address-post'] = true;
+                    $('#address-city-id').prop('disabled', true);
+                    $('#address-city-id').html('');
+                    $.post(getCityUrl, data, function (response) {
+                        response = JSON.parse(response);
+                        if(response.status === 1) {
+                            for (let i = 0; i < response['cities'].length; i++) {
+                                $('<option value="'+ response['cities'][i]['city_id'] +'">').text(response['cities'][i]['name']).appendTo($('#address-city-id'));
+                            }
+                            if(response['cities'].length > 0) {
+                                $('#address-city-id').prop('disabled', false);
+
+                            }
+
+                        }else {
+                            for (let i = 0; i < response['messages'].length; i++) {
+                                $('<p>').text(response['messages'][i]).appendTo(errorMessageBoxElement.find('.messages'));
+                            }
+                            if(response['messages'].length > 0) {
+                                errorMessageBoxElement.css("display", "block");
+                            }
+                        }
+                    });
+                });
+                /*
+                * Post Data
+                * */
+                let addressSubmitBtn = $("#address-submit-btn");
+                let successMessageBoxElement = $("#success-message-box");
+                let errorMessageBoxElement = $("#error-message-box");
+                addressSubmitBtn.click(function (e) {
+                    let data = {};
+                    let error = false;
+                    let element;
+                    let messages = [];
+
+                    successMessageBoxElement.find(".messages").html('');
+                    successMessageBoxElement.css("display", "none");
+                    errorMessageBoxElement.find(".messages").html('');
+                    errorMessageBoxElement.css("display", "none");
+
+                    element = $('#address-first-name');
+                    if(element.val() != '') {
+                        data['address-first-name'] = element.val();
+                    }else {
+                        error = true;
+                        messages.push("{{ T['error_first_name_empty'] }}");
+                    }
+                    element = $('#address-last-name');
+                    if(element.val() != '') {
+                        data['address-last-name'] = element.val();
+                    }else {
+                        error = true;
+                        messages.push("{{ T['error_last_name_empty'] }}");
+                    }
+                    element = $('#address-address');
+                    if(element.val() != '') {
+                        data['address-address'] = element.val();
+                    }else {
+                        error = true;
+                        messages.push("{{ T['error_address_empty'] }}");
+                    }
+                    element = $('#address-zip-code');
+                    if(element.val() != '') {
+                        data['address-zip-code'] = element.val();
+                    }else {
+                        error = true;
+                        messages.push("{{ T['error_zip_code_empty'] }}");
+                    }
+                    element = $("#address-province-id");
+                    if(element.val() != '') {
+                        data['address-province-id'] = element.val();
+                    }else {
+                        error = true;
+                        messages.push("{{ T['error_province_empty'] }}");
+                    }
+                    element = $("#address-city-id");
+                    if(element.val() != '') {
+                        data['address-city-id'] = element.val();
+                    }else {
+                        error = true;
+                        messages.push("{{ T['error_city_empty'] }}");
+                    }
+                    data['post'] = true;
+                    data['address-post'] = true;
+
+                    if(!error) {
+                        $.post(url, data, function (response) {
+                            response = JSON.parse(response);
+                            if(response.status === 1) {
+                                for (let i = 0; i < response['messages'].length; i++) {
+                                    $('<p>').text(response['messages'][i]).appendTo(successMessageBoxElement.find('.messages'));
+                                }
+                                if(response['messages'].length > 0) {
+                                    successMessageBoxElement.css("display", "block");
+                                }
+
+                                if(response['redirect']) {
+                                    window.setTimeout(function () {
+                                        window.location.href = response['redirect'];
+                                    }, 1000)
+                                }
+                            }else {
+                                for (let i = 0; i < response['messages'].length; i++) {
+                                    $('<p>').text(response['messages'][i]).appendTo(errorMessageBoxElement.find('.messages'));
+                                }
+                                if(response['messages'].length > 0) {
+                                    errorMessageBoxElement.css("display", "block");
+                                }
+                            }
+                        });
+                    }else {
+                        for (let i = 0; i < messages.length; i++) {
+                            $('<p>').text(messages[i]).appendTo(errorMessageBoxElement.find('.messages'));
+                        }
+                        if(messages.length > 0) {
+                            errorMessageBoxElement.css("display", "block");
+                        }
+                    }
+                    e.preventDefault();
+                });
+            });
+
+        </script>
+    {% endautoescape %}
+{% endblock %}

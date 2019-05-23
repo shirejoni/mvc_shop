@@ -1,0 +1,9 @@
+{% for Address in Addresses %}
+    <tr>
+        <th scope="row"><input type="checkbox" class="select-row-checkbox" data-address-id="{{ Address['address_id'] }}"></th>
+        <td>{{ Address['first_name'] }}</td>
+        <td>{{ Address['last_name'] }}</td>
+        <td>{{ Address['address'][:60] }}</td>
+
+    </tr>
+{% endfor %}
