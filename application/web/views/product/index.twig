@@ -195,7 +195,11 @@
                                 نام:
                             </div>
                             <div class="input">
-                                <input type="text" id="product-comment-name" placeholder="نام">
+                                {% if Customer %}
+                                    <input type="text" id="product-comment-name" value="{{ Customer.getFirstName() }} {{ Customer.getLastName }}" disabled placeholder="نام">
+                                {% else %}
+                                    <input type="text" id="product-comment-name" placeholder="نام">
+                                {% endif %}
                             </div>
                         </div>
                         <div class="input-label clearfix">
@@ -338,6 +342,7 @@
 {% block Js %}
     <script type="text/javascript">
         {% autoescape false %}
+            let commentUrl = "{{ URL }}comment/add?token={{ Token }}";
             function updateAddonPrice() {
                 $("#addon-price").html('');
                 $('.product-option-item.selected').each(function (index, element) {
@@ -382,6 +387,95 @@
                     e.preventDefault();
                 });
 
+                let selected = 0;
+                $("#comment-rating .star").hover(function () {
+                    $(this).parent().find('.selected').removeClass('selected');
+                    $(this).addClass('selected');
+                    $(this).prevAll().addClass("selected");
+                });
+                $("#comment-rating .star").mouseleave(function () {
+                    $(this).parent().find('.selected').removeClass('selected');
+                    for(let i = 0; i < selected; i++) {
+                        $("#comment-rating").find('.star:nth-child(' + (i + 1) +')').addClass('selected');
+                    }
+                });
+                $("#comment-rating .star").click(function () {
+                    $(this).parent().find('.selected').removeClass('selected');
+                    $(this).addClass('selected');
+                    $(this).prevAll().addClass("selected");
+                    selected = +$(this).attr('data-value');
+                });
+
+                /*
+                * Post Comment Data
+                * */
+                let successMessageBoxElement = $("#success-message-box");
+                let errorMessageBoxElement = $("#error-message-box");
+                $("#add-review-btn").click(function () {
+                    successMessageBoxElement.find(".messages").html('');
+                    successMessageBoxElement.css("display", "none");
+                    errorMessageBoxElement.find(".messages").html('');
+                    errorMessageBoxElement.css("display", "none");
+
+                    let data = {};
+                    let messages = [];
+                    let error = false;
+                    let element;
+
+                    element = $("#product-comment-name");
+                    if(element.val() != "") {
+                        data['comment-name'] = element.val();
+                    }else {
+                        error = true;
+                        messages.push("{{ T['error_comment_name_empty'] }}")
+                    }
+
+                    element = $("#product-comment-description");
+                    if(element.val() != "") {
+                        data['comment-description'] = element.val();
+                    }else {
+                        error = true;
+                        messages.push("{{ T['error_comment_description_empty'] }}")
+                    }
+                    data['comment-rating'] = selected;
+                    data['post'] = true;
+                    data['comment-post'] = true;
+                    if(!error) {
+                        $.post(commentUrl, data, function (response) {
+                            response = JSON.parse(response);
+                            if(response.status === 1) {
+                                for (let i = 0; i < response['messages'].length; i++) {
+                                    $('<p>').text(response['messages'][i]).appendTo(successMessageBoxElement.find('.messages'));
+                                }
+                                if(response['messages'].length > 0) {
+                                    successMessageBoxElement.css("display", "block");
+                                }
+
+                                if(response['redirect']) {
+                                    window.setTimeout(function () {
+                                        window.location.href = response['redirect'];
+                                    }, 1000)
+                                }
+                            }else {
+                                for (let i = 0; i < messages.length; i++) {
+                                    $('<p>').text(messages[i]).appendTo(errorMessageBoxElement.find('.messages'));
+                                }
+                                if(messages.length > 0) {
+                                    errorMessageBoxElement.css("display", "block");
+                                }
+                            }
+
+                        });
+
+                    }else {
+                        for (let i = 0; i < messages.length; i++) {
+                            $('<p>').text(messages[i]).appendTo(errorMessageBoxElement.find('.messages'));
+                        }
+                        if(messages.length > 0) {
+                            errorMessageBoxElement.css("display", "block");
+                        }
+                    }
+                });
 
             });
 
