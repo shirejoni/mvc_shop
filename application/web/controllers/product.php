@@ -118,6 +118,7 @@ class ControllerProduct extends Controller {
                         'thumbnail_img'  => $thumbnail_img
                     );
                 }
+                $product_info['reviews'] = $Product->getProductReviews($product_id);
                 $product_info['images'] = $product_images;
                 $data['Product'] = $product_info;
                 $this->Response->setOutPut($this->render('product/index', $data));

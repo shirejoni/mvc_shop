@@ -549,6 +549,13 @@ class Product extends Model
         return $this->Database->getRows();
     }
 
+    public function getProductReviews($product_id) {
+        $this->Database->query("SELECT * FROM review WHERE product_id = :pID ORDER by date_added DESC ", array(
+            'pID'   => $product_id,
+        ));
+        return $this->Database->getRows();
+    }
+
     public function getProductComplete($product_id, $lID = null) {
         $language_id = $this->Language->getLanguageID();
         if($lID) {

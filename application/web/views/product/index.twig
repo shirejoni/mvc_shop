@@ -241,95 +241,37 @@
 
                     </div>
                     <div class="reviews">
-                        <div class="review">
-                            <div class="review-author">
-                                حسین شیره جونی
-                            </div>
-                            <div class="review-rate">
-                                <div class="rating-stars text-center" data-review-value="5">
-                                    <ul id="stars">
-                                        <li class="star selected" title="Poor" data-value="1">
-                                            <i class="fa fa-star fa-fw"></i>
-                                        </li>
-                                        <li class="star selected" title="Fair" data-value="2">
-                                            <i class="fa fa-star fa-fw"></i>
-                                        </li>
-                                        <li class="star selected" title="Good" data-value="3">
-                                            <i class="fa fa-star fa-fw"></i>
-                                        </li>
-                                        <li class="star selected" title="Excellent" data-value="4">
-                                            <i class="fa fa-star fa-fw"></i>
-                                        </li>
-                                        <li class="star selected" title="WOW!!!" data-value="5">
-                                            <i class="fa fa-star fa-fw"></i>
-                                        </li>
-                                    </ul>
+                        {% for Review in Product['reviews'] %}
+                            <div class="review">
+                                <div class="review-author">
+                                    {{ Review['author'] }}
+                                </div>
+                                <div class="review-rate">
+                                    <div class="rating-stars text-center" data-review-value="{{ Review['rate'] }}">
+                                        <ul id="stars">
+                                            <li class="star selected" title="Poor" data-value="1">
+                                                <i class="fa fa-star fa-fw"></i>
+                                            </li>
+                                            <li class="star selected" title="Fair" data-value="2">
+                                                <i class="fa fa-star fa-fw"></i>
+                                            </li>
+                                            <li class="star selected" title="Good" data-value="3">
+                                                <i class="fa fa-star fa-fw"></i>
+                                            </li>
+                                            <li class="star selected" title="Excellent" data-value="4">
+                                                <i class="fa fa-star fa-fw"></i>
+                                            </li>
+                                            <li class="star selected" title="WOW!!!" data-value="5">
+                                                <i class="fa fa-star fa-fw"></i>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </div>
+                                <div class="review-text">
+                                    {{ Review['text'] }}
                                 </div>
                             </div>
-                            <div class="review-text">
-                                محصول خیلی خوبی بود ممنون از فروشگاه من که سریع ارسال کردند
-                            </div>
-                        </div>
-
-                        <div class="review">
-                            <div class="review-author">
-                                محمد
-                            </div>
-                            <div class="review-rate">
-                                <div class="rating-stars text-center" data-review-value="5">
-                                    <ul id="stars">
-                                        <li class="star selected" title="Poor" data-value="1">
-                                            <i class="fa fa-star fa-fw"></i>
-                                        </li>
-                                        <li class="star selected" title="Fair" data-value="2">
-                                            <i class="fa fa-star fa-fw"></i>
-                                        </li>
-                                        <li class="star selected" title="Good" data-value="3">
-                                            <i class="fa fa-star fa-fw"></i>
-                                        </li>
-                                        <li class="star selected" title="Excellent" data-value="4">
-                                            <i class="fa fa-star fa-fw"></i>
-                                        </li>
-                                        <li class="star selected" title="WOW!!!" data-value="5">
-                                            <i class="fa fa-star fa-fw"></i>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="review-text">
-                                خیلی خوب بود
-                            </div>
-                        </div>
-
-                        <div class="review">
-                            <div class="review-author">
-                                حسین
-                            </div>
-                            <div class="review-rate">
-                                <div class="rating-stars text-center" data-review-value="4">
-                                    <ul id="stars">
-                                        <li class="star selected" title="Poor" data-value="1">
-                                            <i class="fa fa-star fa-fw"></i>
-                                        </li>
-                                        <li class="star selected" title="Fair" data-value="2">
-                                            <i class="fa fa-star fa-fw"></i>
-                                        </li>
-                                        <li class="star selected" title="Good" data-value="3">
-                                            <i class="fa fa-star fa-fw"></i>
-                                        </li>
-                                        <li class="star selected" title="Excellent" data-value="4">
-                                            <i class="fa fa-star fa-fw"></i>
-                                        </li>
-                                        <li class="star" title="WOW!!!" data-value="5">
-                                            <i class="fa fa-star fa-fw"></i>
-                                        </li>
-                                    </ul>
-                                </div>
-                            </div>
-                            <div class="review-text">
-                                یک محصول خوب
-                            </div>
-                        </div>
+                        {% endfor %}
 
                     </div>
                 </div>
