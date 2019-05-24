@@ -342,7 +342,7 @@
 {% block Js %}
     <script type="text/javascript">
         {% autoescape false %}
-            let commentUrl = "{{ URL }}comment/add?token={{ Token }}";
+            let commentUrl = "{{ URL }}review/add";
             function updateAddonPrice() {
                 $("#addon-price").html('');
                 $('.product-option-item.selected').each(function (index, element) {
@@ -439,6 +439,7 @@
                     }
                     data['comment-rating'] = selected;
                     data['post'] = true;
+                    data['product-id'] = "{{ Product['product_id'] }}";
                     data['comment-post'] = true;
                     if(!error) {
                         $.post(commentUrl, data, function (response) {
