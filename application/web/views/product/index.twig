@@ -285,6 +285,7 @@
     <script type="text/javascript">
         {% autoescape false %}
             let commentUrl = "{{ URL }}review/add";
+            let addToCartURL = "{{ URL }}checkout/cart/add";
             function updateAddonPrice() {
                 $("#addon-price").html('');
                 $('.product-option-item.selected').each(function (index, element) {
@@ -416,6 +417,75 @@
                         }
                         if(messages.length > 0) {
                             errorMessageBoxElement.css("display", "block");
+                        }
+                    }
+                });
+
+                /*
+                * Add To Cart
+                * */
+                let addToCartBtn = $("#add-to-cart");
+                let topSuccessMessageBoxElement = $("#top-success-message-box");
+                let topErrorMessageBoxElement = $("#top-error-message-box");
+                addToCartBtn.click(function () {
+                    successMessageBoxElement.find(".messages").html('');
+                    successMessageBoxElement.css("display", "none");
+                    errorMessageBoxElement.find(".messages").html('');
+                    errorMessageBoxElement.css("display", "none");
+
+                    let data = {};
+                   let messages = [];
+                   let error = false;
+                   let element;
+                   element = $("#product-quantity");
+                   if(+element.val() > {{ Product['minimum'] }}) {
+                       data['quantity'] = +element.val();
+                   }else {
+                       data['quantity'] = {{ Product['minimum'] }};
+                   }
+                   data['options'] = {};
+                   $('.product-option-item.selected').each(function (index, element) {
+                       let productOptionID = $(element).attr('data-product-option-id');
+                       let productOptionValueID = $(element).attr('data-product-option-value-id');
+                        data['options'][productOptionID] = productOptionValueID;
+                   });
+                   data['product-id'] = {{ Product['product_id'] }};
+                   data['post'] = true;
+                   data['cart-post'] = true;
+
+                    if(!error) {
+                        $.post(addToCartURL, data, function (response) {
+                            response = JSON.parse(response);
+                            if(response.status === 1) {
+                                for (let i = 0; i < response['messages'].length; i++) {
+                                    $('<p>').text(response['messages'][i]).appendTo(topSuccessMessageBoxElement.find('.messages'));
+                                }
+                                if(response['messages'].length > 0) {
+                                    topSuccessMessageBoxElement.css("display", "block");
+                                }
+
+                                if(response['redirect']) {
+                                    window.setTimeout(function () {
+                                        window.location.href = response['redirect'];
+                                    }, 1000)
+                                }
+                            }else {
+                                for (let i = 0; i < messages.length; i++) {
+                                    $('<p>').text(messages[i]).appendTo(topErrorMessageBoxElement.find('.messages'));
+                                }
+                                if(messages.length > 0) {
+                                    topErrorMessageBoxElement.css("display", "block");
+                                }
+                            }
+
+                        });
+
+                    }else {
+                        for (let i = 0; i < messages.length; i++) {
+                            $('<p>').text(messages[i]).appendTo(topErrorMessageBoxElement.find('.messages'));
+                        }
+                        if(messages.length > 0) {
+                            topErrorMessageBoxElement.css("display", "block");
                         }
                     }
                 });
