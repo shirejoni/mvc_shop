@@ -6,6 +6,7 @@ namespace App\lib;
 
 use App\model\Customer;
 use App\model\Language;
+use App\model\Product;
 
 class Cart
 {
@@ -62,6 +63,125 @@ class Cart
         }
 
     }
+
+    public function getProducts(Product $Product) {
+        $customer_id = $this->Customer && $this->Customer->getCustomerId() ? $this->Customer->getCustomerId() : 0;
+        $this->Database->query("SELECT * FROM cart WHERE customer_id = :cID AND session_id = :sID", array(
+            'cID'   => $customer_id,
+            'sID'   => session_id()
+        ));
+        $cart_products = [];
+        if($this->Database->hasRows()) {
+            foreach ($this->Database->getRows() as $cart_row) {
+                $product = $Product->getProduct($cart_row['product_id'], $this->Language->getLanguageID());
+                if(!$product) {
+                    $product = $Product->getProduct($cart_row['product_id'], $this->Language->getDefaultLanguageID());
+                }
+                if($product && $cart_row['quantity'] > 0) {
+                    $option_price = 0;
+                    $option_weight = 0;
+                    $option_data = [];
+                    $stock = true;
+                    foreach (json_decode($cart_row['product_option']) as $product_option_id => $product_option_value_id) {
+                        $this->Database->query("SELECT * FROM product_option po LEFT JOIN option_group og on po.option_group_id = og.option_group_id
+                        LEFT JOIN option_group_language ogl on og.option_group_id = ogl.option_group_id WHERE po.product_option_id = :pOID
+                        AND po.product_id = :pID AND ogl.language_id = :lID", array(
+                            'pOID'  => $product_option_id,
+                            'pID'   => $product['product_id'],
+                            'lID'   => $this->Language->getLanguageID()
+                        ));
+                        if(!$this->Database->hasRows()) {
+                            $this->Database->query("SELECT * FROM product_option po LEFT JOIN option_group og on po.option_group_id = og.option_group_id
+                        LEFT JOIN option_group_language ogl on og.option_group_id = ogl.option_group_id WHERE po.product_option_id = :pOID
+                        AND po.product_id = :pID AND ogl.language_id = :lID", array(
+                                'pOID'  => $product_option_id,
+                                'pID'   => $product['product_id'],
+                                'lID'   => $this->Language->getDefaultLanguageID()
+                            ));
+                        }
+                        if($this->Database->hasRows()) {
+                            $option_group = $this->Database->getRow();
+                            $this->Database->query("SELECT * FROM product_option_value pov LEFT JOIN option_item oi on pov.option_item_id = oi.option_item_id
+                            LEFT JOIN option_item_language oil ON oil.option_item_id = oi.option_item_id WHERE pov.product_option_value_id = :pOVID AND 
+                            pov.prodct_option_id = :pOID AND oil.language_id = :lID", array(
+                                'pOVID' => $product_option_value_id,
+                                'pOID'  => $product_option_id,
+                                'lID'   => $this->Language->getLanguageID()
+                            ));
+                            if(!$this->Database->hasRows()) {
+                                $this->Database->query("SELECT * FROM product_option_value pov LEFT JOIN option_item oi on pov.option_item_id = oi.option_item_id
+                            LEFT JOIN option_item_language oil ON oil.option_item_id = oi.option_item_id WHERE pov.product_option_value_id = :pOVID AND 
+                            pov.prodct_option_id = :pOID AND oil.language_id = :lID", array(
+                                    'pOVID' => $product_option_value_id,
+                                    'pOID'  => $product_option_id,
+                                    'lID'   => $this->Language->getDefaultLanguageID()
+                                ));
+                            }
+                            if($this->Database->hasRows()) {
+                                $product_option_value = $this->Database->getRow();
+                                if($product_option_value['price_sign'] == "+") {
+                                    $option_price += $product_option_value['price'];
+                                }else {
+                                    $option_price -= $product_option_value['price'];
+
+                                }
+                                if($product_option_value['weight_sign'] == "+") {
+                                    $option_weight += $product_option_value['weight'];
+                                }else {
+                                    $option_weight -= $product_option_value['weight'];
+                                }
+                                if($product_option_value['subtract'] && (!$product_option_value['quantity'] || $product_option_value['quantity'] < $cart_row['quantity'])) {
+                                    $stock = false;
+                                }
+                                $option_data[] = array(
+                                    'product_option_id' => $product_option_id,
+                                    'product_option_value_id'   => $product_option_value_id,
+                                    'option_group_id'       => $option_group['option_group_id'],
+                                    'option_item_id'        => $product_option_value['option_item_id'],
+                                    'name'                  => $product_option_value['name'],
+                                    'price'                 => $product_option_value['price'],
+                                    'weight'                => $product_option_value['weight'],
+                                    'price_sign'            => $product_option_value['price_sign'],
+                                    'weight_sign'            => $product_option_value['weight_sign'],
+                                    'subtract'            => $product_option_value['subtract'],
+                                    'quantity'            => $product_option_value['quantity'],
+                                    'language_id'            => $product_option_value['language_id'],
+
+                                );
+                            }
+                        }
+                    }
+
+                    $price_per_unit = $product['price'] + $option_price;
+                    $cart_products[] = array(
+                        'cart_id'   => $cart_row['cart_id'],
+                        'quantity'  => $cart_row['quantity'],
+                        'option'   => $option_data,
+                        'name'      => $product['name'],
+                        'product_id'=> $product['product_id'],
+                        'image'     => $product['image'],
+                        'minimum'   => $product['minimum'],
+                        'stock'     => $stock,
+                        'price'     => $product['price'],
+                        'weight_per_unit'    => $product['weight'] + $option_weight,
+                        'total_price_per_unit'  => $price_per_unit,
+                        'total'     => $price_per_unit * $cart_row['quantity'],
+                        'weight'    => ($product['weight'] + $option_weight) * $cart_row['quantity'],
+                        'weight_id' => $product['weight_id'],
+                        'length'    => $product['length'],
+                        'length_id' => $product['length_id'],
+                        'width'     => $product['width'],
+                        'height'    => $product['height'],
+                        'total_formatted'   => number_format($price_per_unit * $cart_row['quantity']),
+                        'total_price_per_unit_formatted'    => number_format($price_per_unit),
+                    );
+                }
+
+            }
+        }
+        var_dump($cart_products);
+    }
+
     public function add($product_id, $quantity = 1, $product_option = array()) {
         $customer_id = $this->Customer && $this->Customer->getCustomerId() ? $this->Customer->getCustomerId() : 0;
         $this->Database->query("SELECT COUNT(*) as `total` FROM cart WHERE customer_id = :cID AND product_id = :pID AND 

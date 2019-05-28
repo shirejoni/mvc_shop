@@ -79,4 +79,19 @@ class ControllerCheckoutCart extends Controller {
         return new Action('error/notFound', 'web');
     }
 
+    public function info() {
+        if($this->Customer && isset($_SESSION['session_old_id'])) {
+            /** @var Cart $Cart */
+            $Cart = new Cart($this->registry, $_SESSION['session_old_id']);
+        }else {
+            /** @var Cart $Cart */
+            $Cart = new Cart($this->registry);
+        }
+        /** @var Product $Product */
+        $Product = $this->load("Product", $this->registry);
+        $products = $Cart->getProducts($Product);
+        var_dump($products);
+
+    }
+
 }
