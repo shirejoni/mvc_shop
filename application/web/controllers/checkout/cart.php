@@ -3,8 +3,10 @@
 namespace App\Web\Controller;
 
 use App\lib\Action;
+use App\lib\Cart;
 use App\lib\Request;
 use App\lib\Response;
+use App\model\Category;
 use App\model\Option;
 use App\model\Product;
 use App\system\Controller;
@@ -35,6 +37,7 @@ class ControllerCheckoutCart extends Controller {
                 }else {
                     $productPostOptions = [];
                 }
+                $data['product_option'] = [];
                 foreach ($Product->getProductOptions($product_id) as $productOption) {
                     if($productOption['required'] && !isset($productPostOptions[$productOption['product_option_id']])) {
                         $error = true;
@@ -48,11 +51,22 @@ class ControllerCheckoutCart extends Controller {
                         $error = true;
                         $messages[] = $this->Language->get('error_done');
                     }
+                    if(!$error) {
+                        $data['product_option'][$productOption['product_option_id']] = $productPostOptions[$productOption['product_option_id']];
+                    }
                 }
                 $json = [];
                 if(!$error) {
-
-
+                    if(isset($_SESSION['session_old_id'])) {
+                        $session_old_id = $_SESSION['session_old_id'];
+                    }else {
+                        $session_old_id = false;
+                    }
+                    $Cart = new Cart($this->registry, $session_old_id);
+                    $this->registry->Cart = $Cart;
+                    $Cart->add($data['product_id'], $data['quantity'], $data['product_option']);
+                    $json['status'] = 1;
+                    $json['messages'] = [$this->Language->get('success_message')];
                 }
                 if($error) {
                     $json['status'] = 0;
