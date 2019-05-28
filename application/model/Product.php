@@ -361,7 +361,6 @@ class Product extends Model
             $this->Database->query("DELETE FROM product_option_value WHERE product_id = :pID", array(
                 'pID'   => $product_id
             ));
-
             foreach ($data['options'] as $option) {
                 $this->Database->query("INSERT INTO product_option (option_group_id, product_id, required) VALUES
                 (:oGID, :pID, :pORequired)", array(

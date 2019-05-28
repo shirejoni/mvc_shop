@@ -90,8 +90,24 @@ class ControllerCheckoutCart extends Controller {
         /** @var Product $Product */
         $Product = $this->load("Product", $this->registry);
         $products = $Cart->getProducts($Product);
-        var_dump($products);
-
+        $Image = $this->load("Image", $this->registry);
+        $total = 0;
+        foreach ($products as$index => $product) {
+            $image = $product['image'];
+            if(is_file(ASSETS_PATH . DS . substr($product['image'], strlen(ASSETS_URL)))) {
+                $image = ASSETS_URL . $Image->resize(substr($product['image'], strlen(ASSETS_URL)), 200, 200);
+            }
+            $total += $product['total'];
+            $products[$index]['image'] = $image;
+        }
+        $json['status'] = 1;
+        $json['messages'] = [$this->Language->get('success_message')];
+        $json['data'] = array(
+            'Products'  => $products,
+            'total'     => $total,
+            'total_formatted'   => number_format($total),
+        );
+        $this->Response->setOutPut(json_encode($json));
     }
 
 }

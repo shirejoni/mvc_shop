@@ -344,10 +344,11 @@
                                                                 </th>
                                                             </tr>
                                                             </thead>
-                                                            <tbody id="table-option-3-show-data">
+                                                            <tbody id="table-option-{{ ProductOption['option_group_id'] }}-show-data">
                                                                 {% set Counter = 0 %}
 
                                                                 {% for ProductOptionItem in ProductOption['option_items'] %}
+
                                                                     {% set Counter = Counter + 1 %}
                                                                     <tr id="table-option-{{ ProductOption['option_group_id'] }}-row-{{ Counter }}">
                                                                         <td><select class="form-control">
@@ -1056,14 +1057,15 @@
                                     "name": response['option']['name'],
                                     "option_items": [],
                                 };
-
-
-                                for (let i = 0; i < response['option']['options'].length; i++) {
+                                let i = 0;
+                                for(let option_item_id in response['option']['options']) {
+                                    let option_item = response['option']['options'][option_item_id];
                                     optionData['option-' + response['option']['option_group_id']]['option_items'][i] = {
-                                        "option_value_id": response['option']['options'][i]['option_item_id'],
-                                        "option_value_name": response['option']['options'][i]['name'],
-                                        "option_value_image": response['option']['options'][i]['image'],
+                                        "option_value_id": option_item['option_item_id'],
+                                        "option_value_name": option_item['name'],
+                                        "option_value_image": option_item['image'],
                                     };
+                                    i++;
                                 }
                             }
                         });

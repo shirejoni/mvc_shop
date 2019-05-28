@@ -151,8 +151,21 @@ class Cart
                             }
                         }
                     }
-
-                    $price_per_unit = $product['price'] + $option_price;
+                    if(!$product['quantity'] || $product['quantity'] < $cart_row['quantity']) {
+                        $stock = false;
+                    }
+                    $special = '';
+                    $product_specials = $Product->getProductSpecials($product['product_id']);
+                    foreach ($product_specials as $product_special) {
+                            if($product_special['date_start'] < time() AND $product_special['date_end'] > time()) {
+                                $special = $product_special['price'];
+                            }
+                    }
+                    if($special) {
+                        $price_per_unit = $special + $option_price;
+                    }else {
+                        $price_per_unit = $product['price'] + $option_price;
+                    }
                     $cart_products[] = array(
                         'cart_id'   => $cart_row['cart_id'],
                         'quantity'  => $cart_row['quantity'],
@@ -179,7 +192,7 @@ class Cart
 
             }
         }
-        var_dump($cart_products);
+        return $cart_products;
     }
 
     public function add($product_id, $quantity = 1, $product_option = array()) {

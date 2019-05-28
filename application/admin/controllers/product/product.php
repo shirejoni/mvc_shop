@@ -561,6 +561,7 @@ class ControllerProductProduct extends Controller {
                     $data['Options'][$option['option_group_id']] = $Option->getOptionGroup($option['option_group_id']);
                     $data['Options'][$option['option_group_id']]['option_items'] = $Option->getOptionItems();
                 }
+
                 $productSpecials = $Product->getProductSpecials($product_id);
                 $productInfo['specials'] = [];
                 foreach ($productSpecials as $productSpecial) {
@@ -568,8 +569,8 @@ class ControllerProductProduct extends Controller {
                         'product_special_id'        => $productSpecial['product_special_id'],
                         'price'                     => $productSpecial['price'],
                         'priority'                  => $productSpecial['priority'],
-                        'date_start'                => jdate('Y-m-d', $productSpecial['date_start'], '', '', 'en'),
-                        'date_end'                => jdate('Y-m-d', $productSpecial['date_end'], '', '', 'en'),
+                        'date_start'                => jdate('Y/m/d', $productSpecial['date_start'], '', '', 'en'),
+                        'date_end'                => jdate('Y/m/d', $productSpecial['date_end'], '', '', 'en'),
                     );
                 }
                 $productImages = $Product->getProductImages($product_id);
@@ -792,7 +793,6 @@ class ControllerProductProduct extends Controller {
                             }
                         }
                     }
-
                     $data['specials'] = [];
                     if(!empty($this->Request->post['product-specials']) && count($this->Request->post['product-specials']) > 0) {
                         $priority = [];
@@ -962,6 +962,7 @@ class ControllerProductProduct extends Controller {
                             'messages'=> $messages
                         );
                     }
+                    $json['data'] = $data;
                     $this->Response->setOutPut(json_encode($json));
                     return;
                 }else {
