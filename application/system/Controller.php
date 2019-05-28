@@ -40,10 +40,7 @@ class Controller
             'T'         => $this->Language->all(),
             'ADMIN_URL' => ADMIN_URL
         );
-        if(isset($this->data['Customer'])) {
-            $_['Customer'] = $this->data['Customer'];
-        }
-        $data = array_merge($_, $data);
+        $data = array_merge($this->data, array_merge($_, $data));
         return $this->twig->render($path . '.twig', $data);
     }
 

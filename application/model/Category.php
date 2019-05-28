@@ -29,8 +29,11 @@ class Category extends Model
 
         $sql = "SELECT * FROM category c LEFT JOIN category_language cl on c.category_id = cl.category_id WHERE
         cl.language_id = :lID ";
-        if(isset($data['filter_name'])) {
+        if(isset($option['filter_name'])) {
             $sql .= " AND cl.name LIKE :fName";
+        }
+        if(isset($option['parent_id'])) {
+            $sql .= " AND c.parent_id = :cPID";
         }
 
         $sort_order = array(
@@ -62,14 +65,51 @@ class Category extends Model
         $params = array(
             'lID'   => $option['language_id']
         );
-        if(isset($data['filter_name'])) {
-            $params['fName'] = $data['filter_name'] . "%";
+        if(isset($option['filter_name'])) {
+            $params['fName'] = $option['filter_name'] . "%";
+        }
+        if(isset($option['parent_id'])) {
+            $params['cPID'] = $option['parent_id'] . "%";
         }
         $this->Database->query($sql, $params);
         $this->rows = $this->Database->getRows();
         return $this->rows;
     }
+    public function getCategoryMenu($option) {
+        $option['sort_order'] = isset($option['sort_order']) ? $option['sort_order'] : '';
+        $option['order']   = isset($option['order']) ? $option['order'] : 'ASC';
+        $option['language_id'] = isset($option['language_id']) ? $option['language_id'] : $this->Language->getLanguageID();
 
+        $sql = "SELECT *, c1.level FROM category_path cp LEFT JOIN category c1 ON c1.category_id = cp.category_id LEFT JOIN category_language cl on c1.category_id = cl.category_id
+        WHERE cp.path_id = :cPathID AND cl.language_id = :lID AND c1.parent_id != 0 ";
+        if(isset($option['filter_name'])) {
+            $sql .= " AND cl.name LIKE :fName";
+        }
+        $sql .= "ORDER BY c1.sort_order, c1.level ASC";
+
+
+        if(isset($option['start']) || isset($option['limit'])) {
+            if(!isset($option['start']) || $option['start'] < 0) {
+                $option['start'] = 0;
+            }
+            if(!isset($option['limit']) || $option['limit'] == 0) {
+                $option['limit'] = 20;
+            }
+            $sql .= " LIMIT " . (int) $option['start'] . ',' . (int) $option['limit'];
+        }
+
+        $params = array(
+            'cPathID'   => $option['parent_id'],
+            'lID'   => $option['language_id']
+        );
+        if(isset($option['filter_name'])) {
+            $params['fName'] = $option['filter_name'] . "%";
+        }
+
+        $this->Database->query($sql, $params);
+        $this->rows = $this->Database->getRows();
+        return $this->rows;
+    }
     public function getCategoriesComp($option = []) {
         $option['sort_order'] = isset($option['sort_order']) ? $option['sort_order'] : '';
         $option['order']   = isset($option['order']) ? $option['order'] : 'ASC';

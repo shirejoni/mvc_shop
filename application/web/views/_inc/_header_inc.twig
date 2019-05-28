@@ -37,94 +37,43 @@
             </a>
             <div id="category-box">
                 <ul id="main-category">
-                    <li class="active">
-                        <a href="#">
-                            مردانه
-                            <i class="fa fa-angle-left"></i>
-                        </a>
-                        <div class="sub-category-box">
-                            <div class="column">
-                                <ul>
-                                    <li class="title"><a href="#">    تیشرت</a></li>
-                                    <li class="title"><a href="#">    پیراهن</a></li>
-                                    <li><a href="#">    پیراهن استین بلند</a></li>
-                                    <li><a href="#">    پیراهن استین کوتاه</a></li>
-                                    <li class="title"><a href="#">    شلوار</a></li>
-                                    <li><a href="#">    شلوار جین</a></li>
-                                    <li><a href="#">    شلوار کتان</a></li>
-                                    <li><a href="#">    شلوار رسمی</a></li>
-                                    <li class="title"><a href="#">    شلوارک</a></li>
-                                    <li><a href="#">    پیراهن استین کوتاه</a></li>
-                                    <li class="title"><a href="#">    شلوار</a></li>
-                                    <li><a href="#">    شلوار جین</a></li>
-                                    <li><a href="#">    شلوار کتان</a></li>
-                                </ul>
+                    {% for TopCategory in TopCategories %}
+                        <li class="active">
+                            <a href="#">
+                                {{ TopCategory['name'] }}
+                                <i class="fa fa-angle-left"></i>
+                            </a>
+                            <div class="sub-category-box">
+                                {% set CategoryCount = 0 %}
+                                <div class="column">
+                                    <ul>
+                                {% for SubCategory in TopCategory['subCategories'] %}
+                                    {% if CategoryCount == 13 %}
+                                        <div class="column">
+                                            <ul>
+                                    {% endif %}
+                                    {% if SubCategory['level'] == 1 %}
+                                        <li class="title"><a href="#">{{ SubCategory['name'] }}</a></li>
+                                    {% else %}
+                                        <li><a href="#">{{ SubCategory['name'] }}</a></li>
+                                    {% endif %}
+
+                                    {% if CategoryCount == 13 %}
+                                            </ul>
+                                        </div>
+                                        {% set CategoryCount = 0 %}
+                                    {% endif %}
+
+                                    {% set CategoryCount = CategoryCount + 1 %}
+                                {% endfor %}
+                                    </ul>
+                                </div>
 
                             </div>
-                            <div class="column">
-                                <ul>
-                                    <li class="title"><a href="#">    تیشرت</a></li>
-                                    <li class="title"><a href="#">    پیراهن</a></li>
-                                    <li><a href="#">    پیراهن استین بلند</a></li>
-                                    <li><a href="#">    پیراهن استین کوتاه</a></li>
-                                    <li class="title"><a href="#">    شلوار</a></li>
-                                    <li><a href="#">    شلوار جین</a></li>
-                                    <li><a href="#">    شلوار کتان</a></li>
-                                    <li><a href="#">    شلوار رسمی</a></li>
-                                    <li class="title"><a href="#">    شلوارک</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <a href="#">
-                            زنانه
-                            <i class="fa fa-angle-left"></i>
-                        </a>
-                        <div class="sub-category-box">
-                            <div class="column">
-                                <ul>
-                                    <li><a href="#">    مانتو</a></li>
-                                    <li><a href="#">    مانتو مجلسی</a></li>
-                                    <li class="title"><a href="#">    تاپ و تیشرت</a></li>
-                                    <li><a href="#">    تاپ</a></li>
-                                    <li><a href="#">    تیشرت</a></li>
-                                    <li><a href="#">    پولوشرت</a></li>
-                                    <li class="title"><a href="#">    شال و روسری</a></li>
-                                    <li><a href="#">    پیراهن استین کوتاه</a></li>
-                                    <li class="title"><a href="#">    شلوار</a></li>
-                                    <li><a href="#">    شلوار جین</a></li>
-                                    <li><a href="#">    شلوار کتان</a></li>
-                                </ul>
+                        </li>
 
-                            </div>
-                            <div class="column">
-                                <ul>
-                                    <li class="title"><a href="#">    تیشرت</a></li>
-                                    <li class="title"><a href="#">    پیراهن</a></li>
-                                    <li><a href="#">    پیراهن استین بلند</a></li>
-                                    <li><a href="#">    پیراهن استین کوتاه</a></li>
-                                    <li class="title"><a href="#">    شلوار</a></li>
-                                    <li><a href="#">    شلوار جین</a></li>
-                                    <li><a href="#">    شلوار کتان</a></li>
-                                    <li><a href="#">    شلوار رسمی</a></li>
-                                    <li class="title"><a href="#">    شلوارک</a></li>
-                                </ul>
-                            </div>
-                        </div>
-                    </li>
-                    <li>
-                        <a href="#">
-                            کالای دیجیتال
-                            <i class="fa fa-angle-left"></i>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            لوازم خانگی
-                            <i class="fa fa-angle-left"></i>
-                        </a>
-                    </li>
+                    {% endfor %}
+
                 </ul>
                 <div id="category-ads">
                     <img src="{{ URL }}assets/img/ads/ads.png" alt="Category Ads">

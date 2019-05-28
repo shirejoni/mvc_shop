@@ -60,7 +60,7 @@ class ControllerProductCategory extends Controller {
             if(!empty($this->Request->post['category-parent-id'])) {
                 if((int) $this->Request->post['category-parent-id'] && $categoryParent = $Category->getCategory((int) $this->Request->post['category-parent-id'])) {
                     $data['parent_id'] = $categoryParent['category_id'];
-                    $data['level'] = $categoryParent['level'];
+                    $data['level'] = $categoryParent['level'] + 1;
                 }else {
                     $data['parent_id'] = 0;
                     $data['level'] = 0;
