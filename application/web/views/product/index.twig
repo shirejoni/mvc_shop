@@ -428,10 +428,10 @@
                 let topSuccessMessageBoxElement = $("#top-success-message-box");
                 let topErrorMessageBoxElement = $("#top-error-message-box");
                 addToCartBtn.click(function () {
-                    successMessageBoxElement.find(".messages").html('');
-                    successMessageBoxElement.css("display", "none");
-                    errorMessageBoxElement.find(".messages").html('');
-                    errorMessageBoxElement.css("display", "none");
+                    topSuccessMessageBoxElement.find(".messages").html('');
+                    topSuccessMessageBoxElement.css("display", "none");
+                    topErrorMessageBoxElement.find(".messages").html('');
+                    topErrorMessageBoxElement.css("display", "none");
 
                     let data = {};
                    let messages = [];
@@ -470,10 +470,10 @@
                                     }, 1000)
                                 }
                             }else {
-                                for (let i = 0; i < messages.length; i++) {
-                                    $('<p>').text(messages[i]).appendTo(topErrorMessageBoxElement.find('.messages'));
+                                for (let i = 0; i < response['messages'].length; i++) {
+                                    $('<p>').text(response['messages'][i]).appendTo(topErrorMessageBoxElement.find('.messages'));
                                 }
-                                if(messages.length > 0) {
+                                if(response['messages'].length > 0) {
                                     topErrorMessageBoxElement.css("display", "block");
                                 }
                             }
