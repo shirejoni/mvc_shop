@@ -463,7 +463,7 @@
                                 if(response['messages'].length > 0) {
                                     topSuccessMessageBoxElement.css("display", "block");
                                 }
-
+                                refreshSmallBasket();
                                 if(response['redirect']) {
                                     window.setTimeout(function () {
                                         window.location.href = response['redirect'];

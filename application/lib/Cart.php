@@ -188,6 +188,8 @@ class Cart
                         'total_formatted'   => number_format($price_per_unit * $cart_row['quantity']),
                         'total_price_per_unit_formatted'    => number_format($price_per_unit),
                     );
+                }else {
+                    $this->remove($cart_row['cart_id']);
                 }
 
             }
@@ -226,6 +228,15 @@ class Cart
             ));
         }
         return true;
+    }
+
+    public function remove($cart_id) {
+        $customer_id = $this->Customer && $this->Customer->getCustomerId() ? $this->Customer->getCustomerId() : 0;
+        $this->Database->query("DELETE FROM cart WHERE cart_id = :cID AND customer_id = :cCustomerID", array(
+            'cID'   => $cart_id,
+            'cCustomerID'   => $customer_id
+        ));
+        return $this->Database->numRows();
     }
 
 

@@ -80,34 +80,57 @@ class ControllerCheckoutCart extends Controller {
     }
 
     public function info() {
-        if($this->Customer && isset($_SESSION['session_old_id'])) {
-            /** @var Cart $Cart */
-            $Cart = new Cart($this->registry, $_SESSION['session_old_id']);
-        }else {
-            /** @var Cart $Cart */
-            $Cart = new Cart($this->registry);
-        }
-        /** @var Product $Product */
-        $Product = $this->load("Product", $this->registry);
-        $products = $Cart->getProducts($Product);
-        $Image = $this->load("Image", $this->registry);
-        $total = 0;
-        foreach ($products as$index => $product) {
-            $image = $product['image'];
-            if(is_file(ASSETS_PATH . DS . substr($product['image'], strlen(ASSETS_URL)))) {
-                $image = ASSETS_URL . $Image->resize(substr($product['image'], strlen(ASSETS_URL)), 200, 200);
+        if(isset($this->Request->post['cart-post'])) {
+            if($this->Customer && isset($_SESSION['session_old_id'])) {
+                /** @var Cart $Cart */
+                $Cart = new Cart($this->registry, $_SESSION['session_old_id']);
+            }else {
+                /** @var Cart $Cart */
+                $Cart = new Cart($this->registry);
             }
-            $total += $product['total'];
-            $products[$index]['image'] = $image;
+            /** @var Product $Product */
+            $Product = $this->load("Product", $this->registry);
+            $products = $Cart->getProducts($Product);
+            $Image = $this->load("Image", $this->registry);
+            $total = 0;
+            foreach ($products as$index => $product) {
+                $image = $product['image'];
+                if(is_file(ASSETS_PATH . DS . substr($product['image'], strlen(ASSETS_URL)))) {
+                    $image = ASSETS_URL . $Image->resize(substr($product['image'], strlen(ASSETS_URL)), 200, 200);
+                }
+                $total += $product['total'];
+                $products[$index]['image'] = $image;
+            }
+            $json['status'] = 1;
+            $json['messages'] = [$this->Language->get('success_message')];
+            $json['data'] = array(
+                'Products'  => $products,
+                'total'     => $total,
+                'total_formatted'   => number_format($total),
+            );
+            $this->Response->setOutPut(json_encode($json));
         }
-        $json['status'] = 1;
-        $json['messages'] = [$this->Language->get('success_message')];
-        $json['data'] = array(
-            'Products'  => $products,
-            'total'     => $total,
-            'total_formatted'   => number_format($total),
-        );
-        $this->Response->setOutPut(json_encode($json));
+    }
+    public function remove() {
+        if(isset($this->Request->post['cart_id'])) {
+            $cart_id = +$this->Request->post['cart_id'];
+            if($cart_id) {
+                if($this->Customer && isset($_SESSION['session_old_id'])) {
+                    /** @var Cart $Cart */
+                    $Cart = new Cart($this->registry, $_SESSION['session_old_id']);
+                }else {
+                    /** @var Cart $Cart */
+                    $Cart = new Cart($this->registry);
+                }
+                $Cart->remove($cart_id);
+                $json = array(
+                    'status' => 1
+                );
+                $this->Response->setOutPut(json_encode($json));
+                return;
+            }
+        }
+        return new Action('error/notFound', 'web');
     }
 
 }
