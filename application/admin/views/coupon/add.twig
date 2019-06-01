@@ -1,0 +1,369 @@
+{% extends "_temp/_blank_dashboard_temp.twig" %}
+{% block Content %}
+    <div class="container">
+        <section class="row">
+            <div class="col-12 px-5 pt-4">
+                <div class="message-box success-box" id="success-message-box" style="display: none;">
+                    <h4>موفقیت!</h4>
+                    <hr>
+                    <div class="messages">
+
+                    </div>
+                </div>
+                <div class="message-box error-box" id="error-message-box" style="display: none;">
+                    <h4>خطا!</h4>
+                    <hr>
+                    <div class="messages">
+
+                    </div>
+                </div>
+                <div class="row"  style="box-shadow: 0 0 5px rgba(0,0,0,0.1)">
+                    <div class="col-12 p-2">
+
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">نام کد تخفیف</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="coupon-name">
+                            </div>
+                        </div>
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">کد تخفیف</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="coupon-code">
+                            </div>
+                        </div>
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">نوع کد:</label>
+                            <div class="col-sm-10">
+                                <select id="coupon-type" class="form-control">
+                                    {% for CouponType in CouponTypes %}
+                                        Hello
+                                        <option value="{{ CouponType.index }}">{{ T[CouponType.value] }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">تخفیف</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="coupon-value">
+                            </div>
+                        </div>
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">حداقل قیمت</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="coupon-minimum-price">
+                            </div>
+                        </div>
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">تاریخ شروع</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="coupon-date-start">
+                            </div>
+                        </div>
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">تاریخ پایان</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="coupon-date-end">
+                            </div>
+                        </div>
+
+
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">محصول</label>
+                            <div class="col-sm-10">
+                                <input type="text" id="coupon-product-search" class="form-control">
+                                <div class="auto-recommend-box" id="coupon-product-auto-recommend-box" style="display: none;">
+                                </div>
+                                <div class="show-connect-data" id="coupon-product-show-connect-data">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">دسته بندی</label>
+                            <div class="col-sm-10">
+                                <input type="text" id="coupon-category-search" class="form-control">
+                                <div class="auto-recommend-box" id="coupon-category-auto-recommend-box" style="display: none;">
+                                </div>
+                                <div class="show-connect-data" id="coupon-category-show-connect-data">
+
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form-group d-flex align-middle mt-3">
+                            <label class="col-sm-2 control-label text-center">تعداد</label>
+                            <div class="col-sm-10">
+                                <input type="text" class="form-control" id="coupon-count">
+                            </div>
+                        </div>
+
+                        <div class="form-group text-right pt-3 px-3">
+                            <a href="{{ ADMIN_URL }}coupon/index?token={{ Token }}" class="fa fa-arrow-right btn btn-warning"></a>
+                            <a href="#" id="coupon-submit-btn" class="fa fa-plus btn btn-success"></a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </div>
+{% endblock %}
+{% block Css %}
+    <link rel="stylesheet" href="{{ URL }}assets/persian_date/persian-datepicker.min.css">
+{% endblock %}
+{% block JsBeforeMain %}
+    <script type="text/javascript" src="{{ URL }}assets/persian_date/persian-date.min.js"></script>
+    <script type="text/javascript" src="{{ URL }}assets/persian_date/persian-datepicker.min.js"></script>
+{% endblock %}
+
+{% block Js %}
+    {% autoescape %}
+        <script type="text/javascript">
+            let url = "{{ CURRENT_URL }}?token={{ Token }}";
+            let searchProductUrl = "{{ ADMIN_URL }}product/product/getproducts?token={{ Token }}";
+            let searchCategoryUrl = "{{ ADMIN_URL }}product/category/getcategories?token={{ Token }}";
+            $(document).ready(function () {
+                $("#coupon-date-start").persianDatepicker({
+                    format: 'YYYY/MM/DD',
+                });
+                $("#coupon-date-end").persianDatepicker({
+                    format: 'YYYY/MM/DD',
+                });
+
+                let copounProductSearchInput = $("#coupon-product-search");
+                let couponProductAutoRecommend = $("#coupon-product-auto-recommend-box");
+                let couponProductShowConnectData = $("#coupon-product-show-connect-data");
+                let Products_id = [];
+                let timeOut;
+                copounProductSearchInput.on("keyup", function (e) {
+
+                    clearTimeout(timeOut);
+                    timeOut = setTimeout(function () {
+                        if(copounProductSearchInput.val().length >= 2) {
+                            let data = {};
+                            data['s'] = copounProductSearchInput.val();
+                            data['post'] = true;
+                            $.post(searchProductUrl, data, function (response) {
+                                response = JSON.parse(response);
+                                couponProductAutoRecommend.css('display', 'none');
+                                couponProductAutoRecommend.html('');
+                                if(response.status === 1) {
+                                    for(let i = 0;  i < response['products'].length; i++) {
+                                        $('<div>').attr('data-product-id', response['products'][i]['product_id']).text( response['products'][i]['name'])
+                                            .click(function (e) {
+                                                addProductTOCouponProducts(couponProductShowConnectData, $(this).text(), +$(this).attr('data-product-id'));
+                                                couponProductAutoRecommend.css('display', 'none');
+                                                couponProductAutoRecommend.html('');
+                                                copounProductSearchInput.val('');
+                                                copounProductSearchInput.focus();
+                                            }).appendTo(couponProductAutoRecommend);
+                                    }
+                                    if(response['products'].length > 0) {
+                                        couponProductAutoRecommend.css('display', 'block');
+                                    }
+                                }
+
+                            });
+                        }else {
+                            couponProductAutoRecommend.css('display', 'none');
+                            couponProductAutoRecommend.html('');
+                        }
+                    }, 800);
+                });
+                function addProductTOCouponProducts(boxElement, productName, productID) {
+                    // <p><i class="fa fa-minus-circle"></i> رم > 12GB</p>
+                    if(Products_id.indexOf(productID) < 0) {
+                        let row = $('<p>');
+                        let deleteBtn = $('<i>').addClass('fa fa-minus-circle').click(function (e) {
+                            let filter_id = +$(this).closest('p').attr('data-filter-id');
+                            let index = Products_id.indexOf(filter_id);
+                            if(index > -1) {
+                                Products_id.splice(index, 1);
+                            }
+                            $(this).closest('p').remove();
+                        });
+                        deleteBtn.appendTo(row);
+                        Products_id.push(productID);
+                        row.append(productName).attr('data-product-id', productID);
+                        row.appendTo(boxElement);
+                    }
+                }
+
+                let couponCategorySearchInput = $("#coupon-category-search");
+                let couponCategoryAutoRecommend = $("#coupon-category-auto-recommend-box");
+                let couponCategoryShowConnected = $("#coupon-category-show-connect-data");
+                let Categories_id = [];
+                couponCategorySearchInput.on("keyup", function (e) {
+
+                    clearTimeout(timeOut);
+                    timeOut = setTimeout(function () {
+                        if(couponCategorySearchInput.val().length >= 2) {
+                            let data = {};
+                            data['s'] = couponCategorySearchInput.val();
+                            data['post'] = true;
+                            $.post(searchCategoryUrl, data, function (response) {
+                                response = JSON.parse(response);
+                                couponCategoryAutoRecommend.css('display', 'none');
+                                couponCategoryAutoRecommend.html('');
+                                if(response.status === 1) {
+                                    for(let i = 0;  i < response['categories'].length; i++) {
+                                        $('<div>').attr('data-category-id', response['categories'][i]['category_id']).text( response['categories'][i]['name'])
+                                            .click(function (e) {
+                                                addCategoryTOCouponCategories(couponCategoryShowConnected, $(this).text(), +$(this).attr('data-category-id'));
+                                                couponCategoryAutoRecommend.css('display', 'none');
+                                                couponCategoryAutoRecommend.html('');
+                                                couponCategorySearchInput.val('');
+                                                couponCategorySearchInput.focus();
+                                            }).appendTo(couponCategoryAutoRecommend);
+                                    }
+                                    if(response['categories'].length > 0) {
+                                        couponCategoryAutoRecommend.css('display', 'block');
+                                    }
+                                }
+
+                            });
+                        }else {
+                            couponCategoryAutoRecommend.css('display', 'none');
+                            couponCategoryAutoRecommend.html('');
+                        }
+                    }, 800);
+                });
+                function addCategoryTOCouponCategories(boxElement, productName, productID) {
+                    // <p><i class="fa fa-minus-circle"></i> رم > 12GB</p>
+                    if(Categories_id.indexOf(productID) < 0) {
+                        let row = $('<p>');
+                        let deleteBtn = $('<i>').addClass('fa fa-minus-circle').click(function (e) {
+                            let filter_id = +$(this).closest('p').attr('data-filter-id');
+                            let index = Products_id.indexOf(filter_id);
+                            if(index > -1) {
+                                Products_id.splice(index, 1);
+                            }
+                            $(this).closest('p').remove();
+                        });
+                        deleteBtn.appendTo(row);
+                        Categories_id.push(productID);
+                        row.append(productName).attr('data-category-id', productID);
+                        row.appendTo(boxElement);
+                    }
+                }
+
+
+
+                /*
+                * Post Data
+                * */
+                let couponSubmitBtn = $("#coupon-submit-btn");
+                let successMessageBoxElement = $("#success-message-box");
+                let errorMessageBoxElement = $("#error-message-box");
+                couponSubmitBtn.click(function (e) {
+                    let data = {};
+                    let error = false;
+                    let element;
+                    let messages = [];
+
+                    successMessageBoxElement.find(".messages").html('');
+                    successMessageBoxElement.css("display", "none");
+                    errorMessageBoxElement.find(".messages").html('');
+                    errorMessageBoxElement.css("display", "none");
+
+                    element = $('#coupon-name');
+                    if(element.val() != '') {
+                        data['coupon-name'] = element.val();
+                    }else {
+                        error = true;
+                        messages.push("{{ T['error_coupon_name_empty'] }}");
+                    }
+                    element = $('#coupon-code');
+                    if(element.val() != '') {
+                        data['coupon-code'] = element.val();
+                    }else {
+                        error = true;
+                        messages.push("{{ T['error_coupon_code_empty'] }}");
+                    }
+                    element = $('#coupon-type');
+                    if(element.val() != '') {
+                        data['coupon-type'] = element.val();
+                    }else {
+                        error = true;
+                        messages.push("{{ T['error_coupon_type_empty'] }}");
+                    }
+                    element = $('#coupon-value');
+                    if(element.val() != '') {
+                        data['coupon-discount'] = element.val();
+                    }else {
+                        error = true;
+                        messages.push("{{ T['error_coupon_value_empty'] }}");
+                    }
+                    element = $('#coupon-minimum-price');
+                    if(element.val() != '') {
+                        data['coupon-minimum-price'] = element.val();
+                    }else {
+                        error = true;
+                        messages.push("{{ T['error_coupon_minimum_price_empty'] }}");
+                    }
+                    element = $('#coupon-date-start');
+                    if(element.val() != '') {
+                        data['coupon-date-start'] = element.val();
+                    }else {
+                        error = true;
+                        messages.push("{{ T['error_coupon_date_start_empty'] }}");
+                    }
+                    element = $('#coupon-date-end');
+                    if(element.val() != '') {
+                        data['coupon-date-end'] = element.val();
+                    }else {
+                        error = true;
+                        messages.push("{{ T['error_coupon_date_end_empty'] }}");
+                    }
+                    element = $('#coupon-count');
+                    if(element.val() != '') {
+                        data['coupon-count'] = element.val();
+                    }else {
+                        data['coupon-count'] = 0;
+                    }
+
+                    data['coupon-products'] = Products_id;
+                    data['coupon-categories'] = Categories_id;
+                    data['post'] = true;
+                    data['coupon-post'] = true;
+                    if(!error) {
+                        $.post(url, data, function (response) {
+                            response = JSON.parse(response);
+                            if(response.status === 1) {
+                                for (let i = 0; i < response['messages'].length; i++) {
+                                    $('<p>').text(response['messages'][i]).appendTo(successMessageBoxElement.find('.messages'));
+                                }
+                                if(response['messages'].length > 0) {
+                                    successMessageBoxElement.css("display", "block");
+                                }
+
+                                if(response['redirect']) {
+                                    window.setTimeout(function () {
+                                        window.location.href = response['redirect'];
+                                    }, 1000)
+                                }
+                            }else {
+                                for (let i = 0; i < response['messages'].length; i++) {
+                                    $('<p>').text(response['messages'][i]).appendTo(errorMessageBoxElement.find('.messages'));
+                                }
+                                if(response['messages'].length > 0) {
+                                    errorMessageBoxElement.css("display", "block");
+                                }
+                            }
+                        });
+                    }else {
+                        for (let i = 0; i < messages.length; i++) {
+                            $('<p>').text(messages[i]).appendTo(errorMessageBoxElement.find('.messages'));
+                        }
+                        if(messages.length > 0) {
+                            errorMessageBoxElement.css("display", "block");
+                        }
+                    }
+                    e.preventDefault();
+                });
+            });
+
+        </script>
+    {% endautoescape %}
+{% endblock %}

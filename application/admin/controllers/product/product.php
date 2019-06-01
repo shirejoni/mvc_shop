@@ -981,4 +981,23 @@ class ControllerProductProduct extends Controller {
         return new Action('error/notFound', 'web');
     }
 
+    public function getproducts() {
+        $data = [];
+        $language_id = $this->Language->getLanguageID();
+        /** @var Product $Product */
+        $Product = $this->load("Product", $this->registry);
+        $option = array(
+            'language_id'   => $language_id
+        );
+        if(!empty($this->Request->post['s'])) {
+            $option['filter_name']   = trim($this->Request->post['s']);
+        }
+        $data['Products'] = $Product->getProducts($option);
+        $json = array(
+            'status'    => 1,
+            'products'   => $data['Products']
+        );
+        $this->Response->setOutPut(json_encode($json));
+    }
+
 }

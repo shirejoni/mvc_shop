@@ -1,0 +1,12 @@
+{% for Coupon in Coupons %}
+    <tr>
+        <th scope="row"><input type="checkbox" class="select-row-checkbox" data-coupon-id="{{ Coupon['coupon_id'] }}"></th>
+        <th>{{ Coupon['coupon_id'] }}</th>
+        <td>{{ Coupon['name'] }}</td>
+        <td>{{ Coupon['code'] }}</td>
+        <td>{{ Coupon['count'] }}</td>
+        <td>
+            <a href="{{ ADMIN_URL }}product/coupon/edit/{{ Coupon['coupon_id'] }}?token={{ Token }}" ><i class="btn btn-warning fa fa-pencil-alt"></i></a>
+        </td>
+    </tr>
+{% endfor %}
