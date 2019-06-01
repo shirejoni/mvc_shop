@@ -2,8 +2,11 @@
 
 namespace App\Web\Controller;
 
+use App\lib\Cart;
 use App\lib\Response;
 use App\model\Customer;
+use App\model\Image;
+use App\model\Product;
 use App\system\Controller;
 
 /**
@@ -40,6 +43,36 @@ class ControllerCheckoutCheckout extends Controller {
             ['پایان', false],
 
         );
+        if($this->Customer && isset($_SESSION['session_old_id'])) {
+            /** @var Cart $Cart */
+            $Cart = new Cart($this->registry, $_SESSION['session_old_id']);
+        }else {
+            /** @var Cart $Cart */
+            $Cart = new Cart($this->registry);
+        }
+        /** @var Product $Product */
+        $Product = $this->load("Product", $this->registry);
+        $products = $Cart->getProducts($Product);
+        /** @var Image $Image */
+        $Image = $this->load("Image", $this->registry);
+        $total = 0;
+        foreach ($products as $index => $product) {
+            $image = $product['image'];
+            if(is_file(ASSETS_PATH . DS . substr($product['image'], strlen(ASSETS_URL)))) {
+                $image = ASSETS_URL . $Image->resize(substr($product['image'], strlen(ASSETS_URL)), 200, 200);
+            }
+            $total += $product['total'];
+            $products[$index]['image'] = $image;
+        }
+        $off_price = 0;
+        $data['Products'] = $products;
+        $data['Total'] = $total;
+        $data['TotalFormatted'] = number_format($total);
+        $data['Off'] = $off_price;
+        $data['OffFormatted'] = number_format($data['Off']);
+        $data['PaymentPrice'] = $total - $off_price;
+        $data['PaymentPriceFormatted'] = number_format($data['PaymentPrice']);
+
         $this->Response->setOutPut($this->render('checkout/cart', $data));
     }
 }

@@ -27,7 +27,7 @@
                             <input type="number" disabled class="quantity" value="{{ Product['quantity'] }}">
                         </td>
                         <td>
-                            {{ Product['total_price_for_unit_formatted'] }} <span class="toman">تومان</span>
+                            {{ Product['total_price_per_unit'] }} <span class="toman">تومان</span>
                         </td>
                         <td>
                             {{ Product['total_formatted'] }} <span class="toman">تومان</span>
@@ -54,20 +54,19 @@
                 <tr>
                     <th>مبلغ کل</th>
                     <td class="gray">
-                        <span class="price" id="cart_total_price">{{ TotalFormatted }}</span><span class="toman">تومان</span>
+                        <span class="price" id="cart_total_price">{{ TotalFormatted }} </span><span class="toman">تومان</span>
                     </td>
                 </tr>
                 <tr>
                     <th>تخیفیف</th>
                     <td class="green">
-                        <span class="price" id="cart_off_price">{{ OffFormatted }}</span><span class="toman">تومان</span>
+                        <span class="price" id="cart_off_price">{{ OffFormatted }} </span><span class="toman">تومان</span>
                     </td>
                 </tr>
                 <tr>
                     <th>مبلغ پرداختی:</th>
                     <td>
-                        <span class="price" id="cart_payment_price">{{ PaymentPriceFormatted }}
-                        </span><span class="toman">تومان</span>
+                        <span class="price" id="cart_payment_price">{{ PaymentPriceFormatted }} </span><span class="toman">تومان</span>
                     </td>
                 </tr>
             </table>
@@ -77,3 +76,58 @@
     </div>
 {% endblock %}
 
+
+{% block Js %}
+    <script type="text/javascript">
+        {% autoescape false %}
+        function refreshBigBasket() {
+            $.post(cartInfoUrl, {'cart-post' : true, 'post' : true}, function (response) {
+                response = JSON.parse(response);
+                if(response['status'] == 1) {
+
+                    let shoppingCartTableElement = $("#big-shopping-cart-table");
+                    shoppingCartTableElement.find('tbody').html('');
+                    let products = response['data']['Products'];
+                    if(products.length > 0) {
+                        for(let i = 0; i < products.length; i++) {
+                            let product = products[i];
+                            let outPut = $("<tr>");
+                            if(product['image'] != '') {
+                                let productImage = $("<td>");
+                                $("<img>").attr('src', product['image']).appendTo(productImage);
+                                productImage.appendTo(outPut);
+                            }
+                            let productName = $("<td>");
+                            console.log(outPut);
+                            productName.html(product['name']);
+                            productName.appendTo(outPut);
+                            console.log(outPut);
+
+                            $("<td>"+ product['quantity'] +"</td>").appendTo(outPut);
+                            $("<td>"+ product['total_price_per_unit'] +"</td>").appendTo(outPut);
+                            $("<td>"+ product['total'] +"</td>").appendTo(outPut);
+                            $("<td><span onclick=\"deleteRowCart("+ product['cart_id'] + ")\"><i class=\"fa fa-times\"></i></span></td>").appendTo(outPut);
+                            outPut.appendTo(shoppingCartTableElement.find('tbody'));
+                        }
+                    }else {
+                        shoppingCartTableElement.find('tbody').html('سبد شما خالی است');
+                    }
+                }
+            });
+        }
+        function deleteRowCart(cart_id) {
+            if(cart_id) {
+                $.post(cartDeleteUrl, {"cart-post" : true, 'post' : true, "cart_id" : cart_id }, function (response) {
+                    response = JSON.parse(response);
+                    if(response['status'] == 1) {
+                        refreshSmallBasket();
+                        refreshBigBasket();
+                    }
+                });
+            }
+        }
+
+        {% endautoescape %}
+    </script>
+
+{% endblock %}
