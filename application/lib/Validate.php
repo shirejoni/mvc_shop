@@ -30,4 +30,8 @@ class Validate
         return preg_match('/^[0-9]{10}$/', $zipCode);
     }
 
+    public static function couponValid($couponCode) {
+        return preg_match('/^[a-zA-Z0-9\-\_]{3,64}$/', $couponCode);
+    }
+
 }
