@@ -38,7 +38,8 @@ class Cart
         ));
         if($this->Customer && $this->Customer->getCustomerId()) {
             $this->Database->query("UPDATE cart SET session_id = :sID WHERE customer_id = :cID", array(
-                'cID'   => session_id()
+                'sID'   => session_id(),
+                'cID'   => $this->Customer->getCustomerId(),
             ));
             if($old_session) {
                 $this->Database->query("SELECT * FROM cart WHERE customer_id = 0 AND session_id = :sID", array(

@@ -18,10 +18,17 @@ class ControllerInitLogin extends Controller {
         $ignore_route = array(
             'login/index',
             'login/forget',
-            'login/reset'
+            'login/reset',
+            'checkout/index'
         );
         if(!in_array($route, $ignore_route) && empty($_SESSION['customer'])) {
-            $action = new Action('login/index');
+
+            if(strpos($route, 'checkout') !== false) {
+
+                $action = new Action('checkout/checkout/index');
+            }else {
+                $action = new Action('login/index');
+            }
             return $action;
         }
 
@@ -46,7 +53,9 @@ class ControllerInitLogin extends Controller {
             'login/forget',
             'login/reset',
             'error/notFound',
-            'error/permission'
+            'error/permission',
+            'checkout/index',
+            'checkout/cart'
         );
 //        if(!in_array($route, $ignore_route) && (!isset($_SESSION['token']) || empty($this->Request->get['token'])
 //                || $_SESSION['token'] != $this->Request->get['token'] || !isset($_SESSION['token_time_expiry'])

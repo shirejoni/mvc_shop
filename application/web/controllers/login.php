@@ -59,15 +59,19 @@ class ControllerLogin extends Controller {
                         $json = array(
                             'status' => 1,
                             'messages' => [$this->Language->get('success_message')],
-                            'redirect' => $this->Application->getUrl() . '?token=' . $token,
                         );
+                        if(isset($this->Request->post['checkout-post'])) {
+                            $json['redirect'] = URL . 'checkout/index';
+                        }else {
+                            $json['redirect'] =  $this->Application->getUrl() . '?token=' . $token;
+                        }
                     }else {
                         $error = true;
-                        $messages[] = $this->Language->get('error_no_such_user');
+                        $messages[] = $this->Language->get('error_exist_such_user');
                     }
                 }else {
                     $error = true;
-                    $messages[] = $this->Language->get('error_no_such_user');
+                    $messages[] = $this->Language->get('error_exist_such_user');
                 }
             }
 

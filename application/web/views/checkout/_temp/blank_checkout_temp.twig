@@ -1,0 +1,44 @@
+{% extends "_temp/_blank_page_temp.twig" %}
+
+{% block Content %}
+    <div class="bigWrap">
+        <div class="message-box success-box" id="success-message-box" style="display: none;margin: 10px 0 0 0">
+            <h4>موفقیت!</h4>
+            <hr>
+            <div class="messages">
+
+            </div>
+        </div>
+        <div class="message-box error-box" id="error-message-box" style="display: none;margin: 10px 0 0 0">
+            <h4>خطا!</h4>
+            <hr>
+            <div class="messages">
+
+            </div>
+        </div>
+        <div id="checkoutBox">
+            <div class="checkout-box-header">
+                <h3>فرم پرداخت </h3>
+                <div class="section-form-process">
+                    {% for checkoutProcessItem in checkoutProcess %}
+                        {% if checkoutProcessItem[1] %}
+                            {% set active = "active" %}
+                        {% else %}
+                            {% set active = "" %}
+                        {% endif %}
+                        <div class="section-process-title {{ active }}">
+                            {{ checkoutProcessItem[0] }}
+                        </div>
+                    {% endfor %}
+
+                </div>
+            </div>
+            <div class="checkout-box-body">
+                {% block CheckoutBody %}
+
+                {% endblock %}
+            </div>
+        </div>
+
+    </div>
+{% endblock %}

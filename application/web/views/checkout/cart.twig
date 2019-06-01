@@ -1,0 +1,79 @@
+{% extends "checkout/_temp/blank_checkout_temp.twig" %}
+
+{% block CheckoutBody %}
+    <div class="big-shopping-cart-box">
+        {% if Products %}
+            <table border="1" class="big-shopping-cart-table" id="big-shopping-cart-table">
+                <thead>
+                <tr>
+                    <th>عکس</th>
+                    <th>نام محصول</th>
+                    <th>تعداد</th>
+                    <th>فی</th>
+                    <th>قیمت کل</th>
+                    <th></th>
+                </tr>
+                </thead>
+                <tbody>
+                {% for Product in Products %}
+                    <tr>
+                        <td>
+                            <img src="{{ Product['image'] }}">
+                        </td>
+                        <td>
+                            {{ Product['name'] }}
+                        </td>
+                        <td>
+                            <input type="number" disabled class="quantity" value="{{ Product['quantity'] }}">
+                        </td>
+                        <td>
+                            {{ Product['total_price_for_unit_formatted'] }} <span class="toman">تومان</span>
+                        </td>
+                        <td>
+                            {{ Product['total_formatted'] }} <span class="toman">تومان</span>
+                        </td>
+                        <td>
+                            <span onclick="deleteRowCart({{ Product['cart_id'] }})"><i class="fa fa-times"></i></span>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+        {% else %}
+            سبد شما خالی است
+        {% endif %}
+
+        <div class="off-code">
+            <lable>کد تخفیف دارید؟</lable>
+            <input type="text" id="off-code-value" placeholder="کد تخفیف">
+            <button id="off-code-btn">اعمال</button>
+        </div>
+
+        <div class="total-price-box">
+            <table>
+                <tr>
+                    <th>مبلغ کل</th>
+                    <td class="gray">
+                        <span class="price" id="cart_total_price">{{ TotalFormatted }}</span><span class="toman">تومان</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>تخیفیف</th>
+                    <td class="green">
+                        <span class="price" id="cart_off_price">{{ OffFormatted }}</span><span class="toman">تومان</span>
+                    </td>
+                </tr>
+                <tr>
+                    <th>مبلغ پرداختی:</th>
+                    <td>
+                        <span class="price" id="cart_payment_price">{{ PaymentPriceFormatted }}
+                        </span><span class="toman">تومان</span>
+                    </td>
+                </tr>
+            </table>
+            <a class="fa fa-arrow-left btn-next-link"></a>
+        </div>
+
+    </div>
+{% endblock %}
+

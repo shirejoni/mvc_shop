@@ -1324,3 +1324,44 @@ table.big-shopping-cart-table td:nth-child(6)  {
     cursor: pointer;
     font: 12px yekan;
 }
+.total-price-box {
+    width: 800px;
+    margin: 0 auto;
+}
+.total-price-box table {
+    width: 270px;
+    border-collapse: collapse;
+    border: 1px solid #cccccc;
+}
+.total-price-box td, .total-price-box th {
+    border: 1px solid #cccccc;
+    text-align: center;
+    font: 14px yekan;
+}
+.total-price-box span.price {
+    font: 14px "Maven Pro";
+    font-weight: bold;
+
+}
+.total-price-box span.price + .toman {
+    font: 10px yekan;
+}
+.total-price-box .green span.price {
+    color: green;
+}
+.total-price-box .green span.price + .toman {
+    color: green;
+}
+.total-price-box .gray span.price {
+    color: #5d5d5d;
+}
+.total-price-box .gray span.price + .toman {
+    color: #5d5d5d;
+}
+.btn-next-link {
+    font-size: 18px;
+    background-color: #0a90eb;
+    border-radius: 50%;
+    padding: 7px 9px;
+    margin: 15px;
+}
