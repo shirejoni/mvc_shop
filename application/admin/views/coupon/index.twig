@@ -1,4 +1,4 @@
-{% extends "home/_temp/blank_dashboard_temp.twig" %}
+{% extends "_temp/_blank_dashboard_temp.twig" %}
 
 {% block Content %}
     <div class="container">
@@ -79,7 +79,6 @@
                 "{{ Language['language_id'] }}",
                 {% endfor %}
             ];
-            let LanguageDefaultID = {{ LanguageDefaultID }};
             let successMessageBoxElement = $("#success-message-box");
             let errorMessageBoxElement = $("#error-message-box");
             let selectAllCheckboxElement = $("#select-all-checkbox");
@@ -102,7 +101,7 @@
                     errorMessageBoxElement.css('display', 'none');
                     let data = {};
                     data['coupons_id'] = [];
-                    if(confirm("{{ Translate['are_you_sure_?'] }}")) {
+                    if(confirm("{{ T['are_you_sure_?'] }}")) {
                         $('.select-row-checkbox:checked').each(function (index, element) {
                             data['coupons_id'].push($(element).attr("data-coupon-id"));
                         });

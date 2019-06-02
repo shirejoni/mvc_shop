@@ -16,7 +16,13 @@ use App\system\Controller;
  */
 class ControllerCoupon extends Controller {
     public function index() {
-
+        $data = [];
+        /** @var Coupon $Coupon */
+        $Coupon = $this->load("Coupon", $this->registry);
+        $data['Languages'] = $this->Language->getLanguages();
+        $data['DefaultLanguageID'] = $this->Language->getLanguageID();
+        $data['Coupons'] = $Coupon->getCoupons();
+        $this->Response->setOutPut($this->render('coupon/index', $data));
     }
 
     public function add() {
@@ -121,6 +127,61 @@ class ControllerCoupon extends Controller {
                 );
             }
             $this->Response->setOutPut($this->render('coupon/add', $data));
+        }
+    }
+
+    public function status() {
+        if(isset($this->Request->post['coupon_id']) && isset($this->Request->post['coupon_status'])) {
+            $coupon_id = (int) $this->Request->post['coupon_id'];
+            $coupon_status = (int) $this->Request->post['coupon_status'] == 1 ? 1 : 0;
+            /** @var Coupon $Coupon */
+            $Coupon = $this->load("Coupon", $this->registry);
+            $json = [];
+            if($coupon_id &&  $product = $Coupon->getCoupon($coupon_id)) {
+                $Coupon->editCoupon($coupon_id, array(
+                    'status'    => $coupon_status
+                ));
+                $json['status'] = 1;
+                $json['messages'] = [$this->Language->get('success_message')];
+            }else {
+                $json['status'] = 0;
+                $json['messages'] = [$this->Language->get('error_done')];
+            }
+            $this->Response->setOutPut(json_encode($json));
+            return;
+        }
+        return new Action('error/notFound', 'web');
+    }
+
+    public function delete() {
+        if(!empty($this->Request->post['coupons_id'])) {
+            $json = [];
+            /** @var Coupon $Coupon */
+            $Coupon = $this->load('Coupon', $this->registry);
+            $error = false;
+            $this->Database->db->beginTransaction();
+            foreach ($this->Request->post['coupons_id'] as $coupon_id) {
+                $coupon = $Coupon->getCoupon((int) $coupon_id);
+                if($coupon && (int) $coupon_id) {
+                    $Coupon->deleteCoupon((int) $coupon_id);
+                }else {
+                    $error = true;
+                }
+            }
+            if($error) {
+                $this->Database->db->rollBack();
+                $json['status'] = 0;
+                $json['messages'] = [$this->Language->get('error_done')];
+            }else {
+                $this->Database->db->commit();
+                $json['status'] = 1;
+                $json['messages'] = [$this->Language->get('success_message')];
+                $data['Coupons'] = $Coupon->getCoupons();
+                $json['data'] = $this->render('coupon/coupons_table', $data);
+            }
+            $this->Response->setOutPut(json_encode($json));
+        }else {
+            return new Action('error/notFound', 'web');
         }
     }
 }
