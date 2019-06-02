@@ -1,4 +1,4 @@
-{% extends "home/_temp/blank_dashboard_temp.twig" %}
+{% extends "_temp/_blank_dashboard_temp.twig" %}
 {% block Content %}
     <div class="container">
         <section class="row">
@@ -38,9 +38,9 @@
                                 <select id="coupon-type" class="form-control">
                                     {% for CouponType in CouponTypes %}
                                         {% if Coupon['type'] == CouponType.index %}
-                                            <option value="{{ CouponType.index }}" selected>{{ Translate[CouponType.value] }}</option>
+                                            <option value="{{ CouponType.index }}" selected>{{ T[CouponType.value] }}</option>
                                         {% else %}
-                                            <option value="{{ CouponType.index }}">{{ Translate[CouponType.value] }}</option>
+                                            <option value="{{ CouponType.index }}">{{ T[CouponType.value] }}</option>
                                         {% endif %}
                                     {% endfor %}
                                 </select>
@@ -130,12 +130,7 @@
             let url = "{{ CURRENT_URL }}?token={{ Token }}";
             let searchProductUrl = "{{ ADMIN_URL }}product/product/getproducts?token={{ Token }}";
             let searchCategoryUrl = "{{ ADMIN_URL }}product/category/getcategories?token={{ Token }}";
-            let Languages = [
-                {% for Langauge in Languages %}
-                "{{ Langauge['language_id'] }}",
-                {% endfor %}
-            ];
-            let LanguageDefaultID = {{ LanguageDefaultID }};
+
             $(document).ready(function () {
                 $("#coupon-date-start").persianDatepicker({
                     format: 'YYYY/MM/DD',

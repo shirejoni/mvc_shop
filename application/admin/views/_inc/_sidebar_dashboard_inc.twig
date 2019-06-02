@@ -20,33 +20,16 @@
                     <a href="{{ ADMIN_URL }}product/attribute/index?token={{ Token }}" class="nav-link">خصوصیت محصول</a>
                 </nav>
             </div>
-            <a href="#" class="nav-item nav-link d-block">
-                <span class="fa fa-file-alt" style="margin-left: 5px"></span>
-                بلاگ
+            <a href="#" class="nav-item nav-link d-block dropdown-toggle" data-toggle="collapse" data-target="#marketingMenu" role="button" aria-expanded="false" >
+                <span class="fa fa-share-alt" style="margin-left: 5px"></span>
+                مارکتینگ
             </a>
-            <a href="#" class="nav-item nav-link d-block">
-                <span class="fa fa-chart-pie" style="margin-left: 5px"></span>
-                گزارشات
-            </a>
-            <a href="#" class="nav-item nav-link d-block">
-                <span class="fa fa-credit-card" style="margin-left: 5px"></span>
-                کیف پول
-            </a>
-            <a href="#" class="nav-item nav-link d-block dropdown-toggle" data-toggle="collapse" data-target="#userCollapse" role="button" aria-expanded="false" >
-                <span class="fa fa-users" style="margin-left: 5px"></span>
-                کاربران
-            </a>
-            <div class="collapse" id="userCollapse">
+            <div class="collapse" id="marketingMenu">
                 <nav class="nav flex-column align-items-start pr-4">
-                    <a href="#" class="nav-link">مشاهده</a>
-                    <a href="#" class="nav-link">ویرایش</a>
-                    <a href="#" class="nav-link">حذف</a>
+                    <a href="{{ ADMIN_URL }}coupon/index?token={{ Token }}" class="nav-link">کد تخفیف</a>
                 </nav>
             </div>
-            <a href="#" class="nav-item nav-link d-block">
-                <span class="fa fa-shopping-cart" style="margin-left: 5px"></span>
-                محصولات
-            </a>
+
         </div>
     </div>
 </nav>
