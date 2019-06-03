@@ -46,7 +46,7 @@ class Cart
                     'sID'   => $old_session
                 ));
                 foreach ($this->Database->getRows() as $row) {
-                    $this->Database->query("DELETE FROM cart WHRER cart_id = :cID", array(
+                    $this->Database->query("DELETE FROM cart WHERE cart_id = :cID", array(
                         'cID'   => $row['cart_id']
                     ));
                     $this->add($row['product_id'], $row['quantity'], $row['product_option']);

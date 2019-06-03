@@ -569,7 +569,7 @@ class Product extends Model
          review r2 WHERE r2.product_id = p.product_id AND r2.status = 1) AS reviews
           FROM product p LEFT JOIN product_language pl ON p.product_id = pl.product_id
         LEFT JOIN manufacturer m ON m.manufacturer_id = p.manufacturer_id LEFT JOIN manufacturer_language ml ON ml.manufacturer_id = m.manufacturer_id 
-        WHERE p.product_id = :pID  AND pl.language_id = :lID ", array(
+        WHERE p.product_id = :pID  AND pl.language_id = :lID AND ml.language_id = :lID", array(
             'pID'   => $product_id,
             'lID'   => $language_id
         ));

@@ -80,6 +80,7 @@
 {% block Js %}
     <script type="text/javascript">
         {% autoescape false %}
+        let applyCouponUrl = "{{ URL }}checkout/coupon/applycoupon";
         function refreshBigBasket() {
             $.post(cartInfoUrl, {'cart-post' : true, 'post' : true}, function (response) {
                 response = JSON.parse(response);
@@ -126,7 +127,72 @@
                 });
             }
         }
+        $(document).ready(function () {
+            let successMessageBoxElement = $("#success-message-box");
+            let errorMessageBoxElement = $("#error-message-box");
+            $('#off-code-btn').click(function (e) {
+               let data = {};
+               let messages = [];
+               let error = false;
+               let element = $("#off-code-value");
+               successMessageBoxElement.find(".messages").html('');
+               successMessageBoxElement.css("display", "none");
+               errorMessageBoxElement.find(".messages").html('');
+               errorMessageBoxElement.css("display", "none");
 
+               if(element.val() != "") {
+                   data['code'] = element.val();
+               }else {
+                   error = true;
+                   messages.push("{{ T['error_coupon_code_empty'] }}");
+               }
+               data['post'] = true;
+               data['checkout-post'] = true;
+                if(!error) {
+                    $("#cart_total_price").html('{{ TotalFormatted }}');
+                    $("#cart_off_price").html('{{ OffFormatted }}');
+                    $("#cart_payment_price").html('{{ PaymentPriceFormatted }}');
+                    $.post(applyCouponUrl, data, function (response) {
+                        response = JSON.parse(response);
+                        if(response.status === 1) {
+                            for (let i = 0; i < response['messages'].length; i++) {
+                                $('<p>').text(response['messages'][i]).appendTo(successMessageBoxElement.find('.messages'));
+                            }
+                            if(response['messages'].length > 0) {
+                                successMessageBoxElement.css("display", "block");
+                            }
+                            $("#cart_total_price").html(response['total_formatted']);
+                            $("#cart_off_price").html(response['off_price_formatted']);
+                            $("#cart_payment_price").html(response['payment_price_formatted']);
+
+                            refreshSmallBasket();
+                            if(response['redirect']) {
+                                window.setTimeout(function () {
+                                    window.location.href = response['redirect'];
+                                }, 1000)
+                            }
+                        }else {
+                            for (let i = 0; i < response['messages'].length; i++) {
+                                $('<p>').text(response['messages'][i]).appendTo(errorMessageBoxElement.find('.messages'));
+                            }
+                            if(response['messages'].length > 0) {
+                                errorMessageBoxElement.css("display", "block");
+                            }
+                        }
+
+                    });
+
+                }else {
+                    for (let i = 0; i < messages.length; i++) {
+                        $('<p>').text(messages[i]).appendTo(errorMessageBoxElement.find('.messages'));
+                    }
+                    if(messages.length > 0) {
+                        errorMessageBoxElement.css("display", "block");
+                    }
+                }
+               e.preventDefault();
+            });
+        });
         {% endautoescape %}
     </script>
 

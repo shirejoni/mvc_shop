@@ -19,7 +19,9 @@ class ControllerInitLogin extends Controller {
             'login/index',
             'login/forget',
             'login/reset',
-            'checkout/index'
+            'checkout/index',
+            'checkout/cart/add',
+            'checkout/cart/info'
         );
         if(!in_array($route, $ignore_route) && empty($_SESSION['customer'])) {
 
@@ -55,7 +57,9 @@ class ControllerInitLogin extends Controller {
             'error/notFound',
             'error/permission',
             'checkout/index',
-            'checkout/cart'
+            'checkout/cart',
+            'checkout/cart/add',
+            'checkout/cart/info'
         );
 //        if(!in_array($route, $ignore_route) && (!isset($_SESSION['token']) || empty($this->Request->get['token'])
 //                || $_SESSION['token'] != $this->Request->get['token'] || !isset($_SESSION['token_time_expiry'])

@@ -37,6 +37,32 @@ class Coupon extends Model
         return false;
     }
 
+    public function getCouponByKey($coupon_key) {
+        $this->Database->query("SELECT * FROM coupon WHERE code = :cCode", array(
+            'cCode'   => $coupon_key,
+        ));
+
+        if($this->Database->hasRows()) {
+            $row = $this->Database->getRow();
+            $this->Database->query("SELECT * FROM coupon_product WHERE coupon_id = :cID", array(
+                'cID'   => $row['coupon_id']
+            ));
+            $row['products_id'] = [];
+            foreach ($this->Database->getRows() as $r) {
+                $row['products_id'][] = $r['product_id'];
+            }
+            $this->Database->query("SELECT * FROM coupon_category WHERE coupon_id = :cID", array(
+                'cID'   => $row['coupon_id']
+            ));
+            $row['categories_id'] = [];
+            foreach ($this->Database->getRows() as $r) {
+                $row['categories_id'][] = $r['category_id'];
+            }
+            return $row;
+        }
+        return false;
+    }
+
     public function insertCoupon($data) {
         $this->Database->query("INSERT INTO coupon (name, code, discount, type, minimum_price, date_start, date_end, status, date_added, `count`) VALUES 
         (:cName, :cCode, :cDiscount, :cType, :cMinimumPrice, :cDStarted, :cDEnd, :cStatus, :cDAdded, :cCount)", array(

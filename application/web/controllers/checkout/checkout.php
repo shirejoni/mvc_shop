@@ -13,7 +13,8 @@ use App\system\Controller;
  * @property Response Response
  * @property Customer Customer
  */
-class ControllerCheckoutCheckout extends Controller {
+class
+ControllerCheckoutCheckout extends Controller {
 
     public function index() {
         $data = [];
@@ -64,7 +65,11 @@ class ControllerCheckoutCheckout extends Controller {
             $total += $product['total'];
             $products[$index]['image'] = $image;
         }
-        $off_price = 0;
+        if(isset($_SESSION['customer']['coupon'])) {
+            $off_price = $_SESSION['customer']['coupon']['off_price'];
+        }else {
+            $off_price = 0;
+        }
         $data['Products'] = $products;
         $data['Total'] = $total;
         $data['TotalFormatted'] = number_format($total);
