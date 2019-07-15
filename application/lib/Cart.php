@@ -49,7 +49,7 @@ class Cart
                     $this->Database->query("DELETE FROM cart WHERE cart_id = :cID", array(
                         'cID'   => $row['cart_id']
                     ));
-                    $this->add($row['product_id'], $row['quantity'], $row['product_option']);
+                    $this->add($row['product_id'], $row['quantity'], json_decode($row['product_option']));
                 }
             }
             $this->Database->query("SELECT * FROM cart WHERE customer_id = 0 AND session_id = :sID", array(
