@@ -704,6 +704,8 @@ class Product extends Model
 
     public function getProductsComplete($data = [], $lID = null)
     {
+        $i = 0;
+        $params = [];
         $language_id = $this->Language->getLanguageID();
         if ($lID) {
             $language_id = $lID;
@@ -726,9 +728,18 @@ class Product extends Model
         if(isset($data['category_id'])) {
             $sql .= ' AND pc.category_id = :cID';
         }
-        $params = array(
-            'lID' => $language_id,
-        );
+        if(isset($data['manufacturers_id'])) {
+            $place_holder = [];
+            $place_holder_value = [];
+            foreach ($data['manufacturers_id'] as $manufacturer_id) {
+                $i++;
+                $place_holder[] = ':MID' . $i;// ['MID1', 'MID2' , 'MID3']
+                $place_holder_value['MID' . $i] = $manufacturer_id;
+            }
+            $sql .= ' AND m.manufacturer_id IN ('. implode(', ', $place_holder) .')';
+            $params = array_merge($params, $place_holder_value);
+        }
+        $params['lID']  = $language_id;
         if(isset($data['category_id'])) {
             $params['cID'] = $data['category_id'];
         }
