@@ -718,7 +718,12 @@ class Product extends Model
 
         $sql .= ' FROM product p ';
         if(isset($data['category_id'])) {
-            $sql .= ' INNER JOIN product_category pc ON p.product_id = pc.product_id';
+            $sql .= ' INNER JOIN product_category pc ON p.product_id = pc.product_id INNER JOIN category_path cp ON pc.category_id = cp.category_id';
+            if(isset($data['filters'])) {
+                foreach ($data['filters'] as $filter_group_id => $filters_id) {
+                    $sql .= " LEFT JOIN product_filter pf{$filter_group_id} ON pf{$filter_group_id}.product_id = p.product_id ";
+                }
+            }
         }
         $sql .= ' LEFT JOIN product_language pl ON p.product_id = pl.product_id
         LEFT JOIN manufacturer m ON m.manufacturer_id = p.manufacturer_id LEFT JOIN manufacturer_language ml ON ml.manufacturer_id = m.manufacturer_id ';
@@ -726,7 +731,20 @@ class Product extends Model
 
         $sql .= ' WHERE pl.language_id = :lID AND ml.language_id = :lID';
         if(isset($data['category_id'])) {
-            $sql .= ' AND pc.category_id = :cID';
+            $sql .= ' AND cp.path_id = :cPID';
+            if(isset($data['filters'])) {
+                foreach ($data['filters'] as $filter_group_id => $filters) {
+                    $place_holder = [];
+                    $place_holder_value = [];
+                    foreach ($filters as $filter_id) {
+                        $i++;
+                        $place_holder[] = ':FID' . $i;// ['MID1', 'MID2' , 'MID3']
+                        $place_holder_value['FID' . $i] = $filter_id;
+                    }
+                    $sql .= " AND pf{$filter_group_id}.filter_id IN (". implode(', ', $place_holder) .")";
+                    $params = array_merge($params, $place_holder_value);
+                }
+            }
         }
         if(isset($data['manufacturers_id'])) {
             $place_holder = [];
@@ -739,9 +757,11 @@ class Product extends Model
             $sql .= ' AND m.manufacturer_id IN ('. implode(', ', $place_holder) .')';
             $params = array_merge($params, $place_holder_value);
         }
+
+        $sql .= ' GROUP BY p.product_id';
         $params['lID']  = $language_id;
         if(isset($data['category_id'])) {
-            $params['cID'] = $data['category_id'];
+            $params['cPID'] = $data['category_id'];
         }
         $this->Database->query($sql, $params);
         return $this->Database->getRows();

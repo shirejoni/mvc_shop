@@ -115,18 +115,18 @@ class Filter extends Model
             $language_id = $lID;
         }
         if($lID != "all") {
-            $this->Database->query("SELECT * FROM filter_group fg LEFT JOIN filter_group_language fgl on fg.filter_group_id = fgl.filter_group_id
-            WHERE fgl.language_id = :lID AND fg.filter_group_id = :fGID", array(
+            $this->Database->query('SELECT * FROM filter_group fg LEFT JOIN filter_group_language fgl on fg.filter_group_id = fgl.filter_group_id
+            WHERE fgl.language_id = :lID AND fg.filter_group_id = :fGID', array(
                 'fGID'  => $filter_group_id,
                 'lID'   => $language_id
             ));
             if($this->Database->hasRows()) {
-                $this->Database->query("SELECT * FROM filter f LEFT JOIN filter_language fl on f.filter_id = fl.filter_id
-                WHERE fl.language_id = :lID ", array(
+                $row = $this->Database->getRow();
+                $this->Database->query('SELECT * FROM filter f LEFT JOIN filter_language fl on f.filter_id = fl.filter_id
+                WHERE fl.language_id = :lID ', array(
                     'lID'   => $language_id,
                 ));
                 $filters = $this->Database->getRows();
-                $row = $this->Database->getRow();
                 $this->filter_group_id = $row['filter_group_id'];
                 $this->sort_order = $row['sort_order'];
                 $this->language_id = $row['language_id'];
@@ -138,8 +138,8 @@ class Filter extends Model
             }
             return false;
         }else {
-            $this->Database->query("SELECT * FROM filter_group fg LEFT JOIN filter_group_language fgl on fg.filter_group_id = fgl.filter_group_id
-            WHERE fg.filter_group_id = :fGID", array(
+            $this->Database->query('SELECT * FROM filter_group fg LEFT JOIN filter_group_language fgl on fg.filter_group_id = fgl.filter_group_id
+            WHERE fg.filter_group_id = :fGID', array(
                 'fGID'  => $filter_group_id,
             ));
             $rows = $this->Database->getRows();
