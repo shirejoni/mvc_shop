@@ -64,7 +64,28 @@ class ControllerCategory extends Controller {
                 }
                 /** @var Product $Product */
                 $Product = $this->load('Product', $this->registry);
-                var_dump($Product->getProductsComplete($data));
+                $products = $Product->getProductsComplete($data);
+                if($products) {
+                    $data['Breadcrumbs'] = [];
+                    $data['Breadcrumbs'][] = array(
+                        'text'  => $this->Language->get('home_page'),
+                        'link'  => URL,
+                        'active'=> 0
+                    );
+                    $category = $Category->getCategory($category_id);
+                    $categoryFilters = $Category->getCategoryFilters($category_id);
+                    if($categoryFilters) {
+                        $data['CategoryFilters'] = $categoryFilters;
+                    }
+                    $categories = $Category->getCategoryInfoInPath($category['category_id']);
+                    foreach ($categories as $cat) {
+                        $data['Breadcrumbs'][] = array(
+                            'text'  => $cat['name'],
+                            'link'  => URL . 'category/' . $cat['category_id'],
+                            'active'=> $cat['category_id'] === $category['category_id'] ? 1 : 0
+                        );
+                    }
+                }
                 return;
             }
         }

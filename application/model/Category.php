@@ -408,7 +408,44 @@ class Category extends Model
             'cID'   => $category_id
         ));
         $filters = $this->Database->getRows();
-        return count($filters) > 0 ? $filters : [];
+        $i = 0;
+        $place_holder = [];
+        $place_holder_value = [];
+        foreach ($filters as $filter) {
+            $i++;
+            $place_holder[] = ':FID' . $i;
+            $place_holder_value['FID' . $i] = $filter['filter_id'];
+        }
+        $categoryFilters = [];
+        if($filters) {
+            $sql = 'SELECT DISTINCT * FROM filter f LEFT JOIN filter_group fg ON fg.filter_group_id = f.filter_group_id LEFT JOIN 
+            filter_group_language fgl on fg.filter_group_id = fgl.filter_group_id WHERE fgl.language_id = :lID';
+            $sql .= ' AND f.filter_id IN (' . implode(', ', $place_holder) . ') ';
+            $sql .= ' GROUP BY fg.filter_group_id ';
+            $params = array(
+                'lID'   => $this->Language->getLanguageID()
+            );
+            $params = array_merge($params, $place_holder_value);
+            $this->Database->query($sql , $params);
+            $rows = $this->Database->getRows();
+            foreach ($rows as $row) {
+                $this->Database->query('SELECT *,COALESCE(fl.name, fl2.name) as `name` FROM filter f LEFT JOIN filter_language fl on f.filter_id = fl.filter_id LEFT JOIN filter_language fl2 on f.filter_id = fl2.filter_id WHERE
+                f.filter_group_id = :fGID AND fl.language_id = :lID AND fl2.language_id = :lDID', array(
+                    'fGID'  => $row['filter_group_id'],
+                    'lID'   => $this->Language->getLanguageID(),
+                    'lDID'  => $this->Language->getDefaultLanguageID(),
+                ));
+                $filter_group_filters = $this->Database->getRows();
+                $categoryFilters[] = array(
+                    'filter_group_id'   => $row['filter_group_id'],
+                    'sort_order'        => $row['sort_order'],
+                    'name'              => $row['name'],
+                    'language_id'       => $row['language_id'],
+                    'filters'           => $filter_group_filters
+                );
+            }
+        }
+        return count($categoryFilters) > 0 ? $categoryFilters : [];
     }
 
     public function getCategoryInfoInPath($category_id, $lID = null) {
