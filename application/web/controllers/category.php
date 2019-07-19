@@ -85,6 +85,23 @@ class ControllerCategory extends Controller {
                             'active'=> $cat['category_id'] === $category['category_id'] ? 1 : 0
                         );
                     }
+                    $Image = $this->load("Image", $this->registry);
+                    $minimum_price = 0;
+                    $maximum_price = 0;
+                    foreach ($products as &$product) {
+                        if(is_file(ASSETS_PATH . DS . substr($product['image'], strlen(ASSETS_URL)))) {
+                            $product['image'] = ASSETS_URL . $Image->resize(substr($product['image'], strlen(ASSETS_URL)), 400, 400);
+                        }
+                        if($minimum_price === 0 || (!empty($product['special']) && $minimum_price > $product['special']) || $minimum_price > $product['price']) {
+                            $minimum_price = !empty($product['special']) && $product['special'] < $minimum_price && $product['special'] < $product['price'] ? $product['special'] : $product['price'];
+                        }
+                        if($maximum_price === 0 || (!empty($product['special']) && $maximum_price < $product['special']) || $maximum_price < $product['price']) {
+                            $maximum_price = !empty($product['special']) && $product['special'] < $maximum_price && $product['special'] > $product['price'] ? $product['special'] : $product['price'];
+                        }
+                    }
+                    var_dump($products);
+                    var_dump($minimum_price);
+                    var_dump($maximum_price);
                 }
                 return;
             }
