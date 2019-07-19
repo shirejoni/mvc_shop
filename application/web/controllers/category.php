@@ -55,6 +55,13 @@ class ControllerCategory extends Controller {
                         }
                     }
                 }
+                if(isset($this->Request->get['min'])) {
+                    $data['min'] =(int) $this->Request->get['min'];
+                }
+
+                if(isset($this->Request->get['max'])) {
+                    $data['max'] =(int) $this->Request->get['max'];
+                }
                 /** @var Product $Product */
                 $Product = $this->load('Product', $this->registry);
                 var_dump($Product->getProductsComplete($data));

@@ -710,10 +710,9 @@ class Product extends Model
         if ($lID) {
             $language_id = $lID;
         }
-        $sql = 'SELECT *,p.image as `image`, pl.name AS name, ml.name AS manufacturer_name ,(SELECT ps.price FROM product_special ps WHERE ps.product_id = p.product_id 
-        AND ps.date_start < UNIX_TIMESTAMP() AND ps.date_end > UNIX_TIMESTAMP() ORDER BY ps.priority DESC  LIMIT 0,1) AS special,
+        $sql = 'SELECT *,p.image as `image`,p.price AS `price`, pl.name AS name, ml.name AS manufacturer_name ,
          (SELECT AVG(r1.rate) FROM review r1 WHERE r1.product_id = p.product_id AND r1.status = 1)  AS rating, (SELECT COUNT(*) FROM 
-         review r2 WHERE r2.product_id = p.product_id AND r2.status = 1) AS reviews';
+         review r2 WHERE r2.product_id = p.product_id AND r2.status = 1) AS reviews, ps.price AS `special`';
 
 
         $sql .= ' FROM product p ';
@@ -725,6 +724,8 @@ class Product extends Model
                 }
             }
         }
+        $sql .= ' LEFT JOIN (SELECT ps.price, ps.product_id FROM product_special ps WHERE ps.date_start < UNIX_TIMESTAMP() 
+        AND ps.date_end > UNIX_TIMESTAMP() ORDER BY ps.priority) AS ps ON ps.product_id = p.product_id ';
         $sql .= ' LEFT JOIN product_language pl ON p.product_id = pl.product_id
         LEFT JOIN manufacturer m ON m.manufacturer_id = p.manufacturer_id LEFT JOIN manufacturer_language ml ON ml.manufacturer_id = m.manufacturer_id ';
 
@@ -746,6 +747,12 @@ class Product extends Model
                 }
             }
         }
+        if(isset($data['min'])) {
+            $sql .= ' AND ((ps.price IS NOT NULL AND ps.price >= :pMin) || ( ps.price IS NULL AND p.price >= :pMin)) ';
+        }
+        if(isset($data['max'])) {
+            $sql .= ' AND ((ps.price IS NOT NULL AND ps.price <= :pMax) || (ps.price IS NULL AND p.price <= :pMax)) ';
+        }
         if(isset($data['manufacturers_id'])) {
             $place_holder = [];
             $place_holder_value = [];
@@ -760,8 +767,15 @@ class Product extends Model
 
         $sql .= ' GROUP BY p.product_id';
         $params['lID']  = $language_id;
+
         if(isset($data['category_id'])) {
             $params['cPID'] = $data['category_id'];
+        }
+        if(isset($data['min'])) {
+            $params['pMin'] = $data['min'];
+        }
+        if(isset($data['max'])) {
+            $params['pMax'] = $data['max'];
         }
         $this->Database->query($sql, $params);
         return $this->Database->getRows();
