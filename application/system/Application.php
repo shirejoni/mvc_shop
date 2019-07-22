@@ -60,7 +60,7 @@ class Application {
             require_once SYSTEM_PATH . DS . 'web.php';
         }
         $preActions = $Config->get('pre_actions');
-        if(count($preActions) > 0) {
+        if(is_array($preActions) && count($preActions) > 0) {
             foreach ($preActions as $preAction) {
 
                 $Router->addPreRoute(new Action($preAction));

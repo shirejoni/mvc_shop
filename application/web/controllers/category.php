@@ -46,7 +46,7 @@ class ControllerCategory extends Controller {
                     foreach ($this->Request->get['filters'] as $filter_data) {
                         list($filter_group_id, $filter_id) = explode('-', $filter_data);
                         if((int) $filter_group_id && $filter_group = $Filter->getFilterGroup((int) $filter_group_id)) {
-                            if(isset($data['filters'][$filter_group_id])) {
+                            if(!isset($data['filters'][$filter_group_id])) {
                                 $data['filters'][$filter_group_id] = [];
                                 $data['filters'][$filter_group_id][] = $filter_id;
                             }else {
@@ -99,9 +99,18 @@ class ControllerCategory extends Controller {
                             $maximum_price = !empty($product['special']) && $product['special'] < $maximum_price && $product['special'] > $product['price'] ? $product['special'] : $product['price'];
                         }
                     }
-                    var_dump($products);
-                    var_dump($minimum_price);
-                    var_dump($maximum_price);
+                    $data['MinPrice']= $minimum_price;
+                    $data['MaxPrice'] = $maximum_price;
+                }
+                $data['Products'] = $products;
+                if(isset($this->Request->get['json-response'])) {
+                    $json = array(
+                        'status'    => 1
+                    );
+                    $json['data'] = $this->render('category/products', $data);
+                    $this->Response->setOutPut(json_encode($json));
+                }else {
+                    $this->Response->setOutPut($this->render('category/list', $data));
                 }
                 return;
             }
