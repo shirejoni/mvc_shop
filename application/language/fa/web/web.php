@@ -22,3 +22,4 @@ $_['error_product_option_empty'] = "لطفا تمامی گزینه محصولا�
 $_['error_coupon_code_empty'] = "کد تخفیف نباید خالی باشد";
 $_['error_no_such_off_code'] = "چنین کدتخفیف وجود ندارد";
 $_['error_off_code_minimum_price'] = "مبلغ سبد خرید شما نباید کمتر از {{MINIMUM_PRICE}} باشد";
+$_['error_favorite_customer_is_not_login'] = "شما باید وارد شوید";

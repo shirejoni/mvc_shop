@@ -8,6 +8,7 @@ use App\Lib\Database;
 use App\lib\Request;
 use App\lib\Response;
 use App\model\Category;
+use App\model\Customer;
 use App\model\Filter;
 use App\model\Manufacturer;
 use App\model\Product;
@@ -17,6 +18,7 @@ use App\system\Controller;
  * @property Request Request
  * @property Response Response
  * @property Database Database
+ * @property Customer Customer
  * */
 class ControllerCategory extends Controller {
 
@@ -88,6 +90,10 @@ class ControllerCategory extends Controller {
                     $Image = $this->load("Image", $this->registry);
                     $minimum_price = 0;
                     $maximum_price = 0;
+                    $customerFavoriteProducts = [];
+                    if($this->Customer) {
+                        $customerFavoriteProducts = $this->Customer->getCustomerFavoriteProducts($this->Customer->getCustomerId());
+                    }
                     foreach ($products as &$product) {
                         if(is_file(ASSETS_PATH . DS . substr($product['image'], strlen(ASSETS_URL)))) {
                             $product['image'] = ASSETS_URL . $Image->resize(substr($product['image'], strlen(ASSETS_URL)), 400, 400);
@@ -97,6 +103,11 @@ class ControllerCategory extends Controller {
                         }
                         if($maximum_price === 0 || (!empty($product['special']) && $maximum_price < $product['special']) || $maximum_price < $product['price']) {
                             $maximum_price = !empty($product['special']) && $product['special'] < $maximum_price && $product['special'] > $product['price'] ? $product['special'] : $product['price'];
+                        }
+                        if(in_array($product['product_id'], $customerFavoriteProducts)) {
+                            $product['is_favorite'] = 1;
+                        }else {
+                            $product['is_favorite'] = 0;
                         }
                     }
                     $data['MinPrice']= $minimum_price;
